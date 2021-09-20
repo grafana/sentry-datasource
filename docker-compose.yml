@@ -1,0 +1,16 @@
+version: '3.7'
+
+services:
+  grafana:
+    image: grafana/grafana-enterprise:7.5.1
+    container_name: grafana-sentry-datasource
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./:/var/lib/grafana/plugins/grafana-sentry-datasource
+      - ./provisioning:/etc/grafana/provisioning
+    environment:
+      - TERM=linux
+      - GF_DEFAULT_APP_MODE=development
+      - GF_LOG_LEVEL=debug
+      - GF_DATAPROXY_LOGGING=true

@@ -1,0 +1,41 @@
+{
+  "name": "grafana-sentry-datasource",
+  "version": "0.0.1",
+  "description": "Grafana data source plugin for Sentry",
+  "main": "dist/module.js",
+  "author": "Grafana Labs",
+  "license": "SEE LICENSE IN LICENSE",
+  "private": true,
+  "scripts": {
+    "dev": "grafana-toolkit plugin:dev",
+    "watch": "grafana-toolkit plugin:dev --watch",
+    "start": "yarn watch",
+    "test": "grafana-toolkit plugin:test",
+    "e2e": "grafana-e2e run",
+    "e2e:open": "grafana-e2e open",
+    "e2e:update": "grafana-e2e run --update-screenshots",
+    "build": "grafana-toolkit plugin:build",
+    "ci-build": "grafana-toolkit plugin:ci-build"
+  },
+  "dependencies": {
+    "@grafana/data": "7.5.1",
+    "@grafana/runtime": "7.5.1",
+    "@grafana/ui": "7.5.1",
+    "rxjs": "6.3.3",
+    "tslib": "^2.3.1"
+  },
+  "devDependencies": {
+    "@grafana/e2e": "7.5.1",
+    "@grafana/e2e-selectors": "7.5.1",
+    "@grafana/toolkit": "7.5.1",
+    "@testing-library/dom": "^7.31.0",
+    "@testing-library/jest-dom": "^5.11.9",
+    "@testing-library/react": "^11.2.7",
+    "@testing-library/user-event": "^13.1.9",
+    "@types/lodash": "4.14.172",
+    "cypress": "^7.7.0"
+  },
+  "resolutions": {
+    "rxjs": "6.3.3"
+  }
+}
