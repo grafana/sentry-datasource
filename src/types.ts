@@ -4,8 +4,12 @@ import { DataSourceJsonData, DataQuery } from '@grafana/data';
 //#endregion
 
 //#region Config
-export interface SentryConfig extends DataSourceJsonData {}
-export interface SentrySecureConfig {}
+export interface SentryConfig extends DataSourceJsonData {
+  url: string;
+}
+export interface SentrySecureConfig {
+  authToken: string;
+}
 //#endregion
 
 //#region Query
@@ -20,4 +24,5 @@ export interface SentryVariableQuery {}
 //#endregion
 
 //#region Default values
+export const DEFAULT_SENTRY_URL = `https://sentry.io`;
 //#endregion

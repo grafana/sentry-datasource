@@ -5,7 +5,7 @@ import (
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/datasource"
-	"github.com/grafana/grafana-sentry-datasource/pkg/plugin"
+	"github.com/grafana/sentry-datasource/pkg/plugin"
 )
 
 func main() {

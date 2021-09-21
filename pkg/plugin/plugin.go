@@ -27,7 +27,7 @@ func getInstance(s backend.DataSourceInstanceSettings) (instancemgmt.Instance, e
 	if err != nil {
 		return nil, err
 	}
-	err = settings.validate()
+	err = settings.Validate()
 	if err != nil {
 		return nil, err
 	}
