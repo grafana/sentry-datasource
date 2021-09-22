@@ -8,14 +8,14 @@ import (
 
 type SentryConfig struct {
 	URL       string `json:"url"`
-	AuthToken string `json:"-"`
+	authToken string `json:"-"`
 }
 
 func (sc *SentryConfig) Validate() error {
 	if sc.URL == "" {
 		return ErrorInvalidSentryConfig
 	}
-	if sc.AuthToken == "" {
+	if sc.authToken == "" {
 		return ErrorInvalidAuthToken
 	}
 	return nil
@@ -32,11 +32,11 @@ func GetSettings(s backend.DataSourceInstanceSettings) (*SentryConfig, error) {
 		config.URL = DefaultSentryURL
 	}
 	if authToken, ok := s.DecryptedSecureJSONData["authToken"]; ok {
-		config.AuthToken = authToken
+		config.authToken = authToken
 	}
-	if config.AuthToken == "" {
+	if config.authToken == "" {
 		backend.Logger.Error(ErrorInvalidAuthToken.Error())
 		return nil, ErrorInvalidAuthToken
 	}
-	return config, nil
+	return config, config.Validate()
 }

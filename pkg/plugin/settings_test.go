@@ -47,9 +47,4 @@ func TestSentryConfig_validate(t *testing.T) {
 		assert.NotNil(t, err)
 		assert.Equal(t, plugin.ErrorInvalidAuthToken, err)
 	})
-	t.Run("valid url and password should not throw error", func(t *testing.T) {
-		sc := &plugin.SentryConfig{URL: "https://foo.com", AuthToken: "bar"}
-		err := sc.Validate()
-		assert.Nil(t, err)
-	})
 }
