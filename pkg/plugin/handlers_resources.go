@@ -11,14 +11,12 @@ import (
 	"github.com/grafana/sentry-datasource/pkg/sentry"
 )
 
-type SentryResourceQueryType string
-
-const (
-	SentryResourceQueryTypeOrganization SentryResourceQueryType = "organizations"
-)
+const SentryResourceQueryTypeOrganizations = "organizations"
+const SentryResourceQueryTypeProjects = "projects"
 
 type SentryResourceQuery struct {
-	Type SentryResourceQueryType `json:"type"`
+	Type    string `json:"type"`
+	OrgSlug string `json:"orgSlug"`
 }
 
 func GetResourceQuery(body []byte) (*SentryResourceQuery, error) {
@@ -52,12 +50,15 @@ func (ds *SentryDatasource) CallResource(ctx context.Context, req *backend.CallR
 }
 
 func CallResource(ctx context.Context, sentryClient sentry.SentryClient, query SentryResourceQuery) (interface{}, error) {
-	if query.Type == SentryResourceQueryTypeOrganization {
-		organizations, err := sentryClient.GetOrganizations()
-		if err != nil {
-			return nil, err
+	switch query.Type {
+	case SentryResourceQueryTypeOrganizations:
+		return sentryClient.GetOrganizations()
+	case SentryResourceQueryTypeProjects:
+		if query.OrgSlug == "" {
+			return nil, ErrorInvalidOrganizationSlug
 		}
-		return organizations, nil
+		return sentryClient.GetProjects(query.OrgSlug)
+	default:
+		return nil, ErrorInvalidResourceCallQuery
 	}
-	return nil, ErrorInvalidResourceCallQuery
 }

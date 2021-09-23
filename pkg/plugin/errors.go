@@ -10,4 +10,5 @@ var (
 	ErrorUnmarshalingSettings            = errors.New("error while unmarshaling settings")
 	ErrorInvalidSentryConfig             = errors.New("invalid sentry configuration")
 	ErrorInvalidAuthToken                = errors.New("empty or invalid auth token found")
+	ErrorInvalidOrganizationSlug         = errors.New("invalid organization slug")
 )

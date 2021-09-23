@@ -24,7 +24,22 @@ export const Components = {
     },
   },
   QueryEditor: {},
-  VariablesEditor: {},
+  VariablesEditor: {
+    QueryType: {
+      label: 'Query Type',
+      tooltip: 'Choose query type to get the relevant filters and results',
+      container: {
+        ariaLabel: 'Select your sentry variable query type here',
+      },
+    },
+    Organization: {
+      label: 'Organization',
+      tooltip: 'Select the organization slug',
+      container: {
+        ariaLabel: 'Select the sentry organization here to see its projects',
+      },
+    },
+  },
 };
 
 export const selectors: { components: E2ESelectors<typeof Components> } = {

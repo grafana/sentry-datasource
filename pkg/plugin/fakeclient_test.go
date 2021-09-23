@@ -41,16 +41,16 @@ func (fd *fakeDoer) Do(req *http.Request) (*http.Response, error) {
 	if fd.ExpectedError != nil {
 		return nil, fd.ExpectedError
 	}
-	switch fullurl := req.URL.String(); fullurl {
-	case fakeSentryUrl + "/api/0/organizations/":
+	if req.URL.String() == fakeSentryUrl+"/api/0/organizations/" {
 		res.Body = ioutil.NopCloser(bytes.NewBufferString("[]"))
-	default:
-		return nil, errors.New("fake client not implemented")
 	}
 	if fd.Body != "" {
 		res.Body = ioutil.NopCloser(bytes.NewBufferString(fd.Body))
 	}
-	return res, nil
+	if res.Body != nil {
+		return res, nil
+	}
+	return nil, errors.New("fake client not implemented")
 }
 
 func NewFakeClient(props fakeDoer) *sentry.SentryClient {
