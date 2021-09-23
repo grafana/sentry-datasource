@@ -46,6 +46,28 @@ export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryC
         } else {
           resolve([]);
         }
+      } else if (query && query.type === 'environments') {
+        if (query.orgSlug && query.projectId) {
+          this.getProjects(query.orgSlug)
+            .then((projects) => {
+              let matchingProject = projects.find((p) => p.id === query.projectId);
+              if (matchingProject) {
+                resolve(
+                  (matchingProject.environments || []).map((e) => {
+                    return {
+                      text: e,
+                      value: e,
+                    };
+                  })
+                );
+              } else {
+                resolve([]);
+              }
+            })
+            .catch(reject);
+        } else {
+          resolve([]);
+        }
       } else {
         reject('invalid query');
       }

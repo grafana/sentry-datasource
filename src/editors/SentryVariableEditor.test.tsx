@@ -20,6 +20,7 @@ describe('SentryVariableEditor', () => {
       const result = render(<SentryVariableEditor datasource={datasource} query={query} onChange={onChange} />);
       expect(result.container.firstChild).not.toBeNull();
       expect(result.getByTestId('variable-query-editor-query-type-selector-container')).toBeInTheDocument();
+      expect(result.queryByTestId('variable-query-editor-environments-filter')).not.toBeInTheDocument();
     });
   });
   describe('projects', () => {
@@ -30,6 +31,7 @@ describe('SentryVariableEditor', () => {
       const result = render(<SentryVariableEditor datasource={datasource} query={query} onChange={onChange} />);
       expect(result.container.firstChild).not.toBeNull();
       expect(result.queryByTestId('variable-query-editor-projects-filter')).not.toBeInTheDocument();
+      expect(result.queryByTestId('variable-query-editor-environments-filter')).not.toBeInTheDocument();
     });
     it(`should render projects filter for projects query`, async () => {
       const datasource = {} as SentryDataSource;
@@ -40,6 +42,21 @@ describe('SentryVariableEditor', () => {
       await waitFor(() => {
         expect(result.container.firstChild).not.toBeNull();
         expect(result.getByTestId('variable-query-editor-projects-filter')).toBeInTheDocument();
+        expect(result.queryByTestId('variable-query-editor-environments-filter')).not.toBeInTheDocument();
+      });
+    });
+  });
+  describe('environments', () => {
+    it(`should render environments filters for environments query`, async () => {
+      const datasource = {} as SentryDataSource;
+      datasource.getOrganizations = jest.fn(() => Promise.resolve([]));
+      const query = { type: 'environments' } as SentryVariableQuery;
+      const onChange = jest.fn();
+      const result = render(<SentryVariableEditor datasource={datasource} query={query} onChange={onChange} />);
+      await waitFor(() => {
+        expect(result.container.firstChild).not.toBeNull();
+        expect(result.getByTestId('variable-query-editor-projects-filter')).toBeInTheDocument();
+        expect(result.getByTestId('variable-query-editor-environments-filter')).toBeInTheDocument();
       });
     });
   });

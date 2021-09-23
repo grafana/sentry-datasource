@@ -6,6 +6,7 @@ const PROVISIONING_FILENAME = 'datasources/grafana-sentry-datasource.yaml';
 const SENTRY_ORGANIZATIONS_COUNT = 3;
 const SENTRY_E2E_ORGANIZATION_NAME = 'E2E Organization';
 const SENTRY_E2E_PROJECT_NAME = 'e2e-project';
+const SENTRY_E2E_ENVIRONMENT_NAME = 'production';
 
 const selectDropdown = (container: Cypress.Chainable<JQuery<HTMLElement>>, text: string) => {
   container.within(() => {
@@ -61,7 +62,7 @@ e2e.scenario({
                 .within(() => {
                   e2e.components.Select.singleValue().should('have.text', 'Query').click();
                 });
-              e2e.pages.Dashboard.Settings.Variables.Edit.General.generalNameInput().clear().type('something');
+              e2e.pages.Dashboard.Settings.Variables.Edit.General.generalNameInput().clear().type('variable1');
               e2e.pages.Dashboard.Settings.Variables.Edit.QueryVariable.queryOptionsDataSourceSelect()
                 .click()
                 .within(() => {
@@ -82,6 +83,17 @@ e2e.scenario({
                 .should('exist')
                 .within((previewOfValues) => {
                   expect(previewOfValues.text()).contains(SENTRY_E2E_PROJECT_NAME);
+                });
+              selectDropdown(e2eSelectors.VariablesEditor.QueryType.container.ariaLabel(), 'Environments');
+              cy.wait(2 * 1000);
+              selectDropdown(e2eSelectors.VariablesEditor.Organization.container.ariaLabel(), SENTRY_E2E_ORGANIZATION_NAME);
+              cy.wait(2 * 1000);
+              selectDropdown(e2eSelectors.VariablesEditor.Project.container.ariaLabel(), SENTRY_E2E_PROJECT_NAME);
+              cy.wait(2 * 1000);
+              e2e.pages.Dashboard.Settings.Variables.Edit.General.previewOfValuesOption()
+                .should('exist')
+                .within((previewOfValues) => {
+                  expect(previewOfValues.text()).contains(SENTRY_E2E_ENVIRONMENT_NAME);
                 });
             });
           });

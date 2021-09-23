@@ -8,6 +8,7 @@ export const TypeSelector = (props: { variableQueryType: VariableQueryType; onCh
   const options: Array<SelectableValue<VariableQueryType>> = [
     { value: 'organizations', label: 'Organizations' },
     { value: 'projects', label: 'Projects' },
+    { value: 'environments', label: 'Environments' },
   ];
   const { label, tooltip, container } = selectors.components.VariablesEditor.QueryType;
   return (
