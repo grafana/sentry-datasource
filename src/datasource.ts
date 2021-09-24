@@ -1,5 +1,6 @@
 import { DataSourceInstanceSettings, MetricFindValue } from '@grafana/data';
 import { DataSourceWithBackend } from '@grafana/runtime';
+import { replaceSentryVariableQuery } from './app/replace';
 import {
   ResourceCallOrganizationsResponse,
   ResourceCallProjectsResponse,
@@ -15,61 +16,57 @@ export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryC
     super(instanceSettings);
   }
   metricFindQuery(query: SentryVariableQuery): Promise<MetricFindValue[]> {
+    query = replaceSentryVariableQuery(query);
     return new Promise((resolve, reject) => {
       if (query && query.type === 'organizations') {
         this.getOrganizations()
           .then((organizations) => {
             resolve(
-              organizations.map((o) => {
+              organizations.map((organization) => {
                 return {
-                  value: o.slug,
-                  text: o.name,
+                  value: organization.slug,
+                  text: organization.name,
                 };
               })
             );
           })
           .catch(reject);
-      } else if (query && query.type === 'projects') {
-        if (query.orgSlug) {
-          this.getProjects(query.orgSlug)
-            .then((projects) => {
+      } else if (query && query.type === 'projects' && query.orgSlug) {
+        const orgSlug = query.orgSlug;
+        this.getProjects(orgSlug)
+          .then((projects) => {
+            resolve(
+              projects.map((project) => {
+                return {
+                  value: project.slug,
+                  text: project.name,
+                };
+              })
+            );
+          })
+          .catch(reject);
+      } else if (query && query.type === 'environments' && query.orgSlug && query.projectId) {
+        const orgSlug = query.orgSlug;
+        const projectId = query.projectId;
+        this.getProjects(orgSlug)
+          .then((projects) => {
+            let matchingProject = projects.find((p) => p.id === projectId);
+            if (matchingProject) {
               resolve(
-                projects.map((p) => {
+                (matchingProject.environments || []).map((environment) => {
                   return {
-                    value: p.slug,
-                    text: p.name,
+                    text: environment,
+                    value: environment,
                   };
                 })
               );
-            })
-            .catch(reject);
-        } else {
-          resolve([]);
-        }
-      } else if (query && query.type === 'environments') {
-        if (query.orgSlug && query.projectId) {
-          this.getProjects(query.orgSlug)
-            .then((projects) => {
-              let matchingProject = projects.find((p) => p.id === query.projectId);
-              if (matchingProject) {
-                resolve(
-                  (matchingProject.environments || []).map((e) => {
-                    return {
-                      text: e,
-                      value: e,
-                    };
-                  })
-                );
-              } else {
-                resolve([]);
-              }
-            })
-            .catch(reject);
-        } else {
-          resolve([]);
-        }
+            } else {
+              resolve([]);
+            }
+          })
+          .catch(reject);
       } else {
-        reject('invalid query');
+        resolve([]);
       }
     });
   }

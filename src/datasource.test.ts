@@ -1,13 +1,24 @@
+import * as runtime from '@grafana/runtime';
 import { DataSourceInstanceSettings } from '@grafana/data';
 import { SentryConfig, SentryVariableQuery } from './types';
 import { SentryDataSource } from './datasource';
 
 describe('SentryDataSource', () => {
+  beforeEach(() => {
+    jest.spyOn(runtime, 'getTemplateSrv').mockImplementation(() => ({
+      getVariables: jest.fn(),
+      replace: (s: string) => {
+        return s;
+      },
+    }));
+  });
   describe('metricFindQuery', () => {
-    it('expect error', () => {
+    it('expect no results when invalid query passed', async () => {
       const ds = new SentryDataSource({} as DataSourceInstanceSettings<SentryConfig>);
       const query = {} as SentryVariableQuery;
-      expect(() => ds.metricFindQuery(query)).rejects.toEqual('invalid query');
+      const results = await ds.metricFindQuery(query);
+      expect(results.length).toBe(0);
+      expect(results).toStrictEqual([]);
     });
     it('should return organizations name and slug correctly', async () => {
       const ds = new SentryDataSource({} as DataSourceInstanceSettings<SentryConfig>);
