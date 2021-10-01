@@ -40,7 +40,7 @@ export const Components = {
       },
     },
     Project: {
-      label: 'Project',
+      label: 'Project ID',
       tooltip: 'Select the project id',
       container: {
         ariaLabel: 'Select the sentry project here',

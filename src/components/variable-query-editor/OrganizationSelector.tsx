@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { InlineFormLabel, Select } from '@grafana/ui';
+import { getTemplateSrv } from '@grafana/runtime';
 import { SentryDataSource } from '../../datasource';
 import { selectors } from '../../selectors';
 import { SentryOrganization } from '../../types';
 
-export const OrgSlugSelector = (props: {
+export const OrganizationSelector = (props: {
   datasource: SentryDataSource;
   orgSlug: string;
-  onOrgSlugChange: (orgSlug: string, orgName: string, orgId: string) => void;
+  onOrgSlugChange: (orgSlug: string) => void;
   label?: string;
   tooltip?: string;
 }) => {
@@ -18,18 +19,24 @@ export const OrgSlugSelector = (props: {
     datasource.getOrganizations().then(setOrganizations).catch(console.error);
   }, [datasource]);
   const getOptions = () => {
-    return organizations.map((o) => {
+    const templateVariables = getTemplateSrv()
+      .getVariables()
+      .map((v) => {
+        return {
+          value: `\${${v.name}}`,
+          label: `var: \${${v.name}}`,
+        };
+      });
+    const organizationsVariables = organizations.map((o) => {
       return {
         value: o.slug,
         label: o.name,
       };
     });
+    return [...organizationsVariables, ...templateVariables];
   };
   const onOrgSlugChange = (orgSlug: string) => {
-    const matchingOrg = organizations.find((o) => o.slug === orgSlug);
-    if (matchingOrg) {
-      props.onOrgSlugChange(matchingOrg.slug, matchingOrg.name, matchingOrg.id);
-    }
+    props.onOrgSlugChange(orgSlug);
   };
   return (
     <>

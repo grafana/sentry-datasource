@@ -16,6 +16,7 @@ export const TypeSelector = (props: { variableQueryType: VariableQueryType; onCh
       <InlineFormLabel tooltip={tooltip}>{label}</InlineFormLabel>
       <div data-testid="variable-query-editor-query-type-select-container" aria-label={container.ariaLabel}>
         <Select<VariableQueryType>
+          value={props.variableQueryType}
           options={options}
           onChange={(e) => props.onChange(e.value as VariableQueryType)}
           className="width-30"
