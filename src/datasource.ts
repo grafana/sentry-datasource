@@ -1,5 +1,7 @@
+import flatten from 'lodash/flatten';
+import uniq from 'lodash/uniq';
 import { DataSourceInstanceSettings, MetricFindValue } from '@grafana/data';
-import { DataSourceWithBackend } from '@grafana/runtime';
+import { DataSourceWithBackend, getTemplateSrv } from '@grafana/runtime';
 import { replaceSentryVariableQuery } from './app/replace';
 import {
   ResourceCallOrganizationsResponse,
@@ -18,7 +20,7 @@ export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryC
   metricFindQuery(query: SentryVariableQuery): Promise<MetricFindValue[]> {
     query = replaceSentryVariableQuery(query);
     return new Promise((resolve, reject) => {
-      if (query && query.type === 'organizations') {
+      if (!query || (query && query.type === 'organizations')) {
         this.getOrganizations()
           .then((organizations) => {
             resolve(
@@ -38,28 +40,41 @@ export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryC
             resolve(
               projects.map((project) => {
                 return {
-                  value: project.slug,
-                  text: project.name,
+                  value: project.id,
+                  text: `${project.name} (${project.id})`,
                 };
               })
             );
           })
           .catch(reject);
-      } else if (query && query.type === 'environments' && query.orgSlug && query.projectId) {
+      } else if (query && query.type === 'environments' && query.orgSlug) {
         const orgSlug = query.orgSlug;
-        const projectId = query.projectId;
         this.getProjects(orgSlug)
           .then((projects) => {
-            let matchingProject = projects.find((p) => p.id === projectId);
-            if (matchingProject) {
-              resolve(
-                (matchingProject.environments || []).map((environment) => {
-                  return {
-                    text: environment,
-                    value: environment,
-                  };
-                })
-              );
+            if (query.type === 'environments') {
+              if (query.projectIds && query.projectIds.length > 0) {
+                const environments: string[] = uniq(
+                  flatten(
+                    projects
+                      .filter((p) => {
+                        return query.type === 'environments' && query.projectIds.includes(p.id);
+                      })
+                      .map((p) => p.environments || [])
+                  )
+                );
+                resolve(
+                  environments.map((e) => {
+                    return { value: e, text: e };
+                  })
+                );
+              } else {
+                const environments: string[] = uniq(flatten(projects.map((p) => p.environments || [])));
+                resolve(
+                  environments.map((e) => {
+                    return { value: e, text: e };
+                  })
+                );
+              }
             } else {
               resolve([]);
             }
@@ -77,6 +92,7 @@ export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryC
     return this.postResourceLocal({ type: 'organizations' }) as Promise<ResourceCallOrganizationsResponse>;
   }
   getProjects(orgSlug: string): Promise<ResourceCallProjectsResponse> {
-    return this.postResourceLocal({ type: 'projects', orgSlug }) as Promise<ResourceCallProjectsResponse>;
+    const replacedOrgSlug = getTemplateSrv().replace(orgSlug);
+    return this.postResourceLocal({ type: 'projects', orgSlug: replacedOrgSlug }) as Promise<ResourceCallProjectsResponse>;
   }
 }

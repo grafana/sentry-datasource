@@ -16,7 +16,7 @@ export const replaceSentryVariableQuery = (query: SentryVariableQuery): SentryVa
       return {
         ...query,
         orgSlug: getTemplateSrv().replace(query.orgSlug),
-        projectId: getTemplateSrv().replace(query.projectId),
+        projectIds: (query.projectIds || []).map((projectId) => getTemplateSrv().replace(projectId)),
       };
     default:
       return query;

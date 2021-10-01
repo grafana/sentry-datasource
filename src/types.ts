@@ -36,18 +36,10 @@ export interface SentryQuery extends DataQuery {}
 
 //#region Variable Query
 export type VariableQueryType = 'organizations' | 'projects' | 'environments';
-export type VariableQueryOrganizations = {
-  type: 'organizations';
-};
-export type VariableQueryProjects = {
-  type: 'projects';
-  orgSlug: string;
-};
-export type VariableQueryEnvironments = {
-  type: 'environments';
-  orgSlug: string;
-  projectId: string;
-};
+export type VariableQueryBase<T extends VariableQueryType> = { type: T };
+export type VariableQueryOrganizations = { valueField: 'slug' | 'id' | 'name' } & VariableQueryBase<'organizations'>;
+export type VariableQueryProjects = { orgSlug: string; valueField: 'slug' | 'id' | 'name' } & VariableQueryBase<'projects'>;
+export type VariableQueryEnvironments = { orgSlug: string; projectIds: string[] } & VariableQueryBase<'environments'>;
 export type SentryVariableQuery = VariableQueryOrganizations | VariableQueryProjects | VariableQueryEnvironments;
 //#endregion
 

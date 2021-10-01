@@ -1,7 +1,7 @@
 import React from 'react';
 import { TypeSelector } from '../components/variable-query-editor/TypeSelector';
-import { OrgSlugSelector } from '../components/variable-query-editor/OrgSlugSelector';
-import { ProjectIdSelector } from '../components/variable-query-editor/ProjectIdSelector';
+import { OrganizationSelector } from '../components/variable-query-editor/OrganizationSelector';
+import { ProjectSelector } from '../components/variable-query-editor/ProjectSelector';
 import { SentryDataSource } from './../datasource';
 import { SentryVariableQuery, VariableQueryType } from './../types';
 
@@ -12,20 +12,19 @@ type SentryVariableEditorProps = {
 };
 
 export const SentryVariableEditor = ({ query, onChange, datasource }: SentryVariableEditorProps) => {
-  query = query || { type: 'organizations' };
   const onVariableQueryTypeChange = (type: VariableQueryType) => {
     const newQuery: SentryVariableQuery = { ...query, type } as SentryVariableQuery;
     onChange(newQuery, JSON.stringify(newQuery));
   };
-  const onOrgSlugChange = (orgSlug: string, orgName: string, orgId: string) => {
+  const onOrgSlugChange = (orgSlug: string) => {
     if (query.type === 'projects' || query.type === 'environments') {
       let newQuery: SentryVariableQuery = { ...query, orgSlug };
       onChange(newQuery, JSON.stringify(newQuery));
     }
   };
-  const onProjectIdChange = (projectSlug: string, projectName: string, projectId: string) => {
+  const onProjectIdsChange = (projectIds: string[]) => {
     if (query.type === 'environments') {
-      const newQuery: SentryVariableQuery = { ...query, projectId };
+      const newQuery: SentryVariableQuery = { ...query, projectIds };
       onChange(newQuery, JSON.stringify(newQuery));
     }
   };
@@ -34,17 +33,22 @@ export const SentryVariableEditor = ({ query, onChange, datasource }: SentryVari
       <TypeSelector variableQueryType={query.type} onChange={onVariableQueryTypeChange}></TypeSelector>
       {(query.type === 'projects' || query.type === 'environments') && (
         <div className="gf-form" data-testid="variable-query-editor-projects-filter">
-          <OrgSlugSelector datasource={datasource} orgSlug={query.orgSlug || ''} onOrgSlugChange={onOrgSlugChange} />
+          <OrganizationSelector
+            datasource={datasource}
+            orgSlug={query.orgSlug || ''}
+            onOrgSlugChange={onOrgSlugChange}
+          ></OrganizationSelector>
         </div>
       )}
       {query.type === 'environments' && (
         <div className="gf-form" data-testid="variable-query-editor-environments-filter">
-          <ProjectIdSelector
+          <ProjectSelector
+            mode="id"
             datasource={datasource}
             orgSlug={query.orgSlug || ''}
-            projectId={query.projectId || ''}
-            onProjectIdChange={onProjectIdChange}
-          ></ProjectIdSelector>
+            values={query.projectIds || []}
+            onValuesChange={onProjectIdsChange}
+          ></ProjectSelector>
         </div>
       )}
     </>

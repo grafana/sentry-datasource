@@ -1,10 +1,21 @@
 import React from 'react';
+import * as runtime from '@grafana/runtime';
 import { render, waitFor } from '@testing-library/react';
 import { SentryDataSource } from './../datasource';
 import { SentryVariableEditor } from './SentryVariableEditor';
 import { SentryVariableQuery } from './../types';
 
 describe('SentryVariableEditor', () => {
+  beforeEach(() => {
+    jest.spyOn(runtime, 'getTemplateSrv').mockImplementation(() => ({
+      getVariables: () => {
+        return [];
+      },
+      replace: (s: string) => {
+        return s;
+      },
+    }));
+  });
   it('render without error', () => {
     const datasource = {} as SentryDataSource;
     const query = {} as SentryVariableQuery;
