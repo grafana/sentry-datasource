@@ -1,8 +1,7 @@
-import flatten from 'lodash/flatten';
-import uniq from 'lodash/uniq';
 import { DataSourceInstanceSettings, MetricFindValue } from '@grafana/data';
 import { DataSourceWithBackend, getTemplateSrv } from '@grafana/runtime';
 import { replaceSentryVariableQuery } from './app/replace';
+import { getEnvironmentNamesFromProject } from './app/utils';
 import {
   ResourceCallOrganizationsResponse,
   ResourceCallProjectsResponse,
@@ -52,29 +51,12 @@ export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryC
         this.getProjects(orgSlug)
           .then((projects) => {
             if (query.type === 'environments') {
-              if (query.projectIds && query.projectIds.length > 0) {
-                const environments: string[] = uniq(
-                  flatten(
-                    projects
-                      .filter((p) => {
-                        return query.type === 'environments' && query.projectIds.includes(p.id);
-                      })
-                      .map((p) => p.environments || [])
-                  )
-                );
-                resolve(
-                  environments.map((e) => {
-                    return { value: e, text: e };
-                  })
-                );
-              } else {
-                const environments: string[] = uniq(flatten(projects.map((p) => p.environments || [])));
-                resolve(
-                  environments.map((e) => {
-                    return { value: e, text: e };
-                  })
-                );
-              }
+              const environments = getEnvironmentNamesFromProject(projects, query.projectIds);
+              resolve(
+                environments.map((e) => {
+                  return { value: e, text: e };
+                })
+              );
             } else {
               resolve([]);
             }
@@ -85,14 +67,19 @@ export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryC
       }
     });
   }
-  private postResourceLocal(body: SentryResourceCallQuery): Promise<SentryResourceCallResponse> {
+  private postResourceLocal<T extends SentryResourceCallResponse>(body: SentryResourceCallQuery): Promise<T> {
     return this.postResource('', body);
   }
   getOrganizations(): Promise<ResourceCallOrganizationsResponse> {
-    return this.postResourceLocal({ type: 'organizations' }) as Promise<ResourceCallOrganizationsResponse>;
+    return this.postResourceLocal<ResourceCallOrganizationsResponse>({
+      type: 'organizations',
+    });
   }
   getProjects(orgSlug: string): Promise<ResourceCallProjectsResponse> {
     const replacedOrgSlug = getTemplateSrv().replace(orgSlug);
-    return this.postResourceLocal({ type: 'projects', orgSlug: replacedOrgSlug }) as Promise<ResourceCallProjectsResponse>;
+    return this.postResourceLocal<ResourceCallProjectsResponse>({
+      type: 'projects',
+      orgSlug: replacedOrgSlug,
+    });
   }
 }

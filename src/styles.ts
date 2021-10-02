@@ -1,7 +1,11 @@
 import { css } from 'emotion';
 
 export const styles = {
-  Common: css``,
+  Common: {
+    InlineElement: css`
+      margin-right: 5px;
+    `,
+  },
   ConfigEditor: {
     Heading: css`
       margin-bottom: 20px;

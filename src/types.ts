@@ -1,4 +1,4 @@
-import { DataSourceJsonData, DataQuery } from '@grafana/data';
+import { DataSourceJsonData, DataQuery, SelectableValue } from '@grafana/data';
 
 //#region Constants
 //#endregion
@@ -19,6 +19,7 @@ export type SentryProject = {
   team: { id: string; name: string; slug: string };
   teams: Array<{ id: string; name: string; slug: string }>;
 };
+export type SentryIssueSort = 'inbox' | 'new' | 'date' | 'priority' | 'freq' | 'user';
 //#endregion
 
 //#region Config
@@ -31,7 +32,17 @@ export interface SentrySecureConfig {
 //#endregion
 
 //#region Query
-export interface SentryQuery extends DataQuery {}
+export type QueryType = 'issues';
+export type SentryQueryBase<T extends QueryType> = { queryType: T } & DataQuery;
+export type SentryIssuesQuery = {
+  orgSlug: string;
+  projectIds: string[];
+  environments: string[];
+  issuesQuery: string;
+  issuesSort?: SentryIssueSort;
+  issuesLimit?: number;
+} & SentryQueryBase<'issues'>;
+export type SentryQuery = SentryIssuesQuery;
 //#endregion
 
 //#region Variable Query
@@ -61,6 +72,15 @@ export type SentryResourceCallResponse = ResourceCallOrganizationsResponse | Res
 //#endregion
 
 //#region Selectable values
+export const QueryTypeOptions: Array<SelectableValue<QueryType>> = [{ value: 'issues', label: 'Issues' }];
+export const SentryIssueSortOptions: Array<SelectableValue<SentryIssueSort>> = [
+  // { value: 'inbox', label: 'Date Added' },
+  { value: 'date', label: 'Last Seen' },
+  { value: 'new', label: 'First Seen' },
+  { value: 'priority', label: 'Priority' },
+  { value: 'freq', label: 'Events' },
+  { value: 'user', label: 'Users' },
+];
 //#endregion
 
 //#region Default values

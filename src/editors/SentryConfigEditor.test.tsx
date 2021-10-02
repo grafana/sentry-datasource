@@ -24,10 +24,10 @@ describe('SentryConfigEditor', () => {
     ).not.toBeInTheDocument();
   });
   it('render existing datasource without error', () => {
-    const options = { jsonData: { url: 'https://foo.com' }, secureJsonFields: { authToken: true } as any } as DataSourceSettings<
-      SentryConfig,
-      SentrySecureConfig
-    >;
+    const options = {
+      jsonData: { url: 'https://foo.com' },
+      secureJsonFields: { authToken: true } as any,
+    } as DataSourceSettings<SentryConfig, SentrySecureConfig>;
     const onOptionsChange = jest.fn();
     const result = render(<SentryConfigEditor options={options} onOptionsChange={onOptionsChange} />);
     expect(result.container.firstChild).not.toBeNull();
