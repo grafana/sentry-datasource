@@ -2,16 +2,27 @@ package plugin
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/grafana/grafana-plugin-sdk-go/data/framestruct"
 	"github.com/grafana/sentry-datasource/pkg/sentry"
 )
 
 type SentryQuery struct {
+	QueryType    string   `json:"queryType"`
+	OrgSlug      string   `json:"orgSlug,omitempty"`
+	ProjectIds   []string `json:"projectIds,omitempty"`
+	Environments []string `json:"environments,omitempty"`
+	IssuesQuery  string   `json:"issuesQuery,omitempty"`
+	IssuesSort   string   `json:"issuesSort,omitempty"`
+	IssuesLimit  int64    `json:"issuesLimit,omitempty"`
 }
 
 func GetQuery(query backend.DataQuery) (SentryQuery, error) {
-	return SentryQuery{}, ErrorQueryParsingNotImplemented
+	var out SentryQuery
+	err := json.Unmarshal(query.JSON, &out)
+	return out, err
 }
 
 func (ds *SentryDatasource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
@@ -22,16 +33,44 @@ func (ds *SentryDatasource) QueryData(ctx context.Context, req *backend.QueryDat
 		return response, nil
 	}
 	for _, q := range req.Queries {
-		res := ds.query(ctx, req.PluginContext, q, dsi.sentryClient)
+		res := QueryData(ctx, req.PluginContext, q, dsi.sentryClient)
 		response.Responses[q.RefID] = res
 	}
 	return response, nil
 }
 
-func (ds *SentryDatasource) query(_ context.Context, pCtx backend.PluginContext, query backend.DataQuery, client sentry.SentryClient) backend.DataResponse {
-	_, err := GetQuery(query)
+func QueryData(ctx context.Context, pCtx backend.PluginContext, backendQuery backend.DataQuery, client sentry.SentryClient) backend.DataResponse {
+	response := backend.DataResponse{}
+	query, err := GetQuery(backendQuery)
 	if err != nil {
-		return backend.DataResponse{Error: err}
+		return GetErrorResponse(response, "", err)
 	}
-	return backend.DataResponse{Error: ErrorQueryDataNotImplemented}
+	switch query.QueryType {
+	case "issues":
+		if query.OrgSlug == "" {
+			return GetErrorResponse(response, "", ErrorInvalidOrganizationSlug)
+		}
+		issues, executedQueryString, err := client.GetIssues(sentry.GetIssuesInput{
+			OrganizationSlug: query.OrgSlug,
+			ProjectIds:       query.ProjectIds,
+			Environments:     query.Environments,
+			Query:            query.IssuesQuery,
+			Sort:             query.IssuesSort,
+			Limit:            query.IssuesLimit,
+			From:             backendQuery.TimeRange.From,
+			To:               backendQuery.TimeRange.To,
+		})
+		if err != nil {
+			return GetErrorResponse(response, executedQueryString, err)
+		}
+		frame, err := framestruct.ToDataFrame(GetFrameName("Issues", backendQuery.RefID), issues)
+		if err != nil {
+			return GetErrorResponse(response, executedQueryString, err)
+		}
+		frame = UpdateFrameMeta(frame, executedQueryString)
+		response.Frames = append(response.Frames, frame)
+	default:
+		response.Error = ErrorUnknownQueryType
+	}
+	return response
 }

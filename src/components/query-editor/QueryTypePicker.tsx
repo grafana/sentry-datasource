@@ -22,7 +22,7 @@ export const QueryTypePicker = ({ query, onChange }: QueryTypePickerProps) => {
         options={QueryTypeOptions}
         value={query.queryType}
         onChange={(e) => onQueryTypeChange(e.value)}
-        width={24}
+        width={28}
       ></Select>
     </div>
   );

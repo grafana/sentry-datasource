@@ -14,6 +14,7 @@ export const IssuesEditor = ({ query, onChange, onRunQuery }: IssuesEditorProps)
   };
   const onIssuesSortChange = (issuesSort: SentryIssueSort) => {
     onChange({ ...query, issuesSort: issuesSort || undefined });
+    onRunQuery();
   };
   const onIssuesLimitChange = (issuesLimit?: number) => {
     onChange({ ...query, issuesLimit: issuesLimit || undefined });
@@ -25,7 +26,12 @@ export const IssuesEditor = ({ query, onChange, onRunQuery }: IssuesEditorProps)
           {selectors.components.QueryEditor.Issues.Query.label}
         </InlineFormLabel>
         {/* TODO: Replace input with CodeEditor */}
-        <Input value={query.issuesQuery} onChange={(e) => onIssuesQueryChange(e.currentTarget.value)} onBlur={onRunQuery} />
+        <Input
+          value={query.issuesQuery}
+          onChange={(e) => onIssuesQueryChange(e.currentTarget.value)}
+          onBlur={onRunQuery}
+          placeholder={selectors.components.QueryEditor.Issues.Query.placeholder}
+        />
       </div>
       <div className="gf-form">
         <InlineFormLabel width={10} className="query-keyword" tooltip={selectors.components.QueryEditor.Issues.Sort.tooltip}>
@@ -34,12 +40,13 @@ export const IssuesEditor = ({ query, onChange, onRunQuery }: IssuesEditorProps)
         <Select
           options={SentryIssueSortOptions}
           value={query.issuesSort}
-          width={30}
+          width={28}
           onChange={(e) => onIssuesSortChange(e?.value!)}
           className={styles.Common.InlineElement}
+          placeholder={selectors.components.QueryEditor.Issues.Sort.placeholder}
           isClearable={true}
         />
-        <InlineFormLabel width={10} className="query-keyword" tooltip={selectors.components.QueryEditor.Issues.Limit.tooltip}>
+        <InlineFormLabel width={8} className="query-keyword" tooltip={selectors.components.QueryEditor.Issues.Limit.tooltip}>
           {selectors.components.QueryEditor.Issues.Limit.label}
         </InlineFormLabel>
         <Input
@@ -47,7 +54,7 @@ export const IssuesEditor = ({ query, onChange, onRunQuery }: IssuesEditorProps)
           type="number"
           onChange={(e) => onIssuesLimitChange(e.currentTarget.valueAsNumber)}
           onBlur={onRunQuery}
-          width={24}
+          width={32}
           className={styles.Common.InlineElement}
           placeholder={selectors.components.QueryEditor.Issues.Limit.placeholder}
         />

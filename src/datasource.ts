@@ -1,4 +1,5 @@
-import { DataSourceInstanceSettings, MetricFindValue } from '@grafana/data';
+import { Observable } from 'rxjs';
+import { DataSourceInstanceSettings, MetricFindValue, DataQueryRequest, DataQueryResponse } from '@grafana/data';
 import { DataSourceWithBackend, getTemplateSrv } from '@grafana/runtime';
 import { replaceSentryVariableQuery } from './app/replace';
 import { getEnvironmentNamesFromProject } from './app/utils';
@@ -15,6 +16,9 @@ import {
 export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryConfig> {
   constructor(instanceSettings: DataSourceInstanceSettings<SentryConfig>) {
     super(instanceSettings);
+  }
+  query(request: DataQueryRequest<SentryQuery>): Observable<DataQueryResponse> {
+    return super.query({ ...request, targets: request.targets });
   }
   metricFindQuery(query: SentryVariableQuery): Promise<MetricFindValue[]> {
     query = replaceSentryVariableQuery(query);

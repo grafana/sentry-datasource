@@ -36,20 +36,24 @@ export const Components = {
       ProjectIDs: {
         label: 'Project IDs',
         tooltip: 'Optionally filter results by project IDs',
+        placeholder: 'optional',
       },
       Environments: {
         label: 'Environments',
         tooltip: 'Optionally filter results by environment names',
+        placeholder: 'optional',
       },
     },
     Issues: {
       Query: {
         label: 'Query',
         tooltip: 'Sentry query to filter the results',
+        placeholder: 'is:unresolved',
       },
       Sort: {
         label: 'Sort By',
         tooltip: 'Sort results',
+        placeholder: 'optional',
       },
       Limit: {
         label: 'Limit',
