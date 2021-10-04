@@ -67,7 +67,7 @@ func QueryData(ctx context.Context, pCtx backend.PluginContext, backendQuery bac
 		if err != nil {
 			return GetErrorResponse(response, executedQueryString, err)
 		}
-		frame = UpdateFrameMeta(frame, executedQueryString)
+		frame = UpdateFrameMeta(frame, executedQueryString, query, client.BaseURL)
 		response.Frames = append(response.Frames, frame)
 	default:
 		response.Error = ErrorUnknownQueryType

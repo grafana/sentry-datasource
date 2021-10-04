@@ -11,9 +11,22 @@ func GetFrameName(frameName string, refID string) string {
 	return fmt.Sprintf("%s (%s)", frameName, refID)
 }
 
-func UpdateFrameMeta(frame *data.Frame, executedQueryString string) *data.Frame {
+func UpdateFrameMeta(frame *data.Frame, executedQueryString string, query SentryQuery, baseURL string) *data.Frame {
 	frame.Meta = &data.FrameMeta{
 		ExecutedQueryString: executedQueryString,
+	}
+	for i := range frame.Fields {
+		if frame.Fields[i].Name == "ID" && query.QueryType == "issues" {
+			frame.Fields[i].Config = &data.FieldConfig{
+				Links: []data.DataLink{
+					{
+						Title:       "Open in Sentry",
+						URL:         fmt.Sprintf("%s/organizations/%s/issues/${__data.fields[\"ID\"]}/", baseURL, query.OrgSlug),
+						TargetBlank: true,
+					},
+				},
+			}
+		}
 	}
 	return frame
 }
