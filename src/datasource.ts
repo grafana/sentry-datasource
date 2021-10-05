@@ -17,6 +17,7 @@ export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryC
   constructor(instanceSettings: DataSourceInstanceSettings<SentryConfig>) {
     super(instanceSettings);
   }
+  annotations = {};
   filterQuery(query: SentryQuery): boolean {
     return !(query.hide === true);
   }
