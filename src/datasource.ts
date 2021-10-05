@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
-import { DataSourceInstanceSettings, MetricFindValue, DataQueryRequest, DataQueryResponse } from '@grafana/data';
+import { DataSourceInstanceSettings, MetricFindValue, DataQueryRequest, DataQueryResponse, ScopedVars } from '@grafana/data';
 import { DataSourceWithBackend, getTemplateSrv } from '@grafana/runtime';
-import { replaceSentryVariableQuery } from './app/replace';
+import { applyTemplateVariables, applyTemplateVariablesToVariableQuery } from './app/replace';
 import { getEnvironmentNamesFromProject } from './app/utils';
 import {
   ResourceCallOrganizationsResponse,
@@ -17,11 +17,17 @@ export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryC
   constructor(instanceSettings: DataSourceInstanceSettings<SentryConfig>) {
     super(instanceSettings);
   }
+  filterQuery(query: SentryQuery): boolean {
+    return !(query.hide === true);
+  }
+  applyTemplateVariables(query: SentryQuery, scopedVars: ScopedVars): SentryQuery {
+    return applyTemplateVariables(query, scopedVars);
+  }
   query(request: DataQueryRequest<SentryQuery>): Observable<DataQueryResponse> {
     return super.query({ ...request, targets: request.targets });
   }
   metricFindQuery(query: SentryVariableQuery): Promise<MetricFindValue[]> {
-    query = replaceSentryVariableQuery(query);
+    query = applyTemplateVariablesToVariableQuery(query);
     return new Promise((resolve, reject) => {
       if (!query || (query && query.type === 'organizations')) {
         this.getOrganizations()

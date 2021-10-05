@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
+import { getTemplateSrv } from '@grafana/runtime';
 import { InlineFormLabel, Select, MultiSelect } from '@grafana/ui';
 import { SentryDataSource } from './../../datasource';
 import { getEnvironmentNamesFromProject } from './../../app/utils';
+import { replaceProjectIDs } from './../../app/replace';
 import { selectors } from './../../selectors';
 import { SentryConfig, SentryOrganization, SentryProject, SentryQuery } from './../../types';
-import { styles } from './../../styles';
 
 type ScopePickerProps = Pick<
   QueryEditorProps<SentryDataSource, SentryQuery, SentryConfig>,
@@ -27,22 +28,38 @@ export const ScopePicker = (props: ScopePickerProps) => {
     }
   }, [datasource, orgSlug]);
   useEffect(() => {
-    setAllEnvironments(getEnvironmentNamesFromProject(projects, projectIds));
+    const updatedProjectIDs = replaceProjectIDs(projectIds);
+    setAllEnvironments(getEnvironmentNamesFromProject(projects, updatedProjectIDs));
   }, [projects, projectIds]);
   const getOrganizationsAsOptions = (): Array<SelectableValue<string>> => {
-    return organizations.map((o) => {
-      return { value: o.slug, label: o.name };
-    });
+    return [
+      ...organizations.map((o) => {
+        return { value: o.slug, label: o.name };
+      }),
+      ...(getTemplateSrv().getVariables() || []).map((o) => {
+        return { value: `\${${o.name}}`, label: `var: ${o.label || o.name}` };
+      }),
+    ];
   };
   const getProjectsAsOptions = (): Array<SelectableValue<string>> => {
-    return projects.map((o) => {
-      return { value: o.id, label: o.name };
-    });
+    return [
+      ...projects.map((o) => {
+        return { value: o.id, label: o.name };
+      }),
+      ...(getTemplateSrv().getVariables() || []).map((o) => {
+        return { value: `\${${o.name}}`, label: `var: ${o.label || o.name}` };
+      }),
+    ];
   };
   const getEnvironmentsAsOptions = (): Array<SelectableValue<string>> => {
-    return allEnvironments.map((e) => {
-      return { value: e, label: e };
-    });
+    return [
+      ...allEnvironments.map((e) => {
+        return { value: e, label: e };
+      }),
+      ...(getTemplateSrv().getVariables() || []).map((o) => {
+        return { value: `\${${o.name}}`, label: `var: ${o.label || o.name}` };
+      }),
+    ];
   };
   const onOrgSlugChange = (orgSlug = '') => {
     onChange({ ...query, orgSlug, projectIds: [] });
@@ -50,7 +67,7 @@ export const ScopePicker = (props: ScopePickerProps) => {
   };
   const onProjectIDsChange = (projectIds: string[] = []) => {
     const applicableEnvironments = getEnvironmentNamesFromProject(projects, projectIds);
-    const filteredEnvironments = environments.filter((e) => applicableEnvironments.includes(e));
+    const filteredEnvironments = (environments || []).filter((e) => applicableEnvironments.includes(e));
     onChange({ ...query, projectIds, environments: projectIds.length > 0 ? filteredEnvironments : [] });
     onRunQuery();
   };
@@ -68,7 +85,7 @@ export const ScopePicker = (props: ScopePickerProps) => {
         value={orgSlug}
         onChange={(e) => onOrgSlugChange(e.value)}
         options={getOrganizationsAsOptions()}
-        className={styles.Common.InlineElement}
+        className="inline-element"
       />
       <InlineFormLabel width={8} className="query-keyword" tooltip={selectors.components.QueryEditor.Scope.ProjectIDs.tooltip}>
         {selectors.components.QueryEditor.Scope.ProjectIDs.label}
@@ -78,7 +95,7 @@ export const ScopePicker = (props: ScopePickerProps) => {
         value={projectIds}
         onChange={(projects) => onProjectIDsChange(projects.map((p) => p.value!))}
         options={getProjectsAsOptions()}
-        className={styles.Common.InlineElement}
+        className="inline-element"
         placeholder={selectors.components.QueryEditor.Scope.ProjectIDs.placeholder}
       />
       <InlineFormLabel width={8} className="query-keyword" tooltip={selectors.components.QueryEditor.Scope.Environments.tooltip}>
@@ -89,7 +106,7 @@ export const ScopePicker = (props: ScopePickerProps) => {
         value={environments}
         onChange={(e) => onEnvironmentsChange(e.map((ei) => ei.value!))}
         options={getEnvironmentsAsOptions()}
-        className={styles.Common.InlineElement}
+        className="inline-element"
         placeholder={selectors.components.QueryEditor.Scope.Environments.placeholder}
       />
     </div>

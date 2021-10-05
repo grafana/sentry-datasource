@@ -22,6 +22,7 @@ export const QueryTypePicker = ({ query, onChange }: QueryTypePickerProps) => {
         options={QueryTypeOptions}
         value={query.queryType}
         onChange={(e) => onQueryTypeChange(e.value)}
+        className="inline-element"
         width={28}
       ></Select>
     </div>

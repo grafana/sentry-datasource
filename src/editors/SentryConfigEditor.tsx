@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { InlineFormLabel, Input, Button } from '@grafana/ui';
 import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
 import { Components } from './../selectors';
-import { styles } from './../styles';
 import { DEFAULT_SENTRY_URL, SentryConfig, SentrySecureConfig } from './../types';
 
 type SentryConfigEditorProps = {} & DataSourcePluginOptionsEditorProps<SentryConfig, SentrySecureConfig>;
@@ -34,8 +33,8 @@ export const SentryConfigEditor = (props: SentryConfigEditorProps) => {
     });
   };
   return (
-    <>
-      <h4 className={styles.ConfigEditor.Heading}>{ConfigEditorSelectors.SentrySettings.GroupTitle}</h4>
+    <div className="grafana-sentry-datasource config-editor">
+      <h4 className="heading">{ConfigEditorSelectors.SentrySettings.GroupTitle}</h4>
       <div className="gf-form" data-testid="sentry-config-editor-url-row">
         <InlineFormLabel tooltip={ConfigEditorSelectors.SentrySettings.URL.tooltip} width={labelWidth}>
           {ConfigEditorSelectors.SentrySettings.URL.label}
@@ -59,7 +58,7 @@ export const SentryConfigEditor = (props: SentryConfigEditorProps) => {
             <Input type="text" value="Configured" disabled={true} width={valueWidth * 2}></Input>
             <Button
               variant="secondary"
-              className={styles.ConfigEditor.ResetButton}
+              className="reset-button"
               onClick={() => {
                 setAuthToken('');
                 onSecureFieldReset('authToken');
@@ -83,6 +82,6 @@ export const SentryConfigEditor = (props: SentryConfigEditorProps) => {
         )}
       </div>
       <br />
-    </>
+    </div>
   );
 };

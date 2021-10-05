@@ -4,7 +4,6 @@ import { InlineFormLabel, Input, Select } from '@grafana/ui';
 import { SentryDataSource } from '../../datasource';
 import { selectors } from '../../selectors';
 import { SentryConfig, SentryQuery, SentryIssueSort, SentryIssueSortOptions } from '../../types';
-import { styles } from '../../styles';
 
 type IssuesEditorProps = Pick<QueryEditorProps<SentryDataSource, SentryQuery, SentryConfig>, 'query' | 'onChange' | 'onRunQuery'>;
 
@@ -42,7 +41,7 @@ export const IssuesEditor = ({ query, onChange, onRunQuery }: IssuesEditorProps)
           value={query.issuesSort}
           width={28}
           onChange={(e) => onIssuesSortChange(e?.value!)}
-          className={styles.Common.InlineElement}
+          className="inline-element"
           placeholder={selectors.components.QueryEditor.Issues.Sort.placeholder}
           isClearable={true}
         />
@@ -55,7 +54,7 @@ export const IssuesEditor = ({ query, onChange, onRunQuery }: IssuesEditorProps)
           onChange={(e) => onIssuesLimitChange(e.currentTarget.valueAsNumber)}
           onBlur={onRunQuery}
           width={32}
-          className={styles.Common.InlineElement}
+          className="inline-element"
           placeholder={selectors.components.QueryEditor.Issues.Limit.placeholder}
         />
       </div>
