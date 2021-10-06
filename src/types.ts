@@ -9,10 +9,15 @@ export type SentryOrganization = {
   name: string;
   slug: string;
   dateCreated: string;
-  status: {
-    id: string;
-    name: string;
-  };
+  status: { id: string; name: string };
+};
+export type SentryProject = {
+  id: string;
+  name: string;
+  slug: string;
+  environments: string[];
+  team: { id: string; name: string; slug: string };
+  teams: Array<{ id: string; name: string; slug: string }>;
 };
 //#endregion
 
@@ -30,19 +35,29 @@ export interface SentryQuery extends DataQuery {}
 //#endregion
 
 //#region Variable Query
-export interface SentryVariableQuery {}
+export type VariableQueryType = 'organizations' | 'projects' | 'environments';
+export type VariableQueryBase<T extends VariableQueryType> = { type: T };
+export type VariableQueryOrganizations = {} & VariableQueryBase<'organizations'>;
+export type VariableQueryProjects = { orgSlug: string } & VariableQueryBase<'projects'>;
+export type VariableQueryEnvironments = { orgSlug: string; projectIds: string[] } & VariableQueryBase<'environments'>;
+export type SentryVariableQuery = VariableQueryOrganizations | VariableQueryProjects | VariableQueryEnvironments;
 //#endregion
 
 //#region Resource call Query
 export type ResourceCallOrganizations = {
   type: 'organizations';
 };
-export type SentryResourceCallQuery = ResourceCallOrganizations;
+export type ResourceCallProjects = {
+  type: 'projects';
+  orgSlug: string;
+};
+export type SentryResourceCallQuery = ResourceCallOrganizations | ResourceCallProjects;
 //#endregion
 
 //#region Resource call Response
 export type ResourceCallOrganizationsResponse = SentryOrganization[];
-export type SentryResourceCallResponse = ResourceCallOrganizationsResponse;
+export type ResourceCallProjectsResponse = SentryProject[];
+export type SentryResourceCallResponse = ResourceCallOrganizationsResponse | ResourceCallProjectsResponse;
 //#endregion
 
 //#region Selectable values
