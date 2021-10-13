@@ -5,6 +5,7 @@
   "id": "grafana-sentry-datasource",
   "metrics": true,
   "backend": true,
+  "annotations": true,
   "executable": "gpx_sentry-datasource",
   "info": {
     "description": "Grafana datasource plugin for Sentry",

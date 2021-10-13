@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { InlineFormLabel, Input, Button } from '@grafana/ui';
 import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
 import { Components } from './../selectors';
-import { styles } from './../styles';
 import { DEFAULT_SENTRY_URL, SentryConfig, SentrySecureConfig } from './../types';
 
 type SentryConfigEditorProps = {} & DataSourcePluginOptionsEditorProps<SentryConfig, SentrySecureConfig>;
@@ -16,26 +15,26 @@ export const SentryConfigEditor = (props: SentryConfigEditorProps) => {
   const { ConfigEditor: ConfigEditorSelectors } = Components;
   const labelWidth = 10;
   const valueWidth = 20;
-  const onFieldChange = (field: keyof SentryConfig, value: string) => {
-    onOptionsChange({ ...options, [field]: value });
-  };
-  const onSecureFieldChange = (key: keyof SentrySecureConfig, value: string) => {
+  const onOptionChange = <Key extends keyof SentryConfig, Value extends SentryConfig[Key]>(option: Key, value: Value) => {
     onOptionsChange({
       ...options,
-      secureJsonData: { ...secureJsonData, [key]: value },
-      secureJsonFields: { ...secureJsonFields, [key]: true },
+      jsonData: { ...jsonData, [option]: value },
     });
   };
-  const onSecureFieldReset = (key: keyof SentrySecureConfig) => {
+  const onSecureOptionChange = <Key extends keyof SentrySecureConfig, Value extends SentrySecureConfig[Key]>(
+    option: Key,
+    value: Value,
+    set: boolean
+  ) => {
     onOptionsChange({
       ...options,
-      secureJsonData: { ...secureJsonData, [key]: '' },
-      secureJsonFields: { ...secureJsonFields, [key]: false },
+      secureJsonData: { ...secureJsonData, [option]: value },
+      secureJsonFields: { ...secureJsonFields, [option]: set },
     });
   };
   return (
-    <>
-      <h4 className={styles.ConfigEditor.Heading}>{ConfigEditorSelectors.SentrySettings.GroupTitle}</h4>
+    <div className="grafana-sentry-datasource config-editor">
+      <h4 className="heading">{ConfigEditorSelectors.SentrySettings.GroupTitle}</h4>
       <div className="gf-form" data-testid="sentry-config-editor-url-row">
         <InlineFormLabel tooltip={ConfigEditorSelectors.SentrySettings.URL.tooltip} width={labelWidth}>
           {ConfigEditorSelectors.SentrySettings.URL.label}
@@ -46,7 +45,7 @@ export const SentryConfigEditor = (props: SentryConfigEditorProps) => {
           aria-label={ConfigEditorSelectors.SentrySettings.URL.ariaLabel}
           value={url}
           onChange={(e) => setURL(e.currentTarget.value)}
-          onBlur={() => onFieldChange('url', url)}
+          onBlur={() => onOptionChange('url', url)}
           width={valueWidth * 2}
         ></Input>
       </div>
@@ -59,10 +58,10 @@ export const SentryConfigEditor = (props: SentryConfigEditorProps) => {
             <Input type="text" value="Configured" disabled={true} width={valueWidth * 2}></Input>
             <Button
               variant="secondary"
-              className={styles.ConfigEditor.ResetButton}
+              className="reset-button"
               onClick={() => {
                 setAuthToken('');
-                onSecureFieldReset('authToken');
+                onSecureOptionChange('authToken', authToken, false);
               }}
             >
               {ConfigEditorSelectors.SentrySettings.AuthToken.Reset.label}
@@ -77,12 +76,12 @@ export const SentryConfigEditor = (props: SentryConfigEditorProps) => {
               value={authToken}
               width={valueWidth * 2}
               onChange={(e) => setAuthToken(e.currentTarget.value)}
-              onBlur={() => onSecureFieldChange('authToken', authToken)}
+              onBlur={() => onSecureOptionChange('authToken', authToken, true)}
             ></Input>
           </>
         )}
       </div>
       <br />
-    </>
+    </div>
   );
 };

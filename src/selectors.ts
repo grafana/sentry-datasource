@@ -23,7 +23,49 @@ export const Components = {
       },
     },
   },
-  QueryEditor: {},
+  QueryEditor: {
+    QueryType: {
+      label: 'Query Type',
+      tooltip: 'Choose query type',
+    },
+    Scope: {
+      Organization: {
+        label: 'Organization',
+        tooltip: 'Choose the sentry organization',
+      },
+      ProjectIDs: {
+        label: 'Project IDs',
+        tooltip: 'Optionally filter results by project IDs',
+        placeholder: 'optional',
+      },
+      Environments: {
+        label: 'Environments',
+        tooltip: 'Optionally filter results by environment names',
+        placeholder: 'optional',
+      },
+    },
+    Issues: {
+      Query: {
+        label: 'Query',
+        tooltip: 'Sentry query to filter the results',
+        placeholder: 'is:unresolved',
+      },
+      Sort: {
+        label: 'Sort By',
+        tooltip: 'Sort results',
+        placeholder: 'optional',
+      },
+      Limit: {
+        label: 'Limit',
+        tooltip: 'Number of results',
+        placeholder: '100',
+      },
+    },
+    Preview: {
+      label: 'Query Preview',
+      tooltip: 'JSON preview of the generated query schema',
+    },
+  },
   VariablesEditor: {
     QueryType: {
       label: 'Query Type',

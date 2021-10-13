@@ -10,5 +10,6 @@ var (
 	ErrorUnmarshalingSettings            = errors.New("error while unmarshaling settings")
 	ErrorInvalidSentryConfig             = errors.New("invalid sentry configuration")
 	ErrorInvalidAuthToken                = errors.New("empty or invalid auth token found")
-	ErrorInvalidOrganizationSlug         = errors.New("invalid organization slug")
+	ErrorInvalidOrganizationSlug         = errors.New("invalid or empty organization slug")
+	ErrorUnknownQueryType                = errors.New("unknown query type")
 )
