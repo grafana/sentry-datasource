@@ -33,7 +33,7 @@ export interface SentrySecureConfig {
 //#endregion
 
 //#region Query
-export type QueryType = 'issues';
+export type QueryType = 'issues' | 'statsV2';
 export type SentryQueryBase<T extends QueryType> = { queryType: T } & DataQuery;
 export type SentryIssuesQuery = {
   projectIds: string[];
@@ -42,7 +42,19 @@ export type SentryIssuesQuery = {
   issuesSort?: SentryIssueSort;
   issuesLimit?: number;
 } & SentryQueryBase<'issues'>;
-export type SentryQuery = SentryIssuesQuery;
+export type SentryStatsV2QueryField = 'sum(quantity)' | 'sum(times_seen)';
+export type SentryStatsV2QueryGroupBy = 'outcome' | 'reason' | 'category';
+export type SentryStatsV2QueryCategory = 'transaction' | 'error' | 'attachment' | 'default' | 'session' | 'security';
+export type SentryStatsV2QueryOutcome = 'accepted' | 'filtered' | 'invalid' | 'rate_limited' | 'client_discard' | 'abuse'; // 'dropped'
+export type SentryStatsV2Query = {
+  projectIds: string[];
+  statsFields: SentryStatsV2QueryField[];
+  statsGroupBy: SentryStatsV2QueryGroupBy[];
+  statsCategory: SentryStatsV2QueryCategory[];
+  statsOutcome: SentryStatsV2QueryOutcome[];
+  statsReason: string[];
+} & SentryQueryBase<'statsV2'>;
+export type SentryQuery = SentryIssuesQuery | SentryStatsV2Query;
 //#endregion
 
 //#region Variable Query
@@ -53,25 +65,26 @@ export type VariableQueryEnvironments = { projectIds: string[] } & VariableQuery
 export type SentryVariableQuery = VariableQueryProjects | VariableQueryEnvironments;
 //#endregion
 
+//#region Resource call
 //#region Resource call Query
-export type ResourceCallOrganizations = {
-  type: 'organizations';
-};
-export type ResourceCallProjects = {
-  type: 'projects';
-  orgSlug: string;
-};
-export type SentryResourceCallQuery = ResourceCallOrganizations | ResourceCallProjects;
+export type SentryResourceCallRequestType = 'organizations' | 'projects';
+export type SentryResourceCallRequestBase<T extends SentryResourceCallRequestType> = { type: T };
+export type ResourceCallOrganizations = {} & SentryResourceCallRequestBase<'organizations'>;
+export type ResourceCallProjects = { orgSlug: string } & SentryResourceCallRequestBase<'projects'>;
+export type SentryResourceCallRequest = ResourceCallOrganizations | ResourceCallProjects;
 //#endregion
-
 //#region Resource call Response
 export type ResourceCallOrganizationsResponse = SentryOrganization[];
 export type ResourceCallProjectsResponse = SentryProject[];
 export type SentryResourceCallResponse = ResourceCallOrganizationsResponse | ResourceCallProjectsResponse;
 //#endregion
+//#endregion
 
 //#region Selectable values
-export const QueryTypeOptions: Array<SelectableValue<QueryType>> = [{ value: 'issues', label: 'Issues' }];
+export const QueryTypeOptions: Array<SelectableValue<QueryType>> = [
+  { value: 'statsV2', label: 'Stats' },
+  { value: 'issues', label: 'Issues (alpha)' },
+];
 export const SentryIssueSortOptions: Array<SelectableValue<SentryIssueSort>> = [
   // { value: 'inbox', label: 'Date Added' },
   { value: 'date', label: 'Last Seen' },
@@ -80,6 +93,33 @@ export const SentryIssueSortOptions: Array<SelectableValue<SentryIssueSort>> = [
   { value: 'freq', label: 'Events' },
   { value: 'user', label: 'Users' },
 ];
+export const SentryStatsV2QueryFieldOptions: Array<SelectableValue<SentryStatsV2QueryField>> = [
+  { value: 'sum(quantity)', label: 'sum(quantity)' },
+  { value: 'sum(times_seen)', label: 'sum(times_seen)' },
+];
+export const SentryStatsV2QueryGroupByOptions: Array<SelectableValue<SentryStatsV2QueryGroupBy>> = [
+  { value: 'outcome', label: 'outcome' },
+  { value: 'reason', label: 'reason' },
+  { value: 'category', label: 'category' },
+];
+export const SentryStatsV2QueryCategoryOptions: Array<SelectableValue<SentryStatsV2QueryCategory>> = [
+  { value: 'error', label: 'error' },
+  { value: 'transaction', label: 'transaction' },
+  { value: 'attachment', label: 'attachment' },
+  { value: 'default', label: 'default' },
+  { value: 'session', label: 'session' },
+  { value: 'security', label: 'security' },
+];
+export const SentryStatsV2QueryOutcomeOptions: Array<SelectableValue<SentryStatsV2QueryOutcome>> = [
+  { value: 'accepted', label: 'accepted' },
+  { value: 'filtered', label: 'filtered' },
+  { value: 'invalid', label: 'invalid' },
+  // { value: 'dropped', label: 'dropped' },
+  { value: 'rate_limited', label: 'rate_limited' },
+  { value: 'client_discard', label: 'client_discard' },
+  { value: 'abuse', label: 'abuse' },
+];
+
 //#endregion
 
 //#region Default values

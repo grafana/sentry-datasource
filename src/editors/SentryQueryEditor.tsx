@@ -5,6 +5,7 @@ import { Error } from '../components/Error';
 import { QueryTypePicker } from './../components/query-editor/QueryTypePicker';
 import { ScopePicker } from './../components/query-editor/ScopePicker';
 import { IssuesEditor } from './../components/query-editor/IssuesEditor';
+import { StatsV2Editor } from './../components/query-editor/StatsV2Editor';
 import { SentryConfig, SentryQuery } from './../types';
 import './../styles/editor.scss';
 
@@ -21,8 +22,9 @@ export const SentryQueryEditor = (props: SentryQueryEditorProps) => {
   return (
     <div className="grafana-sentry-datasource query-editor">
       <QueryTypePicker {...props} />
-      {query.queryType === 'issues' ? <ScopePicker {...props} /> : null}
+      <ScopePicker {...props} hideEnvironments={query.queryType === 'statsV2'} />
       {query.queryType === 'issues' ? <IssuesEditor {...props} /> : null}
+      {query.queryType === 'statsV2' ? <StatsV2Editor {...props} /> : null}
     </div>
   );
 };

@@ -8,7 +8,7 @@ import {
   ResourceCallProjectsResponse,
   SentryConfig,
   SentryQuery,
-  SentryResourceCallQuery,
+  SentryResourceCallRequest,
   SentryResourceCallResponse,
   SentryVariableQuery,
 } from './types';
@@ -71,7 +71,7 @@ export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryC
       }
     });
   }
-  private postResourceLocal<T extends SentryResourceCallResponse>(body: SentryResourceCallQuery): Promise<T> {
+  private postResourceLocal<T extends SentryResourceCallResponse>(body: SentryResourceCallRequest): Promise<T> {
     return this.postResource('', body);
   }
   getOrganizations(): Promise<ResourceCallOrganizationsResponse> {

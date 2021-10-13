@@ -10,7 +10,7 @@ type QueryTypePickerProps = Pick<QueryEditorProps<SentryDataSource, SentryQuery,
 export const QueryTypePicker = ({ query, onChange }: QueryTypePickerProps) => {
   const onQueryTypeChange = (queryType?: QueryType) => {
     if (queryType) {
-      onChange({ ...query, queryType });
+      onChange({ ...query, queryType } as SentryQuery);
     }
   };
   return (

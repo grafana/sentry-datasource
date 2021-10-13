@@ -27,6 +27,8 @@ type apiProvider interface {
 	// From and To times will be grafana dashboard's range
 	// https://github.com/getsentry/sentry/blob/master/src/sentry/api/endpoints/organization_group_index.py#L158
 	GetIssues(gii GetIssuesInput) ([]SentryIssue, string, error)
+
+	GetStatsV2(args GetStatsV2Input) (StatsV2Response, string, error)
 }
 
 type SentryClient struct {

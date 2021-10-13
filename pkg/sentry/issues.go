@@ -8,22 +8,28 @@ import (
 )
 
 type SentryIssue struct {
-	ID        string `json:"id"`
-	ShortID   string `json:"shortId"`
-	Title     string `json:"title"`
-	Culprit   string `json:"culprit"`
-	Permalink string `json:"permalink"`
-	Level     string `json:"level"`
-	Status    string `json:"status"`
-	IsPublic  bool   `json:"isPublic"`
-	Platform  string `json:"platform"`
-	Project   struct {
+	ID          string    `json:"id"`
+	ShortID     string    `json:"shortId"`
+	Title       string    `json:"title"`
+	Count       string    `json:"count"`
+	UserCount   int64     `json:"userCount"`
+	Status      string    `json:"status"`
+	Level       string    `json:"level"`
+	Type        string    `json:"type"`
+	Platform    string    `json:"platform"`
+	FirstSeen   time.Time `json:"firstSeen"`
+	LastSeen    time.Time `json:"lastSeen"`
+	Culprit     string    `json:"culprit"`
+	HasSeen     bool      `json:"hasSeen"`
+	IsUnhandled bool      `json:"isUnhandled"`
+	Permalink   string    `json:"permalink"`
+	IsPublic    bool      `json:"isPublic"`
+	Project     struct {
 		ID       string `json:"id"`
 		Name     string `json:"name"`
 		Slug     string `json:"slug"`
 		Platform string `json:"platform"`
 	} `json:"project"`
-	Type     string `json:"type"`
 	Metadata struct {
 		Value    string `json:"value"`
 		Type     string `json:"type"`
@@ -42,12 +48,6 @@ type SentryIssue struct {
 	SubscriptionDetails struct {
 		Reason string `json:"reason"`
 	} `json:"subscriptionDetails"`
-	HasSeen     bool      `json:"hasSeen"`
-	IsUnhandled bool      `json:"isUnhandled"`
-	Count       string    `json:"count"`
-	UserCount   int64     `json:"userCount"`
-	FirstSeen   time.Time `json:"firstSeen"`
-	LastSeen    time.Time `json:"lastSeen"`
 	// StatusDetails struct {
 	// } `json:"statusDetails"`
 	// Stats struct {
