@@ -6,7 +6,6 @@ import { VariableQueryType } from '../../types';
 
 export const TypeSelector = (props: { variableQueryType: VariableQueryType; onChange: (type: VariableQueryType) => void }) => {
   const options: Array<SelectableValue<VariableQueryType>> = [
-    { value: 'organizations', label: 'Organizations' },
     { value: 'projects', label: 'Projects' },
     { value: 'environments', label: 'Environments' },
   ];

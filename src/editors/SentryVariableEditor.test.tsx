@@ -16,43 +16,35 @@ describe('SentryVariableEditor', () => {
       },
     }));
   });
-  it('render without error', () => {
+  it('render error when orgId is not available', () => {
     const datasource = {} as SentryDataSource;
+    datasource.getOrgSlug = jest.fn(() => '');
     const query = {} as SentryVariableQuery;
     const onChange = jest.fn();
     const result = render(<SentryVariableEditor datasource={datasource} query={query} onChange={onChange} />);
     expect(result.container.firstChild).not.toBeNull();
+    expect(result.getByTestId('error-message')).toBeInTheDocument();
   });
-  describe('organization', () => {
-    it('render type selector correctly', () => {
-      const datasource = {} as SentryDataSource;
-      const query = { type: 'organizations' } as SentryVariableQuery;
-      const onChange = jest.fn();
-      const result = render(<SentryVariableEditor datasource={datasource} query={query} onChange={onChange} />);
-      expect(result.container.firstChild).not.toBeNull();
-      expect(result.getByTestId('variable-query-editor-query-type-selector-container')).toBeInTheDocument();
-      expect(result.queryByTestId('variable-query-editor-environments-filter')).not.toBeInTheDocument();
-    });
+  it('render without error', () => {
+    const datasource = {} as SentryDataSource;
+    datasource.getOrgSlug = jest.fn(() => 'foo');
+    const query = {} as SentryVariableQuery;
+    const onChange = jest.fn();
+    const result = render(<SentryVariableEditor datasource={datasource} query={query} onChange={onChange} />);
+    expect(result.container.firstChild).not.toBeNull();
+    expect(result.queryByTestId('error-message')).not.toBeInTheDocument();
   });
   describe('projects', () => {
-    it(`shouldn't render projects filter for non project query`, () => {
-      const datasource = {} as SentryDataSource;
-      const query = { type: 'organizations' } as SentryVariableQuery;
-      const onChange = jest.fn();
-      const result = render(<SentryVariableEditor datasource={datasource} query={query} onChange={onChange} />);
-      expect(result.container.firstChild).not.toBeNull();
-      expect(result.queryByTestId('variable-query-editor-projects-filter')).not.toBeInTheDocument();
-      expect(result.queryByTestId('variable-query-editor-environments-filter')).not.toBeInTheDocument();
-    });
     it(`should render projects filter for projects query`, async () => {
       const datasource = {} as SentryDataSource;
+      datasource.getOrgSlug = jest.fn(() => 'foo');
       datasource.getOrganizations = jest.fn(() => Promise.resolve([]));
       const query = { type: 'projects' } as SentryVariableQuery;
       const onChange = jest.fn();
       const result = render(<SentryVariableEditor datasource={datasource} query={query} onChange={onChange} />);
       await waitFor(() => {
         expect(result.container.firstChild).not.toBeNull();
-        expect(result.getByTestId('variable-query-editor-projects-filter')).toBeInTheDocument();
+        expect(result.queryByTestId('error-message')).not.toBeInTheDocument();
         expect(result.queryByTestId('variable-query-editor-environments-filter')).not.toBeInTheDocument();
       });
     });
@@ -60,13 +52,14 @@ describe('SentryVariableEditor', () => {
   describe('environments', () => {
     it(`should render environments filters for environments query`, async () => {
       const datasource = {} as SentryDataSource;
-      datasource.getOrganizations = jest.fn(() => Promise.resolve([]));
+      datasource.getOrgSlug = jest.fn(() => 'foo');
+      datasource.getProjects = jest.fn(() => Promise.resolve([]));
       const query = { type: 'environments' } as SentryVariableQuery;
       const onChange = jest.fn();
       const result = render(<SentryVariableEditor datasource={datasource} query={query} onChange={onChange} />);
       await waitFor(() => {
         expect(result.container.firstChild).not.toBeNull();
-        expect(result.getByTestId('variable-query-editor-projects-filter')).toBeInTheDocument();
+        expect(result.queryByTestId('error-message')).not.toBeInTheDocument();
         expect(result.getByTestId('variable-query-editor-environments-filter')).toBeInTheDocument();
       });
     });

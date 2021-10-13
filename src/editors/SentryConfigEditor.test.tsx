@@ -15,6 +15,10 @@ describe('SentryConfigEditor', () => {
     expect(result.getByTestId('sentry-config-editor-url-row')).toBeInTheDocument();
     expect(within(result.getByTestId('sentry-config-editor-url-row')).getByTestId('sentry-config-editor-url')).toBeInTheDocument();
     expect(within(result.getByTestId('sentry-config-editor-url-row')).getByDisplayValue(DEFAULT_SENTRY_URL)).toBeInTheDocument();
+    expect(result.getByTestId('sentry-config-editor-org-slug-row')).toBeInTheDocument();
+    expect(
+      within(result.getByTestId('sentry-config-editor-org-slug-row')).getByTestId('sentry-config-editor-org-slug')
+    ).toBeInTheDocument();
     expect(result.getByTestId('sentry-config-editor-auth-token-row')).toBeInTheDocument();
     expect(within(result.getByTestId('sentry-config-editor-auth-token-row')).queryByDisplayValue('Configured')).not.toBeInTheDocument();
     expect(
@@ -25,7 +29,7 @@ describe('SentryConfigEditor', () => {
   });
   it('render existing datasource without error', () => {
     const options = {
-      jsonData: { url: 'https://foo.com' },
+      jsonData: { url: 'https://foo.com', orgSlug: 'my-org-slug' },
       secureJsonFields: { authToken: true } as any,
     } as DataSourceSettings<SentryConfig, SentrySecureConfig>;
     const onOptionsChange = jest.fn();
@@ -35,6 +39,11 @@ describe('SentryConfigEditor', () => {
     expect(within(result.getByTestId('sentry-config-editor-url-row')).getByTestId('sentry-config-editor-url')).toBeInTheDocument();
     expect(within(result.getByTestId('sentry-config-editor-url-row')).queryByDisplayValue(DEFAULT_SENTRY_URL)).not.toBeInTheDocument();
     expect(within(result.getByTestId('sentry-config-editor-url-row')).getByDisplayValue('https://foo.com')).toBeInTheDocument();
+    expect(result.getByTestId('sentry-config-editor-org-slug-row')).toBeInTheDocument();
+    expect(
+      within(result.getByTestId('sentry-config-editor-org-slug-row')).getByTestId('sentry-config-editor-org-slug')
+    ).toBeInTheDocument();
+    expect(within(result.getByTestId('sentry-config-editor-org-slug-row')).getByDisplayValue('my-org-slug')).toBeInTheDocument();
     expect(result.getByTestId('sentry-config-editor-auth-token-row')).toBeInTheDocument();
     expect(within(result.getByTestId('sentry-config-editor-auth-token-row')).getByDisplayValue('Configured')).toBeInTheDocument();
     expect(

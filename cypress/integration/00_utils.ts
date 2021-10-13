@@ -4,8 +4,7 @@ import { selectors } from '../../src/selectors';
 export const e2eSelectors = e2e.getSelectors(selectors.components);
 
 export const PROVISIONING_FILENAME = 'datasources/grafana-sentry-datasource.yaml';
-export const SENTRY_ORGANIZATIONS_COUNT = 4;
-export const SENTRY_E2E_ORGANIZATION_NAME = 'Grafana Plugin Development';
+export const SENTRY_PROJECTS_COUNT = 4;
 export const SENTRY_E2E_PROJECT_NAME = 'project-e2e';
 export const SENTRY_E2E_PROJECT_ID = '5988308';
 export const SENTRY_E2E_PRODUCTION_PROJECT_NAME = 'project-node';
@@ -18,12 +17,18 @@ export const selectDropdown = (container: Cypress.Chainable<JQuery<HTMLElement>>
   });
 };
 
-export const fillSentryConfigurationForm = (password: string, url?: string) => {
+export const fillSentryConfigurationForm = (password: string, url?: string, orgSlug?: string) => {
   if (url) {
     e2eSelectors.ConfigEditor.SentrySettings.URL.ariaLabel().clear();
     e2eSelectors.ConfigEditor.SentrySettings.URL.ariaLabel().type(url);
   }
-  e2eSelectors.ConfigEditor.SentrySettings.AuthToken.ariaLabel().type(password);
+  if (orgSlug) {
+    e2eSelectors.ConfigEditor.SentrySettings.OrgSlug.ariaLabel().clear();
+    e2eSelectors.ConfigEditor.SentrySettings.OrgSlug.ariaLabel().type(orgSlug);
+  }
+  if (password) {
+    e2eSelectors.ConfigEditor.SentrySettings.AuthToken.ariaLabel().type(password);
+  }
 };
 
 export const variableEditorPreviewValuesCheck = (stringsShouldPresent: string[] = [], stringsShouldNotPresent: string[] = []) => {

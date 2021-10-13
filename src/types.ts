@@ -25,6 +25,7 @@ export type SentryIssueSort = 'inbox' | 'new' | 'date' | 'priority' | 'freq' | '
 //#region Config
 export interface SentryConfig extends DataSourceJsonData {
   url: string;
+  orgSlug: string;
 }
 export interface SentrySecureConfig {
   authToken: string;
@@ -35,7 +36,6 @@ export interface SentrySecureConfig {
 export type QueryType = 'issues';
 export type SentryQueryBase<T extends QueryType> = { queryType: T } & DataQuery;
 export type SentryIssuesQuery = {
-  orgSlug: string;
   projectIds: string[];
   environments: string[];
   issuesQuery: string;
@@ -46,12 +46,11 @@ export type SentryQuery = SentryIssuesQuery;
 //#endregion
 
 //#region Variable Query
-export type VariableQueryType = 'organizations' | 'projects' | 'environments';
+export type VariableQueryType = 'projects' | 'environments';
 export type VariableQueryBase<T extends VariableQueryType> = { type: T };
-export type VariableQueryOrganizations = {} & VariableQueryBase<'organizations'>;
-export type VariableQueryProjects = { orgSlug: string } & VariableQueryBase<'projects'>;
-export type VariableQueryEnvironments = { orgSlug: string; projectIds: string[] } & VariableQueryBase<'environments'>;
-export type SentryVariableQuery = VariableQueryOrganizations | VariableQueryProjects | VariableQueryEnvironments;
+export type VariableQueryProjects = {} & VariableQueryBase<'projects'>;
+export type VariableQueryEnvironments = { projectIds: string[] } & VariableQueryBase<'environments'>;
+export type SentryVariableQuery = VariableQueryProjects | VariableQueryEnvironments;
 //#endregion
 
 //#region Resource call Query

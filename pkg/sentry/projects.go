@@ -27,6 +27,6 @@ type SentryProject struct {
 
 func (sc *SentryClient) GetProjects(organizationSlug string) ([]SentryProject, error) {
 	out := []SentryProject{}
-	err := sc.Fetch("/api/0/organizations/"+organizationSlug+"/projects/", &out)
+	err := sc.Fetch("/api/0/organizations/"+sc.OrgSlug+"/projects/", &out)
 	return out, err
 }

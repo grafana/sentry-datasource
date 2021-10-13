@@ -11,6 +11,7 @@ export const SentryConfigEditor = (props: SentryConfigEditorProps) => {
   const { jsonData, secureJsonFields } = options;
   const secureJsonData: SentrySecureConfig = (options.secureJsonData || {}) as SentrySecureConfig;
   const [url, setURL] = useState<string>(jsonData?.url || DEFAULT_SENTRY_URL);
+  const [orgSlug, setOrgSlug] = useState<string>(jsonData?.orgSlug || '');
   const [authToken, setAuthToken] = useState<string>('');
   const { ConfigEditor: ConfigEditorSelectors } = Components;
   const labelWidth = 10;
@@ -46,6 +47,20 @@ export const SentryConfigEditor = (props: SentryConfigEditorProps) => {
           value={url}
           onChange={(e) => setURL(e.currentTarget.value)}
           onBlur={() => onOptionChange('url', url)}
+          width={valueWidth * 2}
+        ></Input>
+      </div>
+      <div className="gf-form" data-testid="sentry-config-editor-org-slug-row">
+        <InlineFormLabel tooltip={ConfigEditorSelectors.SentrySettings.OrgSlug.tooltip} width={labelWidth}>
+          {ConfigEditorSelectors.SentrySettings.OrgSlug.label}
+        </InlineFormLabel>
+        <Input
+          data-testid="sentry-config-editor-org-slug"
+          placeholder={ConfigEditorSelectors.SentrySettings.OrgSlug.placeholder}
+          aria-label={ConfigEditorSelectors.SentrySettings.OrgSlug.ariaLabel}
+          value={orgSlug}
+          onChange={(e) => setOrgSlug(e.currentTarget.value)}
+          onBlur={() => onOptionChange('orgSlug', orgSlug)}
           width={valueWidth * 2}
         ></Input>
       </div>

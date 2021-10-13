@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { getTemplateSrv } from '@grafana/runtime';
-import { InlineFormLabel, Select, MultiSelect } from '@grafana/ui';
+import { InlineFormLabel, MultiSelect } from '@grafana/ui';
 import { SentryDataSource } from './../../datasource';
 import { getEnvironmentNamesFromProject } from './../../app/utils';
 import { replaceProjectIDs } from './../../app/replace';
 import { selectors } from './../../selectors';
-import { SentryConfig, SentryOrganization, SentryProject, SentryQuery } from './../../types';
+import { SentryConfig, SentryProject, SentryQuery } from './../../types';
 
 type ScopePickerProps = Pick<
   QueryEditorProps<SentryDataSource, SentryQuery, SentryConfig>,
@@ -15,13 +15,10 @@ type ScopePickerProps = Pick<
 
 export const ScopePicker = (props: ScopePickerProps) => {
   const { query, onChange, onRunQuery, datasource } = props;
-  const { orgSlug, projectIds, environments } = query;
-  const [organizations, setOrganizations] = useState<SentryOrganization[]>([]);
+  const { projectIds, environments } = query;
   const [projects, setProjects] = useState<SentryProject[]>([]);
   const [allEnvironments, setAllEnvironments] = useState<string[]>([]);
-  useEffect(() => {
-    datasource.getOrganizations().then(setOrganizations).catch(console.error);
-  }, [datasource]);
+  const orgSlug = datasource.getOrgSlug();
   useEffect(() => {
     if (orgSlug) {
       datasource.getProjects(orgSlug).then(setProjects).catch(console.error);
@@ -31,16 +28,6 @@ export const ScopePicker = (props: ScopePickerProps) => {
     const updatedProjectIDs = replaceProjectIDs(projectIds);
     setAllEnvironments(getEnvironmentNamesFromProject(projects, updatedProjectIDs));
   }, [projects, projectIds]);
-  const getOrganizationsAsOptions = (): Array<SelectableValue<string>> => {
-    return [
-      ...organizations.map((o) => {
-        return { value: o.slug, label: o.name };
-      }),
-      ...(getTemplateSrv().getVariables() || []).map((o) => {
-        return { value: `\${${o.name}}`, label: `var: ${o.label || o.name}` };
-      }),
-    ];
-  };
   const getProjectsAsOptions = (): Array<SelectableValue<string>> => {
     return [
       ...projects.map((o) => {
@@ -61,10 +48,6 @@ export const ScopePicker = (props: ScopePickerProps) => {
       }),
     ];
   };
-  const onOrgSlugChange = (orgSlug = '') => {
-    onChange({ ...query, orgSlug, projectIds: [] });
-    onRunQuery();
-  };
   const onProjectIDsChange = (projectIds: string[] = []) => {
     const applicableEnvironments = getEnvironmentNamesFromProject(projects, projectIds);
     const filteredEnvironments = (environments || []).filter((e) => applicableEnvironments.includes(e));
@@ -77,17 +60,7 @@ export const ScopePicker = (props: ScopePickerProps) => {
   };
   return (
     <div className="gf-form">
-      <InlineFormLabel width={10} className="query-keyword" tooltip={selectors.components.QueryEditor.Scope.Organization.tooltip}>
-        {selectors.components.QueryEditor.Scope.Organization.label}
-      </InlineFormLabel>
-      <Select
-        width={50}
-        value={orgSlug}
-        onChange={(e) => onOrgSlugChange(e.value)}
-        options={getOrganizationsAsOptions()}
-        className="inline-element"
-      />
-      <InlineFormLabel width={8} className="query-keyword" tooltip={selectors.components.QueryEditor.Scope.ProjectIDs.tooltip}>
+      <InlineFormLabel width={10} className="query-keyword" tooltip={selectors.components.QueryEditor.Scope.ProjectIDs.tooltip}>
         {selectors.components.QueryEditor.Scope.ProjectIDs.label}
       </InlineFormLabel>
       <MultiSelect

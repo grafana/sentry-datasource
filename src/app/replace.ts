@@ -16,7 +16,6 @@ export const applyTemplateVariables = (query: SentryQuery, scopedVars: ScopedVar
     case 'issues':
       return {
         ...query,
-        orgSlug: getTemplateSrv().replace(query.orgSlug || '', scopedVars),
         issuesQuery: getTemplateSrv().replace(query.issuesQuery || '', scopedVars),
         projectIds: flatten(
           (query.projectIds || []).map((pid) => {
@@ -36,19 +35,13 @@ export const applyTemplateVariables = (query: SentryQuery, scopedVars: ScopedVar
 
 export const applyTemplateVariablesToVariableQuery = (query: SentryVariableQuery): SentryVariableQuery => {
   switch (query.type) {
-    case 'organizations':
-      return {
-        ...query,
-      };
     case 'projects':
       return {
         ...query,
-        orgSlug: getTemplateSrv().replace(query.orgSlug),
       };
     case 'environments':
       return {
         ...query,
-        orgSlug: getTemplateSrv().replace(query.orgSlug),
         projectIds: (query.projectIds || []).map((projectId) => getTemplateSrv().replace(projectId)),
       };
     default:
