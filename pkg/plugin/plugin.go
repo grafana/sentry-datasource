@@ -47,7 +47,7 @@ func getInstance(s backend.DataSourceInstanceSettings) (instancemgmt.Instance, e
 	if err != nil {
 		return nil, err
 	}
-	sc, err := sentry.NewSentryClient(settings.URL, settings.authToken, hc)
+	sc, err := sentry.NewSentryClient(settings.URL, settings.OrgSlug, settings.authToken, hc)
 	if err != nil {
 		return nil, err
 	}

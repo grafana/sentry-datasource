@@ -31,14 +31,16 @@ type apiProvider interface {
 
 type SentryClient struct {
 	BaseURL          string
+	OrgSlug          string
 	authToken        string
 	sentryHttpClient HTTPClient
 	apiProvider
 }
 
-func NewSentryClient(baseURL string, authToken string, doerClient doer) (*SentryClient, error) {
+func NewSentryClient(baseURL string, orgSlug string, authToken string, doerClient doer) (*SentryClient, error) {
 	client := &SentryClient{
 		BaseURL:   DefaultSentryURL,
+		OrgSlug:   orgSlug,
 		authToken: authToken,
 	}
 	if baseURL != "" {

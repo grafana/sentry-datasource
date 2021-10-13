@@ -10,6 +10,7 @@ import (
 )
 
 const fakeSentryUrl string = "https://foo.com"
+const fakeSentryOrg string = "foo"
 const fakeSentryAuthToken string = "fake-token"
 const fakeResponseBody string = "{}"
 
@@ -41,9 +42,6 @@ func (fd *fakeDoer) Do(req *http.Request) (*http.Response, error) {
 	if fd.ExpectedError != nil {
 		return nil, fd.ExpectedError
 	}
-	if req.URL.String() == fakeSentryUrl+"/api/0/organizations/" {
-		res.Body = ioutil.NopCloser(bytes.NewBufferString("[]"))
-	}
 	if fd.Body != "" {
 		res.Body = ioutil.NopCloser(bytes.NewBufferString(fd.Body))
 	}
@@ -54,6 +52,6 @@ func (fd *fakeDoer) Do(req *http.Request) (*http.Response, error) {
 }
 
 func NewFakeClient(props fakeDoer) *sentry.SentryClient {
-	sc, _ := sentry.NewSentryClient(fakeSentryUrl, fakeSentryAuthToken, &props)
+	sc, _ := sentry.NewSentryClient(fakeSentryUrl, fakeSentryOrg, fakeSentryAuthToken, &props)
 	return sc
 }

@@ -14,12 +14,17 @@ import {
 } from './types';
 
 export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryConfig> {
-  constructor(instanceSettings: DataSourceInstanceSettings<SentryConfig>) {
+  constructor(private instanceSettings: DataSourceInstanceSettings<SentryConfig>) {
     super(instanceSettings);
   }
   annotations = {};
   filterQuery(query: SentryQuery): boolean {
     return !(query.hide === true);
+  }
+  interpolateVariablesInQueries(queries: SentryQuery[], scopedVars: ScopedVars): SentryQuery[] {
+    return queries.map((q) => {
+      return applyTemplateVariables(q, scopedVars);
+    });
   }
   applyTemplateVariables(query: SentryQuery, scopedVars: ScopedVars): SentryQuery {
     return applyTemplateVariables(query, scopedVars);
@@ -27,25 +32,14 @@ export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryC
   query(request: DataQueryRequest<SentryQuery>): Observable<DataQueryResponse> {
     return super.query({ ...request, targets: request.targets });
   }
+  getOrgSlug(): string {
+    return this.instanceSettings.jsonData?.orgSlug || '';
+  }
   metricFindQuery(query: SentryVariableQuery): Promise<MetricFindValue[]> {
     query = applyTemplateVariablesToVariableQuery(query);
     return new Promise((resolve, reject) => {
-      if (!query || (query && query.type === 'organizations')) {
-        this.getOrganizations()
-          .then((organizations) => {
-            resolve(
-              organizations.map((organization) => {
-                return {
-                  value: organization.slug,
-                  text: organization.name,
-                };
-              })
-            );
-          })
-          .catch(reject);
-      } else if (query && query.type === 'projects' && query.orgSlug) {
-        const orgSlug = query.orgSlug;
-        this.getProjects(orgSlug)
+      if (query && query.type === 'projects') {
+        this.getProjects(this.getOrgSlug())
           .then((projects) => {
             resolve(
               projects.map((project) => {
@@ -57,9 +51,8 @@ export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryC
             );
           })
           .catch(reject);
-      } else if (query && query.type === 'environments' && query.orgSlug) {
-        const orgSlug = query.orgSlug;
-        this.getProjects(orgSlug)
+      } else if (query && query.type === 'environments') {
+        this.getProjects(this.getOrgSlug())
           .then((projects) => {
             if (query.type === 'environments') {
               const environments = getEnvironmentNamesFromProject(projects, query.projectIds);

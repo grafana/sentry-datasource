@@ -11,7 +11,6 @@ import (
 
 type SentryQuery struct {
 	QueryType    string   `json:"queryType"`
-	OrgSlug      string   `json:"orgSlug,omitempty"`
 	ProjectIds   []string `json:"projectIds,omitempty"`
 	Environments []string `json:"environments,omitempty"`
 	IssuesQuery  string   `json:"issuesQuery,omitempty"`
@@ -47,11 +46,11 @@ func QueryData(ctx context.Context, pCtx backend.PluginContext, backendQuery bac
 	}
 	switch query.QueryType {
 	case "issues":
-		if query.OrgSlug == "" {
+		if client.OrgSlug == "" {
 			return GetErrorResponse(response, "", ErrorInvalidOrganizationSlug)
 		}
 		issues, executedQueryString, err := client.GetIssues(sentry.GetIssuesInput{
-			OrganizationSlug: query.OrgSlug,
+			OrganizationSlug: client.OrgSlug,
 			ProjectIds:       query.ProjectIds,
 			Environments:     query.Environments,
 			Query:            query.IssuesQuery,
@@ -67,7 +66,7 @@ func QueryData(ctx context.Context, pCtx backend.PluginContext, backendQuery bac
 		if err != nil {
 			return GetErrorResponse(response, executedQueryString, err)
 		}
-		frame = UpdateFrameMeta(frame, executedQueryString, query, client.BaseURL)
+		frame = UpdateFrameMeta(frame, executedQueryString, query, client.BaseURL, client.OrgSlug)
 		response.Frames = append(response.Frames, frame)
 	default:
 		response.Error = ErrorUnknownQueryType

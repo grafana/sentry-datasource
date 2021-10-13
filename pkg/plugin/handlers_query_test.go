@@ -17,18 +17,10 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{JSON: []byte(`{}`)}, *sc)
 		assert.Equal(t, plugin.ErrorUnknownQueryType, res.Error)
 	})
-	t.Run("invalid org slug should throw error", func(t *testing.T) {
-		sc := NewFakeClient(fakeDoer{})
-		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{JSON: []byte(`{ 
-			"queryType" : "issues" 
-		}`)}, *sc)
-		assert.Equal(t, plugin.ErrorInvalidOrganizationSlug, res.Error)
-	})
 	t.Run("invalid response should capture error", func(t *testing.T) {
 		sc := NewFakeClient(fakeDoer{Body: "{}", ExpectedStatusCode: 400, ExpectedStatus: "400 Unknown error"})
 		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{JSON: []byte(`{ 
-			"queryType" : "issues", 
-			"orgSlug" : "foo" 
+			"queryType" : "issues"
 		}`)}, *sc)
 		assert.NotNil(t, res.Error)
 		assert.Equal(t, errors.New("400 Unknown error"), res.Error)
@@ -36,8 +28,7 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 	t.Run("invalid response with valid status code should capture error", func(t *testing.T) {
 		sc := NewFakeClient(fakeDoer{Body: "{}"})
 		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{JSON: []byte(`{ 
-			"queryType" : "issues", 
-			"orgSlug" : "foo" 
+			"queryType" : "issues"
 		}`)}, *sc)
 		require.NotNil(t, res.Error)
 		assert.Equal(t, "json: cannot unmarshal object into Go value of type []sentry.SentryIssue", res.Error.Error())
@@ -45,8 +36,7 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 	t.Run("invalid response should capture error detail if available", func(t *testing.T) {
 		sc := NewFakeClient(fakeDoer{Body: `{ "detail" : "simulated error" }`, ExpectedStatusCode: 400, ExpectedStatus: "400 Unknown error"})
 		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{JSON: []byte(`{ 
-			"queryType" : "issues", 
-			"orgSlug" : "foo" 
+			"queryType" : "issues"
 		}`)}, *sc)
 		assert.NotNil(t, res.Error)
 		assert.Equal(t, errors.New("400 Unknown error simulated error"), res.Error)
@@ -54,8 +44,7 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 	t.Run("valid org slug should not throw error", func(t *testing.T) {
 		sc := NewFakeClient(fakeDoer{Body: "[{},{},{}]"})
 		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(`{
-			"queryType" : "issues", 
-			"orgSlug" 	: "foo" 
+			"queryType" : "issues"
 		}`)}, *sc)
 		assert.Nil(t, res.Error)
 		require.Equal(t, 1, len(res.Frames))

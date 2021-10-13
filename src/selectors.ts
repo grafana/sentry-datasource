@@ -12,6 +12,12 @@ export const Components = {
         ariaLabel: `Enter your Sentry URL here. Defaults to ${DEFAULT_SENTRY_URL}`,
         tooltip: `Sentry URL to be used. If left blank, ${DEFAULT_SENTRY_URL} will be used`,
       },
+      OrgSlug: {
+        label: 'Sentry Org',
+        placeholder: 'Sentry org slug',
+        ariaLabel: `Enter your Sentry Organization slug here`,
+        tooltip: `Sentry Org slug. Typically this will be in the url https://sentry.io/organizations/{organization_slug}/`,
+      },
       AuthToken: {
         label: 'Sentry Auth Token',
         placeholder: 'Sentry Authentication Token',
@@ -29,12 +35,8 @@ export const Components = {
       tooltip: 'Choose query type',
     },
     Scope: {
-      Organization: {
-        label: 'Organization',
-        tooltip: 'Choose the sentry organization',
-      },
       ProjectIDs: {
-        label: 'Project IDs',
+        label: 'Projects',
         tooltip: 'Optionally filter results by project IDs',
         placeholder: 'optional',
       },

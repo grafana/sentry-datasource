@@ -5,8 +5,7 @@ import {
   variableEditorPreviewValuesCheck,
   e2eSelectors,
   PROVISIONING_FILENAME,
-  SENTRY_ORGANIZATIONS_COUNT,
-  SENTRY_E2E_ORGANIZATION_NAME,
+  SENTRY_PROJECTS_COUNT,
   SENTRY_E2E_PROJECT_NAME,
   SENTRY_E2E_PRODUCTION_PROJECT_NAME,
   SENTRY_E2E_ENVIRONMENT_NAME,
@@ -24,9 +23,13 @@ e2e.scenario({
         e2e.flows
           .addDataSource({
             type: 'Sentry',
-            expectedAlertMessage: `plugin health check successful. ${SENTRY_ORGANIZATIONS_COUNT} organizations found.`,
+            expectedAlertMessage: `plugin health check successful. ${SENTRY_PROJECTS_COUNT} projects found.`,
             form: () => {
-              fillSentryConfigurationForm(provision.datasources[0].secureJsonData.authToken, provision.datasources[0].jsonData.url);
+              fillSentryConfigurationForm(
+                provision.datasources[0].secureJsonData.authToken,
+                provision.datasources[0].jsonData.url,
+                provision.datasources[0].jsonData.orgSlug
+              );
             },
           })
           .then((ds) => {
@@ -45,20 +48,12 @@ e2e.scenario({
                 .within(() => {
                   e2e.components.Select.input().should('be.visible').type(`${ds.config.name}{enter}`);
                 });
-              // Get list of organization
-              selectDropdown(e2eSelectors.VariablesEditor.QueryType.container.ariaLabel(), 'Organizations');
-              cy.wait(2 * 1000);
-              variableEditorPreviewValuesCheck([SENTRY_E2E_ORGANIZATION_NAME]);
               // Get list of projects
               selectDropdown(e2eSelectors.VariablesEditor.QueryType.container.ariaLabel(), 'Projects');
-              cy.wait(2 * 1000);
-              selectDropdown(e2eSelectors.VariablesEditor.Organization.container.ariaLabel(), SENTRY_E2E_ORGANIZATION_NAME);
               cy.wait(2 * 1000);
               variableEditorPreviewValuesCheck([`${SENTRY_E2E_PROJECT_NAME} (${SENTRY_E2E_PROJECT_ID})`]);
               // Get list of environments
               selectDropdown(e2eSelectors.VariablesEditor.QueryType.container.ariaLabel(), 'Environments');
-              cy.wait(2 * 1000);
-              selectDropdown(e2eSelectors.VariablesEditor.Organization.container.ariaLabel(), SENTRY_E2E_ORGANIZATION_NAME);
               cy.wait(2 * 1000);
               variableEditorPreviewValuesCheck([SENTRY_E2E_ENVIRONMENT_NAME, SENTRY_E2E_NODE_ONLY_ENVIRONMENT_NAME]);
               selectDropdown(e2eSelectors.VariablesEditor.Project.container.ariaLabel(), SENTRY_E2E_PROJECT_NAME);

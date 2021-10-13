@@ -8,12 +8,16 @@ import (
 
 type SentryConfig struct {
 	URL       string `json:"url"`
+	OrgSlug   string `json:"orgSlug"`
 	authToken string `json:"-"`
 }
 
 func (sc *SentryConfig) Validate() error {
 	if sc.URL == "" {
 		return ErrorInvalidSentryConfig
+	}
+	if sc.OrgSlug == "" {
+		return ErrorInvalidOrganizationSlug
 	}
 	if sc.authToken == "" {
 		return ErrorInvalidAuthToken
@@ -30,6 +34,9 @@ func GetSettings(s backend.DataSourceInstanceSettings) (*SentryConfig, error) {
 	if config.URL == "" {
 		backend.Logger.Info("applying default sentry URL", "sentry url", DefaultSentryURL)
 		config.URL = DefaultSentryURL
+	}
+	if config.OrgSlug == "" {
+		return nil, ErrorInvalidOrganizationSlug
 	}
 	if authToken, ok := s.DecryptedSecureJSONData["authToken"]; ok {
 		config.authToken = authToken

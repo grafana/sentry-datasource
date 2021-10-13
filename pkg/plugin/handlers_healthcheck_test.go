@@ -17,24 +17,24 @@ func Test_checkHealth(t *testing.T) {
 		assert.Equal(t, "401 Unauthorized", hc.Message)
 	})
 	t.Run("valid auth token should not throw error", func(t *testing.T) {
-		sc := NewFakeClient(fakeDoer{})
+		sc := NewFakeClient(fakeDoer{Body: "[]"})
 		hc, err := plugin.CheckHealth(*sc)
 		assert.Nil(t, err)
 		assert.Equal(t, backend.HealthStatusOk, hc.Status)
-		assert.Equal(t, "plugin health check successful. 0 organizations found.", hc.Message)
+		assert.Equal(t, "plugin health check successful. 0 projects found.", hc.Message)
 	})
 	t.Run("should return organizations length", func(t *testing.T) {
 		sc := NewFakeClient(fakeDoer{Body: "[{},{}]"})
 		hc, err := plugin.CheckHealth(*sc)
 		assert.Nil(t, err)
 		assert.Equal(t, backend.HealthStatusOk, hc.Status)
-		assert.Equal(t, "plugin health check successful. 2 organizations found.", hc.Message)
+		assert.Equal(t, "plugin health check successful. 2 projects found.", hc.Message)
 	})
 	t.Run("invalid response should throw error", func(t *testing.T) {
 		sc := NewFakeClient(fakeDoer{Body: "{}"})
 		hc, err := plugin.CheckHealth(*sc)
 		assert.Nil(t, err)
 		assert.Equal(t, backend.HealthStatusError, hc.Status)
-		assert.Equal(t, "json: cannot unmarshal object into Go value of type []sentry.SentryOrganization", hc.Message)
+		assert.Equal(t, "json: cannot unmarshal object into Go value of type []sentry.SentryProject", hc.Message)
 	})
 }
