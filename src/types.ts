@@ -82,8 +82,8 @@ export type SentryResourceCallResponse = ResourceCallOrganizationsResponse | Res
 
 //#region Selectable values
 export const QueryTypeOptions: Array<SelectableValue<QueryType>> = [
+  { value: 'issues', label: 'Issues' },
   { value: 'statsV2', label: 'Stats' },
-  { value: 'issues', label: 'Issues (alpha)' },
 ];
 export const SentryIssueSortOptions: Array<SelectableValue<SentryIssueSort>> = [
   // { value: 'inbox', label: 'Date Added' },

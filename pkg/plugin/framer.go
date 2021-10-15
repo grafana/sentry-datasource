@@ -6,6 +6,9 @@ import (
 )
 
 func ConvertStatsV2ResponseToFrame(frameName string, stats sentry.StatsV2Response) (*data.Frame, error) {
+	if len(stats.Intervals) == 0 {
+		return data.NewFrameOfFieldTypes(frameName, 0), nil
+	}
 	frame := data.NewFrameOfFieldTypes(frameName, len(stats.Intervals))
 	field := data.NewField("Timestamp", nil, stats.Intervals)
 	frame.Fields = append(frame.Fields, field)

@@ -5,12 +5,13 @@ import { SentryDataSource } from './../../datasource';
 import { selectors } from './../../selectors';
 import { SentryConfig, SentryQuery, QueryType, QueryTypeOptions } from './../../types';
 
-type QueryTypePickerProps = Pick<QueryEditorProps<SentryDataSource, SentryQuery, SentryConfig>, 'query' | 'onChange'>;
+type QueryTypePickerProps = Pick<QueryEditorProps<SentryDataSource, SentryQuery, SentryConfig>, 'query' | 'onChange' | 'onRunQuery'>;
 
-export const QueryTypePicker = ({ query, onChange }: QueryTypePickerProps) => {
+export const QueryTypePicker = ({ query, onChange, onRunQuery }: QueryTypePickerProps) => {
   const onQueryTypeChange = (queryType?: QueryType) => {
     if (queryType) {
       onChange({ ...query, queryType } as SentryQuery);
+      onRunQuery();
     }
   };
   return (

@@ -28,6 +28,7 @@ type apiProvider interface {
 	// https://github.com/getsentry/sentry/blob/master/src/sentry/api/endpoints/organization_group_index.py#L158
 	GetIssues(gii GetIssuesInput) ([]SentryIssue, string, error)
 
+	// GetStatsV2 list the stats for an organization
 	GetStatsV2(args GetStatsV2Input) (StatsV2Response, string, error)
 }
 
