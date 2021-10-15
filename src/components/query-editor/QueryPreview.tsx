@@ -6,6 +6,7 @@ import { selectors } from '../../selectors';
 import { SentryConfig, SentryQuery } from '../../types';
 
 type QueryPreviewProps = Pick<QueryEditorProps<SentryDataSource, SentryQuery, SentryConfig>, 'query'>;
+
 export const QueryPreview = ({ query }: QueryPreviewProps) => {
   return (
     <div className="gf-form">
