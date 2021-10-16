@@ -63,6 +63,29 @@ export const Components = {
         placeholder: '100',
       },
     },
+    StatsV2: {
+      Field: {
+        label: 'Field',
+        tooltip: 'stats field',
+      },
+      GroupBy: {
+        label: 'Group By',
+        tooltip: 'group by',
+      },
+      Category: {
+        label: 'Category Filter',
+        tooltip: 'category filter. Required',
+      },
+      Outcome: {
+        label: 'Outcome Filter',
+        tooltip: 'outcome filter. Optional. Select one or more outcomes',
+      },
+      Reason: {
+        label: 'Reason Filter',
+        tooltip: 'comma separated list of reasons to filter',
+        placeholder: 'comma separated list of reasons',
+      },
+    },
     Preview: {
       label: 'Query Preview',
       tooltip: 'JSON preview of the generated query schema',

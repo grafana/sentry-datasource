@@ -19,7 +19,7 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 	})
 	t.Run("invalid response should capture error", func(t *testing.T) {
 		sc := NewFakeClient(fakeDoer{Body: "{}", ExpectedStatusCode: 400, ExpectedStatus: "400 Unknown error"})
-		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{JSON: []byte(`{ 
+		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{JSON: []byte(`{
 			"queryType" : "issues"
 		}`)}, *sc)
 		assert.NotNil(t, res.Error)
@@ -27,7 +27,7 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 	})
 	t.Run("invalid response with valid status code should capture error", func(t *testing.T) {
 		sc := NewFakeClient(fakeDoer{Body: "{}"})
-		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{JSON: []byte(`{ 
+		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{JSON: []byte(`{
 			"queryType" : "issues"
 		}`)}, *sc)
 		require.NotNil(t, res.Error)
@@ -35,7 +35,7 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 	})
 	t.Run("invalid response should capture error detail if available", func(t *testing.T) {
 		sc := NewFakeClient(fakeDoer{Body: `{ "detail" : "simulated error" }`, ExpectedStatusCode: 400, ExpectedStatus: "400 Unknown error"})
-		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{JSON: []byte(`{ 
+		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{JSON: []byte(`{
 			"queryType" : "issues"
 		}`)}, *sc)
 		assert.NotNil(t, res.Error)
@@ -52,4 +52,88 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 		require.Equal(t, 32, len(res.Frames[0].Fields))
 		require.Equal(t, 3, res.Frames[0].Fields[0].Len())
 	})
+	t.Run("stats query without field should throw error", func(t *testing.T) {
+		sc := NewFakeClient(fakeDoer{Body: "{}"})
+		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(`{
+			"queryType" : "statsV2"
+		}`)}, *sc)
+		assert.NotNil(t, res.Error)
+		assert.Equal(t, `at least one "field" is required`, res.Error.Error())
+	})
+	t.Run("stats query without category should throw error", func(t *testing.T) {
+		sc := NewFakeClient(fakeDoer{Body: "{}"})
+		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(`{
+			"queryType" : "statsV2", 
+			"statsFields" : ["foo"]
+		}`)}, *sc)
+		assert.NotNil(t, res.Error)
+		assert.Equal(t, `at least one "category" is required`, res.Error.Error())
+	})
+	t.Run("stats query with field and category should not throw error", func(t *testing.T) {
+		sc := NewFakeClient(fakeDoer{Body: "{}"})
+		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(`{
+			"queryType" : "statsV2", 
+			"statsFields" : ["foo"],
+			"statsCategory" : ["foo"]
+		}`)}, *sc)
+		assert.Nil(t, res.Error)
+		require.Equal(t, 1, len(res.Frames))
+		assert.Equal(t, "Stats (A)", res.Frames[0].Name)
+		require.Equal(t, 0, len(res.Frames[0].Fields))
+	})
+	t.Run("valid stats query should produce correct result", func(t *testing.T) {
+		sc := NewFakeClient(fakeDoer{Body: `{
+			"start":"2021-07-15T15:00:00Z",
+			"end":"2021-10-13T18:00:00Z",
+			"intervals": ["2021-07-15T15:00:00Z","2021-07-15T18:00:00Z"],
+			"groups":[
+				{ "by": {}, "series": { "sum(quantity)" : [ 11, 22 ]} }
+			]
+		}`})
+		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(`{
+			"queryType" : "statsV2", 
+			"statsFields" : ["foo"],
+			"statsCategory" : ["foo"]
+		}`)}, *sc)
+		assert.Nil(t, res.Error)
+		require.Equal(t, 1, len(res.Frames))
+		assert.Equal(t, "Stats (A)", res.Frames[0].Name)
+		require.Equal(t, 2, len(res.Frames[0].Fields))
+		require.Equal(t, 2, res.Frames[0].Fields[0].Len())
+		require.Equal(t, "Timestamp", res.Frames[0].Fields[0].Name)
+		require.Equal(t, "Sum (Quantity)", res.Frames[0].Fields[1].Name)
+		require.Equal(t, "", res.Frames[0].Fields[1].Labels.String())
+
+	})
+	t.Run("valid stats query with valid group by should produce correct result", func(t *testing.T) {
+		sc := NewFakeClient(fakeDoer{Body: `{
+			"start":"2021-07-15T15:00:00Z",
+			"end":"2021-10-13T18:00:00Z",
+			"intervals": ["2021-07-15T15:00:00Z","2021-07-15T18:00:00Z"],
+			"groups":[
+				{ "by": { "reason":"foo", "category": "foo1" }, "series": { "sum(quantity)" : [ 11, 22 ], "sum(times_seen)" : [ 11, 22 ]} },
+				{ "by": { "reason":"bar", "category": "foo2" }, "series": { "sum(quantity)" : [ 11, 22 ], "sum(times_seen)" : [ 11, 22 ]} }
+			]
+		}`})
+		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(`{
+			"queryType" : "statsV2", 
+			"statsFields" : ["foo"],
+			"statsCategory" : ["foo"]
+		}`)}, *sc)
+		assert.Nil(t, res.Error)
+		require.Equal(t, 1, len(res.Frames))
+		assert.Equal(t, "Stats (A)", res.Frames[0].Name)
+		require.Equal(t, 5, len(res.Frames[0].Fields))
+		require.Equal(t, 2, res.Frames[0].Fields[0].Len())
+		require.Equal(t, "Timestamp", res.Frames[0].Fields[0].Name)
+		require.Equal(t, "Sum (Quantity)", res.Frames[0].Fields[1].Name)
+		require.Equal(t, "Sum (Times Seen)", res.Frames[0].Fields[2].Name)
+		require.Equal(t, "Sum (Quantity)", res.Frames[0].Fields[3].Name)
+		require.Equal(t, "Sum (Times Seen)", res.Frames[0].Fields[4].Name)
+		require.Equal(t, "Category=foo1, Reason=foo", res.Frames[0].Fields[1].Labels.String())
+		require.Equal(t, "Category=foo1, Reason=foo", res.Frames[0].Fields[2].Labels.String())
+		require.Equal(t, "Category=foo2, Reason=bar", res.Frames[0].Fields[3].Labels.String())
+		require.Equal(t, "Category=foo2, Reason=bar", res.Frames[0].Fields[4].Labels.String())
+	})
+
 }

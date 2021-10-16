@@ -10,12 +10,17 @@ import (
 )
 
 type SentryQuery struct {
-	QueryType    string   `json:"queryType"`
-	ProjectIds   []string `json:"projectIds,omitempty"`
-	Environments []string `json:"environments,omitempty"`
-	IssuesQuery  string   `json:"issuesQuery,omitempty"`
-	IssuesSort   string   `json:"issuesSort,omitempty"`
-	IssuesLimit  int64    `json:"issuesLimit,omitempty"`
+	QueryType     string   `json:"queryType"`
+	ProjectIds    []string `json:"projectIds,omitempty"`
+	Environments  []string `json:"environments,omitempty"`
+	IssuesQuery   string   `json:"issuesQuery,omitempty"`
+	IssuesSort    string   `json:"issuesSort,omitempty"`
+	IssuesLimit   int64    `json:"issuesLimit,omitempty"`
+	StatsCategory []string `json:"statsCategory,omitempty"`
+	StatsFields   []string `json:"statsFields,omitempty"`
+	StatsGroupBy  []string `json:"statsGroupBy,omitempty"`
+	StatsOutcome  []string `json:"statsOutcome,omitempty"`
+	StatsReason   []string `json:"statsReason,omitempty"`
 }
 
 func GetQuery(query backend.DataQuery) (SentryQuery, error) {
@@ -63,6 +68,30 @@ func QueryData(ctx context.Context, pCtx backend.PluginContext, backendQuery bac
 			return GetErrorResponse(response, executedQueryString, err)
 		}
 		frame, err := framestruct.ToDataFrame(GetFrameName("Issues", backendQuery.RefID), issues)
+		if err != nil {
+			return GetErrorResponse(response, executedQueryString, err)
+		}
+		frame = UpdateFrameMeta(frame, executedQueryString, query, client.BaseURL, client.OrgSlug)
+		response.Frames = append(response.Frames, frame)
+	case "statsV2":
+		if client.OrgSlug == "" {
+			return GetErrorResponse(response, "", ErrorInvalidOrganizationSlug)
+		}
+		stats, executedQueryString, err := client.GetStatsV2(sentry.GetStatsV2Input{
+			OrganizationSlug: client.OrgSlug,
+			From:             backendQuery.TimeRange.From,
+			To:               backendQuery.TimeRange.To,
+			ProjectIds:       query.ProjectIds,
+			Category:         query.StatsCategory,
+			Fields:           query.StatsFields,
+			GroupBy:          query.StatsGroupBy,
+			Outcome:          query.StatsOutcome,
+			Reason:           query.StatsReason,
+		})
+		if err != nil {
+			return GetErrorResponse(response, executedQueryString, err)
+		}
+		frame, err := ConvertStatsV2ResponseToFrame(GetFrameName("Stats", backendQuery.RefID), stats)
 		if err != nil {
 			return GetErrorResponse(response, executedQueryString, err)
 		}

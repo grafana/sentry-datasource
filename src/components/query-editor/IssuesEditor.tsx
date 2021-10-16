@@ -9,16 +9,16 @@ type IssuesEditorProps = Pick<QueryEditorProps<SentryDataSource, SentryQuery, Se
 
 export const IssuesEditor = ({ query, onChange, onRunQuery }: IssuesEditorProps) => {
   const onIssuesQueryChange = (issuesQuery: string) => {
-    onChange({ ...query, issuesQuery });
+    onChange({ ...query, issuesQuery } as SentryQuery);
   };
   const onIssuesSortChange = (issuesSort: SentryIssueSort) => {
-    onChange({ ...query, issuesSort: issuesSort || undefined });
+    onChange({ ...query, issuesSort: issuesSort || undefined } as SentryQuery);
     onRunQuery();
   };
   const onIssuesLimitChange = (issuesLimit?: number) => {
-    onChange({ ...query, issuesLimit: issuesLimit || undefined });
+    onChange({ ...query, issuesLimit: issuesLimit || undefined } as SentryQuery);
   };
-  return (
+  return query.queryType === 'issues' ? (
     <>
       <div className="gf-form">
         <InlineFormLabel width={10} className="query-keyword" tooltip={selectors.components.QueryEditor.Issues.Query.tooltip}>
@@ -59,5 +59,7 @@ export const IssuesEditor = ({ query, onChange, onRunQuery }: IssuesEditorProps)
         />
       </div>
     </>
+  ) : (
+    <></>
   );
 };
