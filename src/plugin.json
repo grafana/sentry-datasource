@@ -16,8 +16,8 @@
     },
     "keywords": ["Sentry"],
     "logos": {
-      "small": "img/Sentry-small.svg",
-      "large": "img/Sentry-large.svg"
+      "small": "img/sentry-small.svg",
+      "large": "img/sentry-large.svg"
     },
     "links": [],
     "screenshots": [],
