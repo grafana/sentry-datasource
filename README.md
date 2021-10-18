@@ -1,51 +1,52 @@
-# Grafana data source plugin for Sentry
+# Sentry data source plugin with Grafana
 
 The Sentry data source plugin allows you to query and visualize Sentry data within Grafana.
 
-## BETA DISCLAIMER
+## Beta disclaimer
 
-The plugin is in **BETA** stage and so you can expect bugs and breaking changes before the GA release (General Availability release). Should you encounter any bugs, glitches or other problems on the plugin, create a [github issue](https://github.com/grafana/sentry-datasource/issues/new) with relevant details.
+This **beta** plugin might contain bugs or breaking changes before the general-availability (GA) release. If you encounter a bug or problem with the plugin, create a [Github issue](https://github.com/grafana/sentry-datasource/issues/new) with as many relevant details as possible.
 
 ## Requirements
 
 The Sentry data source has the following requirements:
 
-- Grafana user with a [server admin or org admin role](https://grafana.com/docs/grafana/latest/permissions/).
-- An active Sentry account.
+- Grafana user with a [server admin or org admin role](https://grafana.com/docs/grafana/latest/permissions/)
+- An active Sentry account
 
-## Known Limitations
+## Known limitations
 
 With the Grafana Sentry data source plugin, you will be able to visualize only certain part of the Sentry such as Issues, Stats.
 
-## Install the sentry data source plugin
+## Install the Sentry data source plugin
 
-To install the data source in your grafana instance, refer to [Installation](https://grafana.com/grafana/plugins/grafana-sentry-datasource/?tab=installation).
+To install the Sentry data source plugin in your Grafana instance, refer to [Installation](https://grafana.com/grafana/plugins/grafana-sentry-datasource/?tab=installation).
 
-## Get the Authentication token from Sentry
+## Get the authentication token from Sentry
 
-In order to configure the Sentry data source in Grafana, you need an internal integration token from Sentry. You can generate one with the following steps.
+To configure the Sentry data source in Grafana, you need an internal integration token from Sentry:
 
-1. Go to `https://sentry.io`
-2. Navigate to **Organization Settings** and then **Developer Settings**
-3. Create an **Internal integration**. Give a valid name such as "Grafana".
-4. Provide **Read** permissions to the required resources such as "Project", "Issue and Event" and "Organization"
-5. Copy the token and then use this token when configuring the data source in Grafana.
+1. Go to `https://sentry.io`.
+2. Navigate to **Organization Settings**, and then to **Developer Settings**.
+3. Create an **Internal integration**.
+4. Use a valid name such as "Grafana".
+5. Provide **Read** permissions to the required resources such as "Project", "Issue and Event", and "Organization".
+6. Copy the token, and then use this token when configuring the data source within Grafana.
 
 ## Configure the data source in Grafana
 
 [Add a data source](https://grafana.com/docs/grafana/latest/datasources/add-a-data-source/) by filling in the following fields:
 
-| Field Name        | Description                                                                                                                                                            |
+| Field name        | Description                                                                                                                                                            |
 | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Sentry URL        | Sentry URL to be used. If left blank, defaults to `https://sentry.io`                                                                                                  |
-| Sentry Org        | Sentry Org slug. Typically this will be in the url `https://sentry.io/organizations/{organization_slug}/`                                                              |
+| Sentry URL        | Sentry URL to be used. If left blank, the default is `https://sentry.io`.                                                                                                  |
+| Sentry Org        | Sentry Org slug. Typically this is in the URL, such as `https://sentry.io/organizations/{organization_slug}/`.                                                              |
 | Sentry Auth Token | Sentry Auth token. You can generate this from `https://sentry.io/settings/{organization_slug}/developer-settings/`) using the steps specified in the previous section. |
 
 ## Configure the data source via provisioning
 
-Data sources can be configured with Grafana's provisioning system. You can read more about how it works and all the settings you can set for data sources on [Provisioning Grafana](https://grafana.com/docs/grafana/latest/administration/provisioning/#datasources).
+You can configure data sources to use Grafana’s provisioning system. For more information about how provisioning works, and all of the settings that you can set for data sources, see [Provisioning Grafana](https://grafana.com/docs/grafana/latest/administration/provisioning/#datasources).
 
-Here is an example for provisioning this data source
+Here is an example for provisioning this data source:
 
 ```yaml
 apiVersion: 1
@@ -68,18 +69,18 @@ datasources:
 
 The query editor allows you to query Sentry, get sentry issues and stats and display them in Grafana dashboard panels. You can choose one of the following query types, to get the relevant data.
 
-### Sentry Issues
+### Sentry issues
 
-To get the list of sentry issues, select "Sentry Issues" as the query type. Issues will be filtered based on Grafana's selected time range.
+To get the list of Sentry issues, select **Sentry Issues** as the query type. Issues are filtered based on Grafana’s selected time range.
 
 | Field        | Description                                                      |
 | ------------ | ---------------------------------------------------------------- |
-| Query Type   | Choose **Issues** as query type                                  |
-| Projects     | (optional) Select one or more projects to filter the results     |
-| Environments | (optional) Select one or more environments to filter the results |
-| Query        | (optional) Enter your sentry query to get the relevant results   |
-| Sort By      | (optional) Select the order of results you want to display       |
-| Limit        | (optional) Limit the number of results displayed                 |
+| Query Type   | Choose **Issues** as query type.                                  |
+| Projects     | (optional) Select one or more projects to filter the results.     |
+| Environments | (optional) Select one or more environments to filter the results. |
+| Query        | (optional) Enter your sentry query to get the relevant results.   |
+| Sort By      | (optional) Select the order of results you want to display.       |
+| Limit        | (optional) Limit the number of results displayed.                 |
 
 ### Sentry Stats
 
@@ -87,26 +88,26 @@ To get the trend of sentry stats, select "Stats" as the query type. Stats will b
 
 | Field           | Description                                                                                                     |
 | --------------- | --------------------------------------------------------------------------------------------------------------- |
-| Query Type      | Choose **Stats** as query type                                                                                  |
-| Field           | Select the field type you want to trend. Currently, you must choose either `sum(quantity)` or `sum(times_seen)` |
-| Category Filter | Select the category you want to filter the results. You must to choose one the available option there           |
-| Group By        | (optional) Select one or more fields you want to group the results                                              |
-| Projects        | (optional) Select one or more projects to filter the results                                                    |
-| Outcome Filter  | (optional) Select one of more outcomes to filter the results                                                    |
-| Reason Filter   | (optional) Enter comma separated list of reasons you want to filter                                             |
+| Query Type      | Choose **Stats** as query type.                                                                                  |
+| Field           | Select the field type you want to trend. Currently, you must choose either `sum(quantity)` or `sum(times_seen)`. |
+| Category Filter | Select the category you want to filter the results. You must to choose one the available option there.           |
+| Group By        | (optional) Select one or more fields you want to group the results.                                              |
+| Projects        | (optional) Select one or more projects to filter the results.                                                    |
+| Outcome Filter  | (optional) Select one of more outcomes to filter the results.                                                    |
+| Reason Filter   | (optional) Enter comma separated list of reasons you want to filter.                                            |
 
 ## Templates and variables
 
-In Grafana dashboards, you can use Sentry entities as dashboard variables. Sentry data source supports following variables
+In Grafana dashboards, you can use Sentry entities as dashboard variables. Sentry data source supports following variables:
 
-| Variable Name | Description                                                                                                                      |
+| Variable name | Description                                                                                                                      |
 | ------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| Projects      | Lists the sentry projects. Project name will be used as display value and Project IDs will be used as actual values.             |
-| Environments  | Lists the sentry environments for the selected projects. If no projects selects, all the applicable environments will be listed. |
+| Projects      | Lists the Sentry projects. The project name is used as the display value, and each project ID is used as an actual value.             |
+| Environments  | Lists the Sentry environments for the selected projects. If you do not select a project, all of the applicable environments are listed. |
 
 ## Annotations
 
-Annotations give you the ability to overlay sentry issues on graphs. In the annotations editor, you have to choose "Issues" for creating annotations from Sentry Issues.
+Annotations give you the ability to overlay Sentry issues on graphs. In the annotations editor, you have to choose **Issues** for creating annotations from Sentry issues.
 
 ## Get the most out of the plugin
 
