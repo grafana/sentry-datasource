@@ -5,6 +5,7 @@
   "id": "grafana-sentry-datasource",
   "metrics": true,
   "backend": true,
+  "alerting": true,
   "annotations": true,
   "executable": "gpx_sentry-datasource",
   "info": {

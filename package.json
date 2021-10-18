@@ -1,6 +1,6 @@
 {
   "name": "grafana-sentry-datasource",
-  "version": "0.0.1",
+  "version": "0.0.1-beta.1",
   "description": "Grafana data source plugin for Sentry",
   "main": "dist/module.js",
   "author": "Grafana Labs",
