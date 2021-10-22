@@ -10,26 +10,26 @@ This **beta** plugin might contain bugs or breaking changes before the general-a
 
 The Sentry data source has the following requirements:
 
-- Grafana user with a [server admin or org admin role](https://grafana.com/docs/grafana/latest/permissions/)
+- Grafana user with a server or organization administration role; refer to [Permissions](https://grafana.com/docs/grafana/latest/permissions/).
 - An active Sentry account
 
 ## Known limitations
 
-With the Grafana Sentry data source plugin, you will be able to visualize only certain part of the Sentry such as Issues, Org stats.
+With the Grafana Sentry data source plugin, you are able to visualize issues or usage statistics within an organization. For more information, see [Issues](https://docs.sentry.io/product/issues/) and [Org Stats](https://docs.sentry.io/product/accounts/quotas/org-stats/).
 
 ## Install the Sentry data source plugin
 
 To install the Sentry data source plugin in your Grafana instance, refer to [Installation](https://grafana.com/grafana/plugins/grafana-sentry-datasource/?tab=installation).
 
-## Get the authentication token from Sentry
+## Get an authentication token from Sentry
 
-To configure the Sentry data source in Grafana, you need an internal integration token from Sentry:
+To configure the Sentry data source plugin within Grafana, get an internal integration token from Sentry:
 
 1. Go to `https://sentry.io`.
 2. Navigate to **Organization Settings**, and then to **Developer Settings**.
-3. Create an **Internal integration**.
-4. Use a valid name such as "Grafana".
-5. Provide **Read** permissions to the required resources such as "Project", "Issue and Event", and "Organization".
+3. Select **New Internal Integration**.
+4. Use a valid name such as _Grafana_.
+5. Go to **PERMISSIONS**, provide **Read** permissions to the required resources such as "Project", "Issue and Event", and "Organization".
 6. Copy the token, and then use this token when configuring the data source within Grafana.
 
 ## Configure the data source in Grafana
