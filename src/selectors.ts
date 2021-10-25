@@ -22,7 +22,7 @@ export const Components = {
         label: 'Sentry Auth Token',
         placeholder: 'Sentry Authentication Token',
         ariaLabel: `Enter your Sentry Auth token here.`,
-        tooltip: `Sentry authentication token. Auth tokens can be created from ${DEFAULT_SENTRY_URL}/settings/account/api/auth-tokens/new-token/`,
+        tooltip: `Sentry authentication token. Auth tokens can be created from ${DEFAULT_SENTRY_URL}/settings/{organization_slug}/developer-settings`,
         Reset: {
           label: `Reset`,
         },
