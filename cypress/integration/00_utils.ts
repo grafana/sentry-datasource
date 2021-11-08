@@ -4,7 +4,7 @@ import { selectors } from '../../src/selectors';
 export const e2eSelectors = e2e.getSelectors(selectors.components);
 
 export const PROVISIONING_FILENAME = 'datasources/grafana-sentry-datasource.yaml';
-export const SENTRY_PROJECTS_COUNT = 4;
+export const SENTRY_PROJECTS_COUNT = 5;
 export const SENTRY_E2E_PROJECT_NAME = 'project-e2e';
 export const SENTRY_E2E_PROJECT_ID = '5988308';
 export const SENTRY_E2E_PRODUCTION_PROJECT_NAME = 'project-node';

@@ -2,10 +2,6 @@
 
 The Sentry data source plugin allows you to query and visualize Sentry data within Grafana.
 
-## Beta disclaimer
-
-This **beta** plugin might contain bugs or breaking changes before the general-availability (GA) release. If you encounter a bug or problem with the plugin, create a [Github issue](https://github.com/grafana/sentry-datasource/issues/new) with as many relevant details as possible.
-
 ## Requirements
 
 The Sentry data source has the following requirements:
