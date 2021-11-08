@@ -45,7 +45,7 @@ You can configure data sources to use Grafana’s provisioning system. For more 
 
 Here is an example for provisioning this data source:
 
-```yaml
+```yml
 apiVersion: 1
 
 datasources:
