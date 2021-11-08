@@ -37,7 +37,6 @@ To configure the Sentry data source plugin within Grafana, get an internal integ
 | Sentry URL        | Sentry URL to be used. If left blank, the default is `https://sentry.io`.                                                                                              |
 | Sentry Org        | Sentry Org slug. Typically this is in the URL, such as `https://sentry.io/organizations/{organization_slug}/`.                                                         |
 | Sentry Auth Token | Sentry Auth token. You can generate this from `https://sentry.io/settings/{organization_slug}/developer-settings/`) using the steps specified in the previous section. |
-| Sentry Auth Token | Sentry Auth token. To generate this, go to `https://sentry.io/settings/{organization_slug}/developer-settings/`, and use the steps specified in the previous section.  |
 
 ## Configure the data source via provisioning
 
@@ -47,7 +46,6 @@ Here is an example for provisioning this data source:
 
 ```yml
 apiVersion: 1
-
 datasources:
   - name: Sentry
     type: grafana-sentry-datasource
