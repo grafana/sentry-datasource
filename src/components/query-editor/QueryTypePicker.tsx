@@ -25,6 +25,7 @@ export const QueryTypePicker = ({ query, onChange, onRunQuery }: QueryTypePicker
         value={query.queryType}
         onChange={(e) => onQueryTypeChange(e.value)}
         className="inline-element"
+        placeholder={selectors.components.QueryEditor.QueryType.placeholder}
         width={28}
       ></Select>
     </div>

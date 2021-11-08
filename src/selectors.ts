@@ -33,17 +33,18 @@ export const Components = {
     QueryType: {
       label: 'Query Type',
       tooltip: 'Choose query type',
+      placeholder: 'Required. Select query type',
     },
     Scope: {
       ProjectIDs: {
         label: 'Projects',
         tooltip: 'Optionally filter results by project IDs',
-        placeholder: 'optional',
+        placeholder: 'Optional',
       },
       Environments: {
         label: 'Environments',
         tooltip: 'Optionally filter results by environment names',
-        placeholder: 'optional',
+        placeholder: 'Optional',
       },
     },
     Issues: {
@@ -55,7 +56,7 @@ export const Components = {
       Sort: {
         label: 'Sort By',
         tooltip: 'Sort results',
-        placeholder: 'optional',
+        placeholder: 'Optional',
       },
       Limit: {
         label: 'Limit',
@@ -67,23 +68,27 @@ export const Components = {
       Field: {
         label: 'Field',
         tooltip: 'stats field',
+        placeholder: 'Required. Select one or more fields to see the stat',
       },
       GroupBy: {
         label: 'Group By',
         tooltip: 'group by',
+        placeholder: 'Optional. Select the option to group the results',
       },
       Category: {
         label: 'Category Filter',
         tooltip: 'category filter. Required',
+        placeholder: 'Required. Select category to filter results',
       },
       Outcome: {
         label: 'Outcome Filter',
         tooltip: 'outcome filter. Optional. Select one or more outcomes',
+        placeholder: 'Optional. Select list of outcomes to filter results',
       },
       Reason: {
         label: 'Reason Filter',
         tooltip: 'Comma separated list of reasons to filter',
-        placeholder: 'Comma separated list of reasons. Optional',
+        placeholder: 'Optional. Comma separated list of reasons',
       },
     },
     Preview: {

@@ -39,6 +39,7 @@ export const StatsV2Editor = (props: StatsV2EditorProps) => {
           value={query.statsFields?.[0] || ''}
           options={SentryStatsV2QueryFieldOptions}
           onChange={(e) => onPropChange('statsFields', [e.value!])}
+          placeholder={StatsV2Selectors.Field.placeholder}
         ></Select>
       </div>
       <div
@@ -52,6 +53,7 @@ export const StatsV2Editor = (props: StatsV2EditorProps) => {
           value={query.statsCategory?.[0] || ''}
           options={SentryStatsV2QueryCategoryOptions}
           onChange={(e) => onPropChange('statsCategory', [e.value!])}
+          placeholder={StatsV2Selectors.Category.placeholder}
         ></Select>
       </div>
       <div className="gf-form">
@@ -61,6 +63,7 @@ export const StatsV2Editor = (props: StatsV2EditorProps) => {
         <MultiSelect
           value={query.statsOutcome || []}
           options={SentryStatsV2QueryOutcomeOptions}
+          placeholder={StatsV2Selectors.Outcome.placeholder}
           onChange={(e) =>
             onPropChange(
               'statsOutcome',
@@ -92,6 +95,7 @@ export const StatsV2Editor = (props: StatsV2EditorProps) => {
           value={query.statsGroupBy || []}
           isClearable={true}
           options={SentryStatsV2QueryGroupByOptions}
+          placeholder={StatsV2Selectors.GroupBy.placeholder}
           onChange={(e) =>
             onPropChange(
               'statsGroupBy',
