@@ -82,8 +82,8 @@ export const Components = {
       },
       Reason: {
         label: 'Reason Filter',
-        tooltip: 'comma separated list of reasons to filter',
-        placeholder: 'comma separated list of reasons',
+        tooltip: 'Comma separated list of reasons to filter',
+        placeholder: 'Comma separated list of reasons. Optional',
       },
     },
     Preview: {

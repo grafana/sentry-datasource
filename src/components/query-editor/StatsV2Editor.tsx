@@ -1,6 +1,6 @@
 import React from 'react';
 import { QueryEditorProps } from '@grafana/data';
-import { InlineFormLabel, Select, MultiSelect, Input } from '@grafana/ui';
+import { InlineFormLabel, Select, MultiSelect, Input, useTheme } from '@grafana/ui';
 import { SentryDataSource } from '../../datasource';
 import { Components } from '../../selectors';
 import {
@@ -17,6 +17,7 @@ type StatsV2EditorProps = Pick<QueryEditorProps<SentryDataSource, SentryQuery, S
 
 export const StatsV2Editor = (props: StatsV2EditorProps) => {
   const { query, onChange, onRunQuery } = props;
+  const theme = useTheme();
   const { StatsV2: StatsV2Selectors } = Components.QueryEditor;
   if (query.queryType !== 'statsV2') {
     return <></>;
@@ -27,7 +28,10 @@ export const StatsV2Editor = (props: StatsV2EditorProps) => {
   };
   return (
     <>
-      <div className="gf-form">
+      <div
+        className="gf-form"
+        style={{ borderLeft: !(query.statsFields && query.statsFields.length > 0) ? `1px solid ${theme.palette.red}` : '' }}
+      >
         <InlineFormLabel width={10} className="query-keyword" tooltip={StatsV2Selectors.Field.tooltip}>
           {StatsV2Selectors.Field.label}
         </InlineFormLabel>
@@ -37,23 +41,10 @@ export const StatsV2Editor = (props: StatsV2EditorProps) => {
           onChange={(e) => onPropChange('statsFields', [e.value!])}
         ></Select>
       </div>
-      <div className="gf-form">
-        <InlineFormLabel width={10} className="query-keyword" tooltip={StatsV2Selectors.GroupBy.tooltip}>
-          {StatsV2Selectors.GroupBy.label}
-        </InlineFormLabel>
-        <MultiSelect
-          value={query.statsGroupBy || []}
-          isClearable={true}
-          options={SentryStatsV2QueryGroupByOptions}
-          onChange={(e) =>
-            onPropChange(
-              'statsGroupBy',
-              e.map((item) => item.value!)
-            )
-          }
-        ></MultiSelect>
-      </div>
-      <div className="gf-form">
+      <div
+        className="gf-form"
+        style={{ borderLeft: !(query.statsCategory && query.statsCategory.length > 0) ? `1px solid ${theme.palette.red}` : '' }}
+      >
         <InlineFormLabel width={10} className="query-keyword" tooltip={StatsV2Selectors.Category.tooltip}>
           {StatsV2Selectors.Category.label}
         </InlineFormLabel>
@@ -92,6 +83,22 @@ export const StatsV2Editor = (props: StatsV2EditorProps) => {
             )
           }
         ></Input>
+      </div>
+      <div className="gf-form">
+        <InlineFormLabel width={10} className="query-keyword" tooltip={StatsV2Selectors.GroupBy.tooltip}>
+          {StatsV2Selectors.GroupBy.label}
+        </InlineFormLabel>
+        <MultiSelect
+          value={query.statsGroupBy || []}
+          isClearable={true}
+          options={SentryStatsV2QueryGroupByOptions}
+          onChange={(e) =>
+            onPropChange(
+              'statsGroupBy',
+              e.map((item) => item.value!)
+            )
+          }
+        ></MultiSelect>
       </div>
     </>
   );

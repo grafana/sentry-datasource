@@ -1,5 +1,5 @@
 # Changelog
 
-## 0.0.1 (Unreleased)
+## 1.0.0 (2021-11-08)
 
 - Initial release.

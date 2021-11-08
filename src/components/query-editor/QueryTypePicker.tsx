@@ -1,6 +1,6 @@
 import React from 'react';
 import { QueryEditorProps } from '@grafana/data';
-import { InlineFormLabel, Select } from '@grafana/ui';
+import { InlineFormLabel, Select, useTheme } from '@grafana/ui';
 import { SentryDataSource } from './../../datasource';
 import { selectors } from './../../selectors';
 import { SentryConfig, SentryQuery, QueryType, QueryTypeOptions } from './../../types';
@@ -8,6 +8,7 @@ import { SentryConfig, SentryQuery, QueryType, QueryTypeOptions } from './../../
 type QueryTypePickerProps = Pick<QueryEditorProps<SentryDataSource, SentryQuery, SentryConfig>, 'query' | 'onChange' | 'onRunQuery'>;
 
 export const QueryTypePicker = ({ query, onChange, onRunQuery }: QueryTypePickerProps) => {
+  const theme = useTheme();
   const onQueryTypeChange = (queryType?: QueryType) => {
     if (queryType) {
       onChange({ ...query, queryType } as SentryQuery);
@@ -15,7 +16,7 @@ export const QueryTypePicker = ({ query, onChange, onRunQuery }: QueryTypePicker
     }
   };
   return (
-    <div className="gf-form">
+    <div className="gf-form" style={{ borderLeft: !query.queryType ? `1px solid ${theme.palette.red}` : '' }}>
       <InlineFormLabel width={10} className="query-keyword" tooltip={selectors.components.QueryEditor.QueryType.tooltip}>
         {selectors.components.QueryEditor.QueryType.label}
       </InlineFormLabel>
