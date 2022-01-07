@@ -14,7 +14,7 @@
       "name": "Grafana Labs",
       "url": "https://grafana.com"
     },
-    "keywords": ["Sentry"],
+    "keywords": ["Sentry", "Application monitoring", "Error tracking"],
     "logos": {
       "small": "img/sentry-small.svg",
       "large": "img/sentry-large.svg"
