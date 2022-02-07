@@ -8,6 +8,7 @@ The Sentry data source has the following requirements:
 
 - Grafana user with a server or organization administration role; refer to [Permissions](https://grafana.com/docs/grafana/latest/permissions/).
 - An active Sentry account
+- In Sentry, The Admin, Manager, or Owner role is required to get an internal integration token
 
 ## Known limitations
 
@@ -27,6 +28,8 @@ To configure the Sentry data source plugin within Grafana, get an internal integ
 4. Use a valid name such as _Grafana_.
 5. Go to **PERMISSIONS**, provide **Read** permissions to the required resources such as "Project", "Issue and Event", and "Organization".
 6. Copy the token, and then use this token when configuring the data source within Grafana.
+
+> Note: In Sentry, The Admin, Manager, or Owner role is required to get an internal integration token
 
 ## Configure the data source in Grafana
 
