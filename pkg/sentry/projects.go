@@ -1,6 +1,7 @@
 package sentry
 
 import (
+	"errors"
 	"time"
 )
 
@@ -27,6 +28,21 @@ type SentryProject struct {
 
 func (sc *SentryClient) GetProjects(organizationSlug string) ([]SentryProject, error) {
 	out := []SentryProject{}
-	err := sc.Fetch("/api/0/organizations/"+sc.OrgSlug+"/projects/", &out)
+	if organizationSlug == "" {
+		organizationSlug = sc.OrgSlug
+	}
+	err := sc.Fetch("/api/0/organizations/"+organizationSlug+"/projects/", &out)
+	return out, err
+}
+
+func (sc *SentryClient) GetTeamsProjects(organizationSlug string, teamSlug string) ([]SentryProject, error) {
+	out := []SentryProject{}
+	if organizationSlug == "" {
+		organizationSlug = sc.OrgSlug
+	}
+	if teamSlug == "" {
+		return out, errors.New("invalid team slug")
+	}
+	err := sc.Fetch("/api/0/teams/"+organizationSlug+"/"+teamSlug+"/projects/", &out)
 	return out, err
 }

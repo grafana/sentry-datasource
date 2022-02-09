@@ -111,6 +111,13 @@ export const Components = {
         ariaLabel: 'Select the sentry organization here to see its projects',
       },
     },
+    Team: {
+      label: 'Team slug',
+      tooltip: 'Select the team slug',
+      container: {
+        ariaLabel: 'Select the sentry team slug here',
+      },
+    },
     Project: {
       label: 'Project ID',
       tooltip: 'Select the project id',

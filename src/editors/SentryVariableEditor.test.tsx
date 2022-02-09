@@ -19,6 +19,7 @@ describe('SentryVariableEditor', () => {
   it('render error when orgId is not available', () => {
     const datasource = {} as SentryDataSource;
     datasource.getOrgSlug = jest.fn(() => '');
+    datasource.getOrgTeams = jest.fn(() => Promise.resolve([]));
     const query = {} as SentryVariableQuery;
     const onChange = jest.fn();
     const result = render(<SentryVariableEditor datasource={datasource} query={query} onChange={onChange} />);
@@ -28,6 +29,7 @@ describe('SentryVariableEditor', () => {
   it('render without error', () => {
     const datasource = {} as SentryDataSource;
     datasource.getOrgSlug = jest.fn(() => 'foo');
+    datasource.getOrgTeams = jest.fn(() => Promise.resolve([]));
     const query = {} as SentryVariableQuery;
     const onChange = jest.fn();
     const result = render(<SentryVariableEditor datasource={datasource} query={query} onChange={onChange} />);
@@ -39,6 +41,7 @@ describe('SentryVariableEditor', () => {
       const datasource = {} as SentryDataSource;
       datasource.getOrgSlug = jest.fn(() => 'foo');
       datasource.getOrganizations = jest.fn(() => Promise.resolve([]));
+      datasource.getOrgTeams = jest.fn(() => Promise.resolve([]));
       const query = { type: 'projects' } as SentryVariableQuery;
       const onChange = jest.fn();
       const result = render(<SentryVariableEditor datasource={datasource} query={query} onChange={onChange} />);
@@ -54,6 +57,7 @@ describe('SentryVariableEditor', () => {
       const datasource = {} as SentryDataSource;
       datasource.getOrgSlug = jest.fn(() => 'foo');
       datasource.getProjects = jest.fn(() => Promise.resolve([]));
+      datasource.getOrgTeams = jest.fn(() => Promise.resolve([]));
       const query = { type: 'environments' } as SentryVariableQuery;
       const onChange = jest.fn();
       const result = render(<SentryVariableEditor datasource={datasource} query={query} onChange={onChange} />);

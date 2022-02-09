@@ -18,6 +18,10 @@ type apiProvider interface {
 	// https://docs.sentry.io/api/organizations/list-your-organizations/
 	GetOrganizations() ([]SentryOrganization, error)
 
+	// ListOrganizationTeams lists the teams for an organization
+	// https://docs.sentry.io/api/teams/list-an-organizations-teams/
+	ListOrganizationTeams(organizationSlug string) ([]SentryTeam, error)
+
 	// GetProjects List an Organization's Projects
 	// https://docs.sentry.io/api/organizations/list-an-organizations-projects/
 	GetProjects(organizationSlug string) ([]SentryProject, error)
