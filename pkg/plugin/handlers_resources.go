@@ -1,64 +1,70 @@
 package plugin
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
-	"strings"
 
-	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	"github.com/grafana/grafana-plugin-sdk-go/backend/resource"
+	"github.com/gorilla/mux"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
 	"github.com/grafana/sentry-datasource/pkg/sentry"
 )
 
-const SentryResourceQueryTypeOrganizations = "organizations"
-const SentryResourceQueryTypeProjects = "projects"
-
-type SentryResourceQuery struct {
-	Type    string `json:"type"`
-	OrgSlug string `json:"orgSlug"`
+func (host *SentryDatasource) getResourceRouter() *mux.Router {
+	router := mux.NewRouter()
+	router.HandleFunc("/api/0/organizations", host.withDatasourceHandler(GetOrganizationsHandler)).Methods("GET")
+	router.HandleFunc("/api/0/organizations/{organization_slug}/projects", host.withDatasourceHandler(GetProjectsHandler)).Methods("GET")
+	router.NotFoundHandler = http.HandlerFunc(host.withDatasourceHandler(DefaultResourceHandler))
+	return router
 }
 
-func GetResourceQuery(body []byte) (*SentryResourceQuery, error) {
-	query := SentryResourceQuery{}
-	if err := json.Unmarshal(body, &query); err != nil {
-		return nil, ErrorFailedUnmarshalingResourceQuery
+func GetOrganizationsHandler(client *sentry.SentryClient) http.HandlerFunc {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		orgs, err := client.GetOrganizations()
+		writeResponse(orgs, err, rw)
 	}
-	if query.Type == "" {
-		return nil, ErrorInvalidResourceCallQuery
-	}
-	return &query, nil
 }
 
-func (ds *SentryDatasource) CallResource(ctx context.Context, req *backend.CallResourceRequest, sender backend.CallResourceResponseSender) error {
-	if strings.ToUpper(req.Method) == http.MethodPost {
-		dsi, err := ds.getDatasourceInstance(ctx, req.PluginContext)
-		if err != nil {
-			return err
+func GetProjectsHandler(client *sentry.SentryClient) http.HandlerFunc {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		orgSlug := mux.Vars(r)["organization_slug"]
+		if orgSlug == "" {
+			http.Error(rw, "invalid orgSlug", http.StatusBadRequest)
+			return
 		}
-		query, err := GetResourceQuery(req.Body)
-		if err != nil {
-			return err
-		}
-		o, err := CallResource(ctx, dsi.sentryClient, *query)
-		if err != nil {
-			return err
-		}
-		return resource.SendJSON(sender, o)
+		orgs, err := client.GetProjects(orgSlug)
+		writeResponse(orgs, err, rw)
 	}
-	return ErrorInvalidResourceCallQuery
 }
 
-func CallResource(ctx context.Context, sentryClient sentry.SentryClient, query SentryResourceQuery) (interface{}, error) {
-	switch query.Type {
-	case SentryResourceQueryTypeOrganizations:
-		return sentryClient.GetOrganizations()
-	case SentryResourceQueryTypeProjects:
-		if query.OrgSlug == "" {
-			return nil, ErrorInvalidOrganizationSlug
-		}
-		return sentryClient.GetProjects(query.OrgSlug)
-	default:
-		return nil, ErrorInvalidResourceCallQuery
+func DefaultResourceHandler(client *sentry.SentryClient) http.HandlerFunc {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		http.Error(rw, "not a valid resource call", http.StatusNotImplemented)
 	}
+}
+
+func (host *SentryDatasource) withDatasourceHandler(getHandler func(d *sentry.SentryClient) http.HandlerFunc) func(rw http.ResponseWriter, r *http.Request) {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		pluginContext := httpadapter.PluginConfigFromContext(ctx)
+		datasource, err := host.getDatasourceInstance(ctx, pluginContext)
+		if err != nil {
+			http.Error(rw, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		h := getHandler(&datasource.sentryClient)
+		h.ServeHTTP(rw, r)
+	}
+}
+
+func writeResponse(resp interface{}, err error, rw http.ResponseWriter) {
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	b, err := json.Marshal(resp)
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	rw.Write(b) //nolint
 }

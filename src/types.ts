@@ -66,18 +66,14 @@ export type SentryVariableQuery = VariableQueryProjects | VariableQueryEnvironme
 //#endregion
 
 //#region Resource call
-//#region Resource call Query
-export type SentryResourceCallRequestType = 'organizations' | 'projects';
-export type SentryResourceCallRequestBase<T extends SentryResourceCallRequestType> = { type: T };
-export type ResourceCallOrganizations = {} & SentryResourceCallRequestBase<'organizations'>;
-export type ResourceCallProjects = { orgSlug: string } & SentryResourceCallRequestBase<'projects'>;
-export type SentryResourceCallRequest = ResourceCallOrganizations | ResourceCallProjects;
-//#endregion
-//#region Resource call Response
-export type ResourceCallOrganizationsResponse = SentryOrganization[];
-export type ResourceCallProjectsResponse = SentryProject[];
-export type SentryResourceCallResponse = ResourceCallOrganizationsResponse | ResourceCallProjectsResponse;
-//#endregion
+type GetResourceCallBase<P extends string, Q extends Record<string, any>, R extends unknown> = {
+  path: P;
+  query?: Q;
+  response: R;
+};
+export type GetResourceCallOrganizations = GetResourceCallBase<`api/0/organizations`, {}, SentryOrganization[]>;
+export type GetResourceCallProjects = GetResourceCallBase<`api/0/organizations/${string}/projects`, {}, SentryProject[]>;
+export type GetResourceCall = GetResourceCallOrganizations | GetResourceCallProjects;
 //#endregion
 
 //#region Selectable values

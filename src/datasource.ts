@@ -4,13 +4,14 @@ import { DataSourceWithBackend, getTemplateSrv } from '@grafana/runtime';
 import { applyTemplateVariables, applyTemplateVariablesToVariableQuery } from './app/replace';
 import { getEnvironmentNamesFromProject } from './app/utils';
 import {
-  ResourceCallOrganizationsResponse,
-  ResourceCallProjectsResponse,
+  GetResourceCall,
   SentryConfig,
   SentryQuery,
-  SentryResourceCallRequest,
-  SentryResourceCallResponse,
   SentryVariableQuery,
+  SentryOrganization,
+  SentryProject,
+  GetResourceCallOrganizations,
+  GetResourceCallProjects,
 } from './types';
 
 export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryConfig> {
@@ -71,19 +72,16 @@ export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryC
       }
     });
   }
-  private postResourceLocal<T extends SentryResourceCallResponse>(body: SentryResourceCallRequest): Promise<T> {
-    return this.postResource('', body);
+  //#region Resource calls
+  getResource<O extends GetResourceCall>(path: O['path'], params?: O['query']): Promise<O['response']> {
+    return super.getResource(path, params);
   }
-  getOrganizations(): Promise<ResourceCallOrganizationsResponse> {
-    return this.postResourceLocal<ResourceCallOrganizationsResponse>({
-      type: 'organizations',
-    });
+  getOrganizations(): Promise<SentryOrganization[]> {
+    return this.getResource<GetResourceCallOrganizations>('api/0/organizations');
   }
-  getProjects(orgSlug: string): Promise<ResourceCallProjectsResponse> {
+  getProjects(orgSlug: string): Promise<SentryProject[]> {
     const replacedOrgSlug = getTemplateSrv().replace(orgSlug);
-    return this.postResourceLocal<ResourceCallProjectsResponse>({
-      type: 'projects',
-      orgSlug: replacedOrgSlug,
-    });
+    return this.getResource<GetResourceCallProjects>(`api/0/organizations/${replacedOrgSlug}/projects`, {});
   }
+  //#endregion
 }
