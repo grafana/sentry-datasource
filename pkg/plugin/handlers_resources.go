@@ -13,6 +13,8 @@ func (host *SentryDatasource) getResourceRouter() *mux.Router {
 	router := mux.NewRouter()
 	router.HandleFunc("/api/0/organizations", host.withDatasourceHandler(GetOrganizationsHandler)).Methods("GET")
 	router.HandleFunc("/api/0/organizations/{organization_slug}/projects", host.withDatasourceHandler(GetProjectsHandler)).Methods("GET")
+	router.HandleFunc("/api/0/organizations/{organization_slug}/teams", host.withDatasourceHandler(GetOrganizationTeamsHandler)).Methods("GET")
+	router.HandleFunc("/api/0/teams/{organization_slug}/{team_slug}/projects", host.withDatasourceHandler(GetTeamsProjectsHandler)).Methods("GET")
 	router.NotFoundHandler = http.HandlerFunc(host.withDatasourceHandler(DefaultResourceHandler))
 	return router
 }
@@ -33,6 +35,35 @@ func GetProjectsHandler(client *sentry.SentryClient) http.HandlerFunc {
 		}
 		orgs, err := client.GetProjects(orgSlug)
 		writeResponse(orgs, err, rw)
+	}
+}
+
+func GetTeamsProjectsHandler(client *sentry.SentryClient) http.HandlerFunc {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		orgSlug := mux.Vars(r)["organization_slug"]
+		if orgSlug == "" {
+			http.Error(rw, "invalid orgSlug", http.StatusBadRequest)
+			return
+		}
+		teamSlug := mux.Vars(r)["team_slug"]
+		if teamSlug == "" {
+			http.Error(rw, "invalid teamSlug", http.StatusBadRequest)
+			return
+		}
+		projects, err := client.GetTeamsProjects(orgSlug, teamSlug)
+		writeResponse(projects, err, rw)
+	}
+}
+
+func GetOrganizationTeamsHandler(client *sentry.SentryClient) http.HandlerFunc {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		orgSlug := mux.Vars(r)["organization_slug"]
+		if orgSlug == "" {
+			http.Error(rw, "invalid orgSlug", http.StatusBadRequest)
+			return
+		}
+		teams, err := client.ListOrganizationTeams(orgSlug)
+		writeResponse(teams, err, rw)
 	}
 }
 

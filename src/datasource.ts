@@ -12,6 +12,12 @@ import {
   SentryProject,
   GetResourceCallOrganizations,
   GetResourceCallProjects,
+  SentryTeam,
+  GetResourceCallListOrgTeams,
+  GetResourceCallProjectsPath,
+  GetResourceCallListOrgTeamsPath,
+  GetResourceCallGetTeamsProjectsPath,
+  GetResourceCallGetTeamsProjects,
 } from './types';
 
 export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryConfig> {
@@ -36,22 +42,40 @@ export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryC
   getOrgSlug(): string {
     return this.instanceSettings.jsonData?.orgSlug || '';
   }
+  private getProjectsAsMetricFindValue = (projects: SentryProject[]): MetricFindValue[] => {
+    return projects.map((project) => {
+      return {
+        value: project.id,
+        text: `${project.name} (${project.id})`,
+      };
+    });
+  };
   metricFindQuery(query: SentryVariableQuery): Promise<MetricFindValue[]> {
     query = applyTemplateVariablesToVariableQuery(query);
     return new Promise((resolve, reject) => {
-      if (query && query.type === 'projects') {
-        this.getProjects(this.getOrgSlug())
-          .then((projects) => {
+      if (query && query.type === 'teams') {
+        this.getOrgTeams(this.getOrgSlug())
+          .then((teams) => {
             resolve(
-              projects.map((project) => {
+              teams.map((team) => {
                 return {
-                  value: project.id,
-                  text: `${project.name} (${project.id})`,
+                  value: team.slug,
+                  text: `${team.name} (${team.slug})`,
                 };
               })
             );
           })
           .catch(reject);
+      } else if (query && query.type === 'projects') {
+        if (query.teamSlug) {
+          this.getTeamsProjects(this.getOrgSlug(), query.teamSlug)
+            .then((projects) => resolve(this.getProjectsAsMetricFindValue(projects)))
+            .catch(reject);
+        } else {
+          this.getProjects(this.getOrgSlug())
+            .then((projects) => resolve(this.getProjectsAsMetricFindValue(projects)))
+            .catch(reject);
+        }
       } else if (query && query.type === 'environments') {
         this.getProjects(this.getOrgSlug())
           .then((projects) => {
@@ -80,8 +104,26 @@ export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryC
     return this.getResource<GetResourceCallOrganizations>('api/0/organizations');
   }
   getProjects(orgSlug: string): Promise<SentryProject[]> {
-    const replacedOrgSlug = getTemplateSrv().replace(orgSlug);
-    return this.getResource<GetResourceCallProjects>(`api/0/organizations/${replacedOrgSlug}/projects`, {});
+    const replacedOrgSlug: string = getTemplateSrv().replace(orgSlug);
+    return this.getResource<GetResourceCallProjects>(`api/0/organizations/${replacedOrgSlug}/projects` as GetResourceCallProjectsPath, {});
+  }
+  getTeamsProjects(orgSlug: string, teamSlug: string): Promise<SentryProject[]> {
+    const replacedOrgSlug: string = getTemplateSrv().replace(orgSlug || '');
+    const replacedTeamSlug: string = getTemplateSrv().replace(teamSlug || '');
+    if (replacedOrgSlug === '' || replacedTeamSlug === '') {
+      return Promise.reject('invalid arguments');
+    }
+    return this.getResource<GetResourceCallGetTeamsProjects>(
+      `api/0/teams/${replacedOrgSlug}/${replacedTeamSlug}/projects` as GetResourceCallGetTeamsProjectsPath,
+      {}
+    );
+  }
+  getOrgTeams(orgSlug: string): Promise<SentryTeam[]> {
+    const replacedOrgSlug: string = getTemplateSrv().replace(orgSlug);
+    return this.getResource<GetResourceCallListOrgTeams>(
+      `api/0/organizations/${replacedOrgSlug}/teams` as GetResourceCallListOrgTeamsPath,
+      {}
+    );
   }
   //#endregion
 }

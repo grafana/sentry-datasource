@@ -1,6 +1,7 @@
 import React from 'react';
 import { Error } from '../components/Error';
 import { TypeSelector } from '../components/variable-query-editor/TypeSelector';
+import { TeamSelector } from '../components/variable-query-editor/TeamSelector';
 import { ProjectSelector } from '../components/variable-query-editor/ProjectSelector';
 import { SentryDataSource } from './../datasource';
 import { SentryVariableQuery, VariableQueryType } from './../types';
@@ -28,9 +29,20 @@ export const SentryVariableEditor = ({ query, onChange, datasource }: SentryVari
       onChange(newQuery, JSON.stringify(newQuery));
     }
   };
+  const onTeamSlugChange = (teamSlug: string | null) => {
+    if (query.type === 'projects') {
+      const newQuery: SentryVariableQuery = { ...query, teamSlug: teamSlug || '' };
+      onChange(newQuery, JSON.stringify(newQuery));
+    }
+  };
   return (
     <>
       <TypeSelector variableQueryType={query.type} onChange={onVariableQueryTypeChange}></TypeSelector>
+      {query.type === 'projects' && (
+        <div className="gf-form" data-testid="variable-query-editor-projects-filter">
+          <TeamSelector datasource={datasource} orgSlug={orgSlug || ''} teamSlug={query.teamSlug || ''} onValuesChange={onTeamSlugChange} />
+        </div>
+      )}
       {query.type === 'environments' && (
         <div className="gf-form" data-testid="variable-query-editor-environments-filter">
           <ProjectSelector

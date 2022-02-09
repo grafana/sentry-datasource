@@ -31,6 +31,20 @@ func TestGetOrganizationsHandler(t *testing.T) {
 		assert.Equal(t, fakeOrgs, rr.Body.String())
 	})
 }
+
+func TestGetOrganizationTeamsHandler(t *testing.T) {
+	fakeTeams := "[{\"avatar\":{\"avatarType\":\"\",\"avatarUuid\":null},\"dateCreated\":\"0001-01-01T00:00:00Z\",\"hasAccess\":false,\"id\":\"\",\"isMember\":false,\"isPending\":false,\"memberCount\":0,\"name\":\"\",\"projects\":null,\"slug\":\"\"},{\"avatar\":{\"avatarType\":\"\",\"avatarUuid\":null},\"dateCreated\":\"0001-01-01T00:00:00Z\",\"hasAccess\":false,\"id\":\"\",\"isMember\":false,\"isPending\":false,\"memberCount\":0,\"name\":\"\",\"projects\":null,\"slug\":\"\"},{\"avatar\":{\"avatarType\":\"\",\"avatarUuid\":null},\"dateCreated\":\"0001-01-01T00:00:00Z\",\"hasAccess\":false,\"id\":\"\",\"isMember\":false,\"isPending\":false,\"memberCount\":0,\"name\":\"\",\"projects\":null,\"slug\":\"\"}]"
+	t.Run("valid org slug should return results", func(t *testing.T) {
+		req, _ := http.NewRequest("GET", "/api/0/organizations/foo/teams", nil)
+		client := NewFakeClient(fakeDoer{Body: fakeTeams})
+		handler := plugin.GetOrganizationTeamsHandler(client)
+		rr := httptest.NewRecorder()
+		router := getFakeRouter(map[string]func(http.ResponseWriter, *http.Request){"/api/0/organizations/{organization_slug}/teams": handler})
+		router.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, fakeTeams, rr.Body.String())
+	})
+}
 func TestGetProjectsHandler(t *testing.T) {
 	fakeProjects := "[{\"dateCreated\":\"0001-01-01T00:00:00Z\",\"hasAccess\":false,\"id\":\"\",\"isBookmarked\":false,\"isMember\":false,\"environments\":null,\"name\":\"\",\"slug\":\"\",\"team\":{\"id\":\"\",\"name\":\"\",\"slug\":\"\"},\"teams\":null},{\"dateCreated\":\"0001-01-01T00:00:00Z\",\"hasAccess\":false,\"id\":\"\",\"isBookmarked\":false,\"isMember\":false,\"environments\":null,\"name\":\"\",\"slug\":\"\",\"team\":{\"id\":\"\",\"name\":\"\",\"slug\":\"\"},\"teams\":null},{\"dateCreated\":\"0001-01-01T00:00:00Z\",\"hasAccess\":false,\"id\":\"\",\"isBookmarked\":false,\"isMember\":false,\"environments\":null,\"name\":\"\",\"slug\":\"\",\"team\":{\"id\":\"\",\"name\":\"\",\"slug\":\"\"},\"teams\":null}]"
 	t.Run("valid org slug should return results", func(t *testing.T) {
