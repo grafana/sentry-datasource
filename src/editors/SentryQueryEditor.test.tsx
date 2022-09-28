@@ -8,6 +8,7 @@ import { SentryQuery } from './../types';
 describe('SentryQueryEditor', () => {
   beforeEach(() => {
     jest.spyOn(runtime, 'getTemplateSrv').mockImplementation(() => ({
+      updateTimeRange: jest.fn(),
       getVariables: () => [],
       replace: (s: string) => s,
     }));

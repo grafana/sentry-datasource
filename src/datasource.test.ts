@@ -6,6 +6,7 @@ import { SentryDataSource } from './datasource';
 describe('SentryDataSource', () => {
   beforeEach(() => {
     jest.spyOn(runtime, 'getTemplateSrv').mockImplementation(() => ({
+      updateTimeRange: jest.fn(),
       getVariables: jest.fn(),
       replace: (s: string) => {
         return s;

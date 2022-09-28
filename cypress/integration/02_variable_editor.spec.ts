@@ -3,6 +3,7 @@ import {
   selectDropdown,
   fillSentryConfigurationForm,
   variableEditorPreviewValuesCheck,
+  openDashboardSettings,
   e2eSelectors,
   PROVISIONING_FILENAME,
   SENTRY_PROJECTS_COUNT,
@@ -34,20 +35,11 @@ e2e.scenario({
           })
           .then((ds) => {
             e2e.flows.addDashboard().then(() => {
-              e2e.components.PageToolbar.item('Dashboard settings').click();
-              e2e.pages.Dashboard.Settings.General.sectionItems('Variables').click();
-              e2e.pages.Dashboard.Settings.Variables.List.addVariableCTA().click();
-              e2e.pages.Dashboard.Settings.Variables.Edit.General.generalTypeSelect()
-                .should('be.visible')
-                .within(() => {
-                  e2e.components.Select.singleValue().should('have.text', 'Query').click();
-                });
+              openDashboardSettings('Variables');
+              e2e.pages.Dashboard.Settings.Variables.List.addVariableCTAV2().click();
               e2e.pages.Dashboard.Settings.Variables.Edit.General.generalNameInput().clear().type('variable1');
-              e2e.pages.Dashboard.Settings.Variables.Edit.QueryVariable.queryOptionsDataSourceSelect()
-                .click()
-                .within(() => {
-                  e2e.components.Select.input().should('be.visible').type(`${ds.config.name}{enter}`);
-                });
+              cy.wait(6 * 1000); // When clearing the variable name, the validation popup comes and hides the datasource picker. so wait sometime till the popup closes.
+              selectDropdown(e2e.pages.Dashboard.Settings.Variables.Edit.QueryVariable.queryOptionsDataSourceSelect(), ds.config.name);
               // Get list of projects
               selectDropdown(e2eSelectors.VariablesEditor.QueryType.container.ariaLabel(), 'Projects');
               cy.wait(2 * 1000);

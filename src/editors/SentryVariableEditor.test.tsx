@@ -8,12 +8,9 @@ import { SentryVariableQuery } from './../types';
 describe('SentryVariableEditor', () => {
   beforeEach(() => {
     jest.spyOn(runtime, 'getTemplateSrv').mockImplementation(() => ({
-      getVariables: () => {
-        return [];
-      },
-      replace: (s: string) => {
-        return s;
-      },
+      updateTimeRange: jest.fn(),
+      getVariables: () => [],
+      replace: (s: string) => s,
     }));
   });
   it('render error when orgId is not available', () => {
