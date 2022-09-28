@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { InlineFormLabel, Input, Button } from '@grafana/ui';
-import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
 import { Components } from './../selectors';
-import { DEFAULT_SENTRY_URL, SentryConfig, SentrySecureConfig } from './../types';
+import { DEFAULT_SENTRY_URL } from './../constants';
+import type { DataSourcePluginOptionsEditorProps } from '@grafana/data/types';
+import type { SentryConfig, SentrySecureConfig } from './../types';
 
 type SentryConfigEditorProps = {} & DataSourcePluginOptionsEditorProps<SentryConfig, SentrySecureConfig>;
 

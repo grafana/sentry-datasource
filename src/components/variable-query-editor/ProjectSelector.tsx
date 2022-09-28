@@ -3,7 +3,7 @@ import { InlineFormLabel, MultiSelect } from '@grafana/ui';
 import { getTemplateSrv } from '@grafana/runtime';
 import { SentryDataSource } from '../../datasource';
 import { selectors } from '../../selectors';
-import { SentryProject } from '../../types';
+import type { SentryProject } from '../../types';
 
 export const ProjectSelector = (props: {
   mode: 'slug' | 'id' | 'name';

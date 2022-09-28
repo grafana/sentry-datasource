@@ -3,7 +3,7 @@ import { Error } from '../components/Error';
 import { TypeSelector } from '../components/variable-query-editor/TypeSelector';
 import { ProjectSelector } from '../components/variable-query-editor/ProjectSelector';
 import { SentryDataSource } from './../datasource';
-import { SentryVariableQuery, VariableQueryType } from './../types';
+import type { SentryVariableQuery, VariableQueryType } from './../types';
 
 type SentryVariableEditorProps = {
   query: SentryVariableQuery;

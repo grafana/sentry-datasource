@@ -1,8 +1,8 @@
 import React from 'react';
-import { SelectableValue } from '@grafana/data';
+import type { SelectableValue } from '@grafana/data/types';
 import { InlineFormLabel, Select } from '@grafana/ui';
 import { selectors } from '../../selectors';
-import { VariableQueryType } from '../../types';
+import type { VariableQueryType } from '../../types';
 
 export const TypeSelector = (props: { variableQueryType: VariableQueryType; onChange: (type: VariableQueryType) => void }) => {
   const options: Array<SelectableValue<VariableQueryType>> = [

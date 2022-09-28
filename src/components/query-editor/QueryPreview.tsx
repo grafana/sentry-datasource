@@ -1,9 +1,9 @@
 import React from 'react';
-import { QueryEditorProps } from '@grafana/data';
 import { InlineFormLabel } from '@grafana/ui';
-import { SentryDataSource } from '../../datasource';
 import { selectors } from '../../selectors';
-import { SentryConfig, SentryQuery } from '../../types';
+import type { QueryEditorProps } from '@grafana/data/types';
+import type { SentryDataSource } from '../../datasource';
+import type { SentryConfig, SentryQuery } from '../../types';
 
 type QueryPreviewProps = Pick<QueryEditorProps<SentryDataSource, SentryQuery, SentryConfig>, 'query'>;
 

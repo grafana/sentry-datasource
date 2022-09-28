@@ -1,6 +1,6 @@
 import flatten from 'lodash/flatten';
 import uniq from 'lodash/uniq';
-import { SentryProject } from './../types';
+import type { SentryProject } from './../types';
 
 export const getEnvironmentNamesFromProject = (allProjects: SentryProject[], selectedProjectIds: string[]): string[] => {
   if (selectedProjectIds && selectedProjectIds.length > 0) {

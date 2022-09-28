@@ -1,10 +1,10 @@
 import React from 'react';
 import * as runtime from '@grafana/runtime';
 import { render } from '@testing-library/react';
-import { DataSourceInstanceSettings } from '@grafana/data';
 import { ScopePicker } from './ScopePicker';
 import { SentryDataSource } from './../../datasource';
-import { SentryQuery, SentryConfig } from './../../types';
+import type { DataSourceInstanceSettings } from '@grafana/data/types';
+import type { SentryQuery, SentryConfig } from './../../types';
 
 describe('ScopePicker', () => {
   beforeEach(() => {

@@ -1,12 +1,12 @@
 import React from 'react';
-import { QueryEditorProps } from '@grafana/data';
 import { SentryDataSource } from './../datasource';
 import { Error } from '../components/Error';
 import { QueryTypePicker } from './../components/query-editor/QueryTypePicker';
 import { ScopePicker } from './../components/query-editor/ScopePicker';
 import { IssuesEditor } from './../components/query-editor/IssuesEditor';
 import { StatsV2Editor } from './../components/query-editor/StatsV2Editor';
-import { SentryConfig, SentryQuery } from './../types';
+import type { QueryEditorProps } from '@grafana/data/types';
+import type { SentryConfig, SentryQuery } from './../types';
 import './../styles/editor.scss';
 
 type SentryQueryEditorProps = {} & QueryEditorProps<SentryDataSource, SentryQuery, SentryConfig>;

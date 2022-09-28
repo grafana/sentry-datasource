@@ -1,10 +1,10 @@
 import React from 'react';
 import * as runtime from '@grafana/runtime';
 import { render, waitFor } from '@testing-library/react';
-import { DataSourceInstanceSettings } from '@grafana/data';
 import { ProjectSelector } from './ProjectSelector';
 import { SentryDataSource } from './../../datasource';
-import { SentryConfig } from './../../types';
+import type { DataSourceInstanceSettings } from '@grafana/data/types';
+import type { SentryConfig } from './../../types';
 
 describe('ProjectSelector', () => {
   beforeEach(() => {
