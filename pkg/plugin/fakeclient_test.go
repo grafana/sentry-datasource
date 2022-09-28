@@ -3,7 +3,7 @@ package plugin_test
 import (
 	"bytes"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/grafana/sentry-datasource/pkg/sentry"
@@ -26,7 +26,7 @@ func (fd *fakeDoer) Do(req *http.Request) (*http.Response, error) {
 	res := &http.Response{
 		StatusCode: http.StatusOK,
 		Status:     "200 OK",
-		Body:       ioutil.NopCloser(bytes.NewBufferString(fakeResponseBody)),
+		Body:       io.NopCloser(bytes.NewBufferString(fakeResponseBody)),
 	}
 	if fd.AuthToken != "" && fd.AuthToken != fakeSentryAuthToken {
 		res.StatusCode = 401
@@ -43,7 +43,7 @@ func (fd *fakeDoer) Do(req *http.Request) (*http.Response, error) {
 		return nil, fd.ExpectedError
 	}
 	if fd.Body != "" {
-		res.Body = ioutil.NopCloser(bytes.NewBufferString(fd.Body))
+		res.Body = io.NopCloser(bytes.NewBufferString(fd.Body))
 	}
 	if res.Body != nil {
 		return res, nil
