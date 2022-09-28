@@ -1,0 +1,23 @@
+{
+  "language": "en",
+  "ignorePaths": [
+    "node_modules",
+    "dist",
+    "coverage",
+    "cypress",
+    "pkg/**/*_test.go",
+    "mage_output_file.go",
+    "src/**/*.{test,spec}.{ts,tsx}"
+  ],
+  "words": [
+    "DataSource",
+    "DataSources",
+    "endregion",
+    "framestruct",
+    "Grafana",
+    "httpclient",
+    "instancemgmt",
+    "testid",
+    "Unmarshaling"
+  ]
+}

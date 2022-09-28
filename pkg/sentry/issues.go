@@ -70,7 +70,7 @@ type GetIssuesInput struct {
 }
 
 func (gii *GetIssuesInput) ToQuery() string {
-	urlpath := fmt.Sprintf("/api/0/organizations/%s/issues/?", gii.OrganizationSlug)
+	urlPath := fmt.Sprintf("/api/0/organizations/%s/issues/?", gii.OrganizationSlug)
 	if gii.Limit < 1 || gii.Limit > 10000 {
 		gii.Limit = 10000
 	}
@@ -88,7 +88,7 @@ func (gii *GetIssuesInput) ToQuery() string {
 	for _, environment := range gii.Environments {
 		params.Add("environment", environment)
 	}
-	return urlpath + params.Encode()
+	return urlPath + params.Encode()
 }
 
 func (sc *SentryClient) GetIssues(gii GetIssuesInput) ([]SentryIssue, string, error) {
