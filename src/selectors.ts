@@ -33,7 +33,7 @@ export const Components = {
     QueryType: {
       label: 'Query Type',
       tooltip: 'Choose query type',
-      placeholder: 'Required. Select query type',
+      placeholder: 'Query type',
     },
     Scope: {
       ProjectIDs: {
