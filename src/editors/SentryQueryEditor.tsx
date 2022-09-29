@@ -5,6 +5,7 @@ import { QueryTypePicker } from './../components/query-editor/QueryTypePicker';
 import { ScopePicker } from './../components/query-editor/ScopePicker';
 import { IssuesEditor } from './../components/query-editor/IssuesEditor';
 import { StatsV2Editor } from './../components/query-editor/StatsV2Editor';
+import { EventsQueryEditor } from './../components/query-editor/EventsQuery';
 import type { QueryEditorProps } from '@grafana/data/types';
 import type { SentryConfig, SentryQuery } from './../types';
 import './../styles/editor.scss';
@@ -25,6 +26,7 @@ export const SentryQueryEditor = (props: SentryQueryEditorProps) => {
       <ScopePicker {...props} hideEnvironments={query.queryType === 'statsV2'} />
       {query.queryType === 'issues' ? <IssuesEditor {...props} /> : null}
       {query.queryType === 'statsV2' ? <StatsV2Editor {...props} /> : null}
+      {query.queryType === 'events' ? <EventsQueryEditor {...props} query={query} /> : null}
     </div>
   );
 };
