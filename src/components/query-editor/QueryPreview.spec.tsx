@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { QueryPreview } from './QueryPreview';
-import { SentryQuery } from './../../types';
+import type { SentryQuery } from './../../types';
 
 describe('QueryPreview', () => {
   it('should render without error', () => {

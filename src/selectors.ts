@@ -1,5 +1,5 @@
 import { E2ESelectors } from '@grafana/e2e-selectors';
-import { DEFAULT_SENTRY_URL } from './types';
+import { DEFAULT_SENTRY_URL } from './constants';
 
 export const Components = {
   Common: {},

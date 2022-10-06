@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { QueryTypePicker } from './QueryTypePicker';
-import { SentryQuery } from './../../types';
+import type { SentryQuery } from './../../types';
 
 describe('QueryTypePicker', () => {
   it('should render without error', () => {

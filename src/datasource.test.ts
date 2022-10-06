@@ -1,11 +1,12 @@
 import * as runtime from '@grafana/runtime';
-import { DataSourceInstanceSettings } from '@grafana/data';
-import { SentryConfig, SentryProject, SentryTeam, SentryVariableQuery } from './types';
 import { SentryDataSource } from './datasource';
+import type { DataSourceInstanceSettings } from '@grafana/data/types';
+import type { SentryConfig, SentryProject, SentryTeam, SentryVariableQuery } from './types';
 
 describe('SentryDataSource', () => {
   beforeEach(() => {
     jest.spyOn(runtime, 'getTemplateSrv').mockImplementation(() => ({
+      updateTimeRange: jest.fn(),
       getVariables: jest.fn(),
       replace: (s: string) => {
         return s;

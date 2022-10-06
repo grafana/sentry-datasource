@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { IssuesEditor } from './IssuesEditor';
-import { SentryQuery } from './../../types';
+import type { SentryQuery } from './../../types';
 
 describe('IssuesEditor', () => {
   it('should render without error', () => {

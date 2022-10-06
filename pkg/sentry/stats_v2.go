@@ -42,7 +42,7 @@ type GetStatsV2Input struct {
 }
 
 func (args *GetStatsV2Input) ToQuery() string {
-	urlpath := fmt.Sprintf("/api/0/organizations/%s/stats_v2/?", args.OrganizationSlug)
+	urlPath := fmt.Sprintf("/api/0/organizations/%s/stats_v2/?", args.OrganizationSlug)
 	params := url.Values{}
 	params.Set("start", args.From.Format("2006-01-02T15:04:05"))
 	params.Set("end", args.To.Format("2006-01-02T15:04:05"))
@@ -79,7 +79,7 @@ func (args *GetStatsV2Input) ToQuery() string {
 			params.Add("reason", reason)
 		}
 	}
-	return urlpath + params.Encode()
+	return urlPath + params.Encode()
 }
 
 func (sc *SentryClient) GetStatsV2(args GetStatsV2Input) (StatsV2Response, string, error) {

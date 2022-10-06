@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { StatsV2Editor } from './StatsV2Editor';
-import { SentryQuery } from './../../types';
+import type { SentryQuery } from './../../types';
 
 describe('StatsV2Editor', () => {
   it('should render without error', () => {

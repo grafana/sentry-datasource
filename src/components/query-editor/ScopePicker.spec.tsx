@@ -4,11 +4,12 @@ import { render } from '@testing-library/react';
 import { DataSourceInstanceSettings } from '@grafana/data';
 import { ScopePicker } from './ScopePicker';
 import { SentryDataSource } from './../../datasource';
-import { SentryQuery, SentryConfig } from './../../types';
+import type { SentryQuery, SentryConfig } from './../../types';
 
 describe('ScopePicker', () => {
   beforeEach(() => {
     jest.spyOn(runtime, 'getTemplateSrv').mockImplementation(() => ({
+      updateTimeRange: jest.fn(),
       getVariables: () => [],
       replace: (s: string) => s,
     }));

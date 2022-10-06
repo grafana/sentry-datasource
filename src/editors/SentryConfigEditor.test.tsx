@@ -3,8 +3,9 @@ import { DataSourceSettings } from '@grafana/data';
 import { render, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SentryConfigEditor } from './SentryConfigEditor';
-import { DEFAULT_SENTRY_URL, SentryConfig, SentrySecureConfig } from './../types';
-import { selectors } from 'selectors';
+import { DEFAULT_SENTRY_URL } from './../constants';
+import { selectors } from './../selectors';
+import type { SentryConfig, SentrySecureConfig } from './../types';
 
 describe('SentryConfigEditor', () => {
   it('render default editor without error', () => {

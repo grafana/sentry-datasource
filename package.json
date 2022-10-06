@@ -7,6 +7,7 @@
   "license": "SEE LICENSE IN LICENSE",
   "private": true,
   "scripts": {
+    "spellcheck": "cspell -c cspell.config.json \"**/*.{ts,tsx,js,go,md,mdx,yml,yaml,json,scss,css}\"",
     "dev": "grafana-toolkit plugin:dev",
     "watch": "grafana-toolkit plugin:dev --watch",
     "start": "yarn watch",
@@ -18,22 +19,24 @@
     "ci-build": "grafana-toolkit plugin:ci-build"
   },
   "dependencies": {
-    "@grafana/data": "7.5.1",
-    "@grafana/runtime": "7.5.1",
-    "@grafana/ui": "7.5.1",
+    "@emotion/css": "^11.10.0",
+    "@grafana/data": "8.4.7",
+    "@grafana/runtime": "8.4.7",
+    "@grafana/ui": "8.4.7",
     "lodash": "^4.17.21",
     "rxjs": "6.3.3",
     "tslib": "^2.3.1"
   },
   "devDependencies": {
-    "@grafana/e2e": "7.5.1",
-    "@grafana/e2e-selectors": "7.5.1",
-    "@grafana/toolkit": "7.5.1",
+    "@grafana/e2e": "8.4.7",
+    "@grafana/e2e-selectors": "8.4.7",
+    "@grafana/toolkit": "8.4.7",
     "@testing-library/dom": "^7.31.0",
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^13.1.9",
     "@types/lodash": "^4.14.175",
+    "cspell": "^6.12.0",
     "cypress": "^7.7.0"
   },
   "resolutions": {
