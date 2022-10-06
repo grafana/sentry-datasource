@@ -30,6 +30,11 @@ type apiProvider interface {
 
 	// GetStatsV2 list the stats for an organization
 	GetStatsV2(args GetStatsV2Input) (StatsV2Response, string, error)
+
+	// GetEvents
+	// https://docs.sentry.io/api/discover/query-discover-events-in-table-format/
+	// GET /api/0/organizations/{organization_slug}/events/
+	GetOrgEvents(i GetOrgEventsInput) ([]map[string]interface{}, string, error)
 }
 
 type SentryClient struct {

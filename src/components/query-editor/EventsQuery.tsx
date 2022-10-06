@@ -11,8 +11,8 @@ export const EventsQueryEditor = ({ query, onChange, onRunQuery }: SentryQueryEd
   }
   return (
     <EditorRows>
-      <QueryEditor queryString={query.query || ''} onChange={(v) => onChange({ ...query, query: v })} onRunQuery={onRunQuery} />
-      <FieldsEditor fields={query.fields || []} onChange={(v) => onChange({ ...query, fields: v })} onRunQuery={onRunQuery} />
+      <QueryEditor queryString={query.eventsQuery || ''} onChange={(v) => onChange({ ...query, eventsQuery: v })} onRunQuery={onRunQuery} />
+      <FieldsEditor fields={query.eventsFields || []} onChange={(v) => onChange({ ...query, eventsFields: v })} onRunQuery={onRunQuery} />
     </EditorRows>
   );
 };

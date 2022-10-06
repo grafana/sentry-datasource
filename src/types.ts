@@ -59,9 +59,8 @@ export type SentryEventsField =
 export type SentryEventsQuery = {
   projectIds: string[];
   environments: string[];
-  query?: string;
-  sort?: string;
-  fields?: SentryEventsField[];
+  eventsQuery?: string;
+  eventsFields?: SentryEventsField[];
 } & SentryQueryBase<'events'>;
 export type SentryQuery = SentryIssuesQuery | SentryStatsV2Query | SentryEventsQuery;
 //#endregion

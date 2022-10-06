@@ -9,18 +9,25 @@ import (
 	"github.com/grafana/sentry-datasource/pkg/sentry"
 )
 
+type QueryEventsField struct {
+	FieldType string `json:"fieldType,omitempty"`
+	Value     string `json:"value,omitempty"`
+}
+
 type SentryQuery struct {
-	QueryType     string   `json:"queryType"`
-	ProjectIds    []string `json:"projectIds,omitempty"`
-	Environments  []string `json:"environments,omitempty"`
-	IssuesQuery   string   `json:"issuesQuery,omitempty"`
-	IssuesSort    string   `json:"issuesSort,omitempty"`
-	IssuesLimit   int64    `json:"issuesLimit,omitempty"`
-	StatsCategory []string `json:"statsCategory,omitempty"`
-	StatsFields   []string `json:"statsFields,omitempty"`
-	StatsGroupBy  []string `json:"statsGroupBy,omitempty"`
-	StatsOutcome  []string `json:"statsOutcome,omitempty"`
-	StatsReason   []string `json:"statsReason,omitempty"`
+	QueryType     string             `json:"queryType"`
+	ProjectIds    []string           `json:"projectIds,omitempty"`
+	Environments  []string           `json:"environments,omitempty"`
+	IssuesQuery   string             `json:"issuesQuery,omitempty"`
+	IssuesSort    string             `json:"issuesSort,omitempty"`
+	IssuesLimit   int64              `json:"issuesLimit,omitempty"`
+	StatsCategory []string           `json:"statsCategory,omitempty"`
+	StatsFields   []string           `json:"statsFields,omitempty"`
+	StatsGroupBy  []string           `json:"statsGroupBy,omitempty"`
+	StatsOutcome  []string           `json:"statsOutcome,omitempty"`
+	StatsReason   []string           `json:"statsReason,omitempty"`
+	EventsQuery   string             `json:"eventsQuery,omitempty"`
+	EventsFields  []QueryEventsField `json:"eventsFields,omitempty"`
 }
 
 func GetQuery(query backend.DataQuery) (SentryQuery, error) {
