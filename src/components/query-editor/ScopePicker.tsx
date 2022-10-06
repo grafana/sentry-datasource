@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { getTemplateSrv } from '@grafana/runtime';
-import { InlineFormLabel, MultiSelect } from '@grafana/ui';
+import { MultiSelect } from '@grafana/ui';
+import { EditorField } from './@grafana/ui';
 import { SentryDataSource } from './../../datasource';
 import { getEnvironmentNamesFromProject } from './../../app/utils';
 import { replaceProjectIDs } from './../../app/replace';
 import { selectors } from './../../selectors';
-import type { QueryEditorProps, SelectableValue } from '@grafana/data';
+import type { QueryEditorProps, SelectableValue } from '@grafana/data/types';
 import type { SentryConfig, SentryProject, SentryQuery } from './../../types';
 
 type ScopePickerProps = { hideEnvironments?: boolean } & Pick<
@@ -60,33 +61,33 @@ export const ScopePicker = (props: ScopePickerProps) => {
     onRunQuery();
   };
   return (
-    <div className="gf-form">
-      <InlineFormLabel width={10} className="query-keyword" tooltip={selectors.components.QueryEditor.Scope.ProjectIDs.tooltip}>
-        {selectors.components.QueryEditor.Scope.ProjectIDs.label}
-      </InlineFormLabel>
-      <MultiSelect
-        width={60}
-        value={projectIds}
-        onChange={(projects) => onProjectIDsChange(projects.map((p) => p.value!))}
-        options={getProjectsAsOptions()}
-        className="inline-element"
-        placeholder={selectors.components.QueryEditor.Scope.ProjectIDs.placeholder}
-      />
+    <>
+      <EditorField
+        label={selectors.components.QueryEditor.Scope.ProjectIDs.label}
+        tooltip={selectors.components.QueryEditor.Scope.ProjectIDs.tooltip}
+      >
+        <MultiSelect
+          width={60}
+          value={projectIds}
+          onChange={(projects) => onProjectIDsChange(projects.map((p) => p.value!))}
+          options={getProjectsAsOptions()}
+          placeholder={selectors.components.QueryEditor.Scope.ProjectIDs.placeholder}
+        />
+      </EditorField>
       {!hideEnvironments && (
-        <>
-          <InlineFormLabel width={8} className="query-keyword" tooltip={selectors.components.QueryEditor.Scope.Environments.tooltip}>
-            {selectors.components.QueryEditor.Scope.Environments.label}
-          </InlineFormLabel>
+        <EditorField
+          tooltip={selectors.components.QueryEditor.Scope.Environments.tooltip}
+          label={selectors.components.QueryEditor.Scope.Environments.label}
+        >
           <MultiSelect
             width={60}
             value={environments}
             onChange={(e) => onEnvironmentsChange(e.map((ei) => ei.value!))}
             options={getEnvironmentsAsOptions()}
-            className="inline-element"
             placeholder={selectors.components.QueryEditor.Scope.Environments.placeholder}
           />
-        </>
+        </EditorField>
       )}
-    </div>
+    </>
   );
 };
