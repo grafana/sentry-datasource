@@ -16,7 +16,7 @@ export const TeamSelector = (props: {
   const [teams, setTeams] = useState<SentryTeam[]>([]);
   useEffect(() => {
     datasource.getOrgTeams(orgSlug).then(setTeams);
-  }, [datasource]);
+  }, [datasource, orgSlug]);
   const getOptions = () => {
     const templateVariables = getTemplateSrv()
       .getVariables()

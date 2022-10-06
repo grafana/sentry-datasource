@@ -5,6 +5,7 @@ describe('replace', () => {
   describe('replaceProjectIDs', () => {
     it('default replaceProjectIDs should return valid objects', () => {
       jest.spyOn(runtime, 'getTemplateSrv').mockImplementation(() => ({
+        updateTimeRange: jest.fn(),
         getVariables: jest.fn(),
         replace: (s: string) => {
           return s;
@@ -15,6 +16,7 @@ describe('replace', () => {
     });
     it('list with variables passed to replaceProjectIDs should return valid objects', () => {
       jest.spyOn(runtime, 'getTemplateSrv').mockImplementation(() => ({
+        updateTimeRange: jest.fn(),
         getVariables: jest.fn(),
         replace: (s: string) => {
           return s === '${attr}' ? 'foo' : s;
@@ -25,6 +27,7 @@ describe('replace', () => {
     });
     it('var with multiple value replaceProjectIDs should return valid objects', () => {
       jest.spyOn(runtime, 'getTemplateSrv').mockImplementation(() => ({
+        updateTimeRange: jest.fn(),
         getVariables: jest.fn(),
         replace: (s: string): any => {
           return s === '${attr}' ? 'foo,bar' : s;

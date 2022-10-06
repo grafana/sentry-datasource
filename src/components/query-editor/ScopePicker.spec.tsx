@@ -9,6 +9,7 @@ import { SentryQuery, SentryConfig } from './../../types';
 describe('ScopePicker', () => {
   beforeEach(() => {
     jest.spyOn(runtime, 'getTemplateSrv').mockImplementation(() => ({
+      updateTimeRange: jest.fn(),
       getVariables: () => [],
       replace: (s: string) => s,
     }));
