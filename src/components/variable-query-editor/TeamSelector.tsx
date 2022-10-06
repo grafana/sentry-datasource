@@ -37,7 +37,7 @@ export const TeamSelector = (props: {
   return (
     <>
       <InlineFormLabel tooltip={tooltip}>{label}</InlineFormLabel>
-      <Select value={teamSlug || ''} isClearable={true} options={getOptions()} onChange={(e) => onValuesChange(e.value!)}></Select>
+      <Select value={teamSlug || ''} isClearable={true} options={getOptions()} onChange={(e) => onValuesChange(e?.value || null)}></Select>
     </>
   );
 };
