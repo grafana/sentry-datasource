@@ -1,7 +1,7 @@
 import flatten from 'lodash/flatten';
-import { ScopedVars } from '@grafana/data';
 import { getTemplateSrv } from '@grafana/runtime';
-import { SentryQuery, SentryVariableQuery } from './../types';
+import type { ScopedVars } from '@grafana/data/types';
+import type { SentryQuery, SentryVariableQuery } from './../types';
 
 export const replaceProjectIDs = (projectIds: string[]): string[] => {
   return flatten(

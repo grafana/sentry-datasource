@@ -3,7 +3,7 @@ import * as runtime from '@grafana/runtime';
 import { render, waitFor } from '@testing-library/react';
 import { SentryDataSource } from './../datasource';
 import { SentryQueryEditor } from './SentryQueryEditor';
-import { SentryQuery } from './../types';
+import type { SentryQuery } from './../types';
 
 describe('SentryQueryEditor', () => {
   beforeEach(() => {

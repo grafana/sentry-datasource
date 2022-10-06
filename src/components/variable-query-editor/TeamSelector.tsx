@@ -3,7 +3,7 @@ import { InlineFormLabel, Select } from '@grafana/ui';
 import { getTemplateSrv } from '@grafana/runtime';
 import { SentryDataSource } from '../../datasource';
 import { selectors } from '../../selectors';
-import { SentryTeam } from './../../types';
+import type { SentryTeam } from './../../types';
 
 export const TeamSelector = (props: {
   datasource: SentryDataSource;
