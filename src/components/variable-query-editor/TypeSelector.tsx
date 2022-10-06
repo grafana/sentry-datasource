@@ -1,13 +1,14 @@
 import React from 'react';
-import type { SelectableValue } from '@grafana/data/types';
 import { InlineFormLabel, Select } from '@grafana/ui';
 import { selectors } from '../../selectors';
+import type { SelectableValue } from '@grafana/data/types';
 import type { VariableQueryType } from '../../types';
 
 export const TypeSelector = (props: { variableQueryType: VariableQueryType; onChange: (type: VariableQueryType) => void }) => {
   const options: Array<SelectableValue<VariableQueryType>> = [
     { value: 'projects', label: 'Projects' },
     { value: 'environments', label: 'Environments' },
+    { value: 'teams', label: 'Teams' },
   ];
   const { label, tooltip, container } = selectors.components.VariablesEditor.QueryType;
   return (

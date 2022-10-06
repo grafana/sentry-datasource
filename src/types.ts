@@ -16,6 +16,26 @@ export type SentryProject = {
   team: { id: string; name: string; slug: string };
   teams: Array<{ id: string; name: string; slug: string }>;
 };
+export type SentryTeam = {
+  avatar?: {
+    avatarType: string;
+    avatarUuid?: any;
+  };
+  color?: string;
+  dateCreated?: Date;
+  features?: string[];
+  firstEvent?: any;
+  hasAccess?: boolean;
+  id: string;
+  isBookmarked?: boolean;
+  isInternal?: boolean;
+  isMember?: boolean;
+  isPublic?: boolean;
+  name: string;
+  platform?: any;
+  slug: string;
+  status?: string;
+};
 export type SentryIssueSort = 'inbox' | 'new' | 'date' | 'priority' | 'freq' | 'user';
 //#endregion
 
@@ -55,24 +75,31 @@ export type SentryQuery = SentryIssuesQuery | SentryStatsV2Query;
 //#endregion
 
 //#region Variable Query
-export type VariableQueryType = 'projects' | 'environments';
+export type VariableQueryType = 'projects' | 'environments' | 'teams';
 export type VariableQueryBase<T extends VariableQueryType> = { type: T };
-export type VariableQueryProjects = {} & VariableQueryBase<'projects'>;
+export type VariableQueryProjects = { teamSlug?: string } & VariableQueryBase<'projects'>;
 export type VariableQueryEnvironments = { projectIds: string[] } & VariableQueryBase<'environments'>;
-export type SentryVariableQuery = VariableQueryProjects | VariableQueryEnvironments;
+export type VariableQueryTeams = VariableQueryBase<'teams'>;
+export type SentryVariableQuery = VariableQueryProjects | VariableQueryEnvironments | VariableQueryTeams;
 //#endregion
 
 //#region Resource call
-//#region Resource call Query
-export type SentryResourceCallRequestType = 'organizations' | 'projects';
-export type SentryResourceCallRequestBase<T extends SentryResourceCallRequestType> = { type: T };
-export type ResourceCallOrganizations = {} & SentryResourceCallRequestBase<'organizations'>;
-export type ResourceCallProjects = { orgSlug: string } & SentryResourceCallRequestBase<'projects'>;
-export type SentryResourceCallRequest = ResourceCallOrganizations | ResourceCallProjects;
-//#endregion
-//#region Resource call Response
-export type ResourceCallOrganizationsResponse = SentryOrganization[];
-export type ResourceCallProjectsResponse = SentryProject[];
-export type SentryResourceCallResponse = ResourceCallOrganizationsResponse | ResourceCallProjectsResponse;
-//#endregion
+export type GetResourceCallBase<P extends string, Q extends Record<string, any>, R extends unknown> = {
+  path: P;
+  query?: Q;
+  response: R;
+};
+export type GetResourceCallOrganizationsPath = `api/0/organizations`;
+export type GetResourceCallOrganizations = GetResourceCallBase<GetResourceCallOrganizationsPath, {}, SentryOrganization[]>;
+export type GetResourceCallProjectsPath = `api/0/organizations/${string}/projects`;
+export type GetResourceCallProjects = GetResourceCallBase<GetResourceCallProjectsPath, {}, SentryProject[]>;
+export type GetResourceCallListOrgTeamsPath = `api/0/organizations/${string}/teams`;
+export type GetResourceCallListOrgTeams = GetResourceCallBase<GetResourceCallListOrgTeamsPath, {}, SentryTeam[]>;
+export type GetResourceCallGetTeamsProjectsPath = `api/0/teams/${string}/${string}/projects`;
+export type GetResourceCallGetTeamsProjects = GetResourceCallBase<GetResourceCallGetTeamsProjectsPath, {}, SentryProject[]>;
+export type GetResourceCall =
+  | GetResourceCallOrganizations
+  | GetResourceCallProjects
+  | GetResourceCallListOrgTeams
+  | GetResourceCallGetTeamsProjects;
 //#endregion

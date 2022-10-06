@@ -1,25 +1,26 @@
 {
-  "language": "en",
-  "ignorePaths": [
-    "node_modules",
-    "dist",
-    "coverage",
-    "cypress",
-    "pkg/**/*_test.go",
-    "pkg/mocker/testdata",
-    "mage_output_file.go",
-    "src/**/*.{test,spec}.{ts,tsx}"
-  ],
-  "words": [
-    "DataSource",
-    "DataSources",
-    "endregion",
-    "framestruct",
-    "Grafana",
-    "httpclient",
-    "instancemgmt",
-    "testdata",
-    "testid",
-    "Unmarshaling"
-  ]
+    "language": "en",
+    "ignorePaths": [
+        "node_modules",
+        "dist",
+        "coverage",
+        "cypress",
+        "provisioning",
+        "pkg/**/*_test.go",
+        "mage_output_file.go",
+        "src/**/*.{test,spec}.{ts,tsx}"
+    ],
+    "words": [
+        "DataSource",
+        "DataSources",
+        "endregion",
+        "framestruct",
+        "Grafana",
+        "httpadapter",
+        "httpclient",
+        "instancemgmt",
+        "nolint",
+        "testid",
+        "Unmarshaling"
+    ]
 }

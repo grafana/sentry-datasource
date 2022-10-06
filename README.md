@@ -100,6 +100,7 @@ In Grafana dashboards, you can use Sentry entities as dashboard variables. Sentr
 
 | Variable name | Description                                                                                                                             |
 | ------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Teams         | Lists the Sentry teams. The team name is used as the display value, and team slug is used as as actual value.                           |
 | Projects      | Lists the Sentry projects. The project name is used as the display value, and each project ID is used as an actual value.               |
 | Environments  | Lists the Sentry environments for the selected projects. If you do not select a project, all of the applicable environments are listed. |
 

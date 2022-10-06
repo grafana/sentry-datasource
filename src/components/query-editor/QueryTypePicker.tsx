@@ -2,7 +2,7 @@ import React from 'react';
 import { InlineFormLabel, Select, useTheme } from '@grafana/ui';
 import { SentryDataSource } from './../../datasource';
 import { selectors } from './../../selectors';
-import { QueryTypeOptions } from './../../constants';
+import { QueryTypeOptions } from '../../constants';
 import type { QueryEditorProps } from '@grafana/data/types';
 import type { SentryConfig, SentryQuery, QueryType } from './../../types';
 
