@@ -11,6 +11,7 @@ import type {
 export const QueryTypeOptions: Array<SelectableValue<QueryType>> = [
   { value: 'issues', label: 'Issues' },
   { value: 'statsV2', label: 'Stats' },
+  { value: 'events', label: 'Events' },
 ];
 export const SentryIssueSortOptions: Array<SelectableValue<SentryIssueSort>> = [
   // { value: 'inbox', label: 'Date Added' },

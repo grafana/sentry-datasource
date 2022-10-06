@@ -50,7 +50,7 @@ export interface SentrySecureConfig {
 //#endregion
 
 //#region Query
-export type QueryType = 'issues' | 'statsV2';
+export type QueryType = 'issues' | 'statsV2' | 'events';
 export type SentryQueryBase<T extends QueryType> = { queryType: T } & DataQuery;
 export type SentryIssuesQuery = {
   projectIds: string[];
@@ -71,7 +71,18 @@ export type SentryStatsV2Query = {
   statsOutcome: SentryStatsV2QueryOutcome[];
   statsReason: string[];
 } & SentryQueryBase<'statsV2'>;
-export type SentryQuery = SentryIssuesQuery | SentryStatsV2Query;
+export type SentryEventsField =
+  | { fieldType: 'builtin'; value: string }
+  | { fieldType: 'tag_raw'; value: string }
+  | { fieldType: 'function_raw'; value: string }
+  | { fieldType: 'expression_raw'; value: string };
+export type SentryEventsQuery = {
+  projectIds: string[];
+  environments: string[];
+  eventsQuery?: string;
+  eventsFields?: SentryEventsField[];
+} & SentryQueryBase<'events'>;
+export type SentryQuery = SentryIssuesQuery | SentryStatsV2Query | SentryEventsQuery;
 //#endregion
 
 //#region Variable Query
