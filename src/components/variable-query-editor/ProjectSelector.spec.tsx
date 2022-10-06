@@ -16,8 +16,7 @@ describe('ProjectSelector', () => {
   });
   it('should render without error', () => {
     const datasource = new SentryDataSource({} as DataSourceInstanceSettings<SentryConfig>);
-    datasource.postResource = jest.fn(() => Promise.resolve([]));
-    datasource.getProjects = jest.fn(() => Promise.resolve([]));
+    datasource.getResource = jest.fn(() => Promise.resolve([]));
     const onChange = jest.fn();
     const result = render(<ProjectSelector datasource={datasource} onValuesChange={onChange} mode="id" orgSlug="foo" values={[]} />);
     waitFor(() => {

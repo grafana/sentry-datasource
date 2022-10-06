@@ -1,6 +1,6 @@
 import * as runtime from '@grafana/runtime';
 import { DataSourceInstanceSettings } from '@grafana/data';
-import { SentryConfig, SentryVariableQuery } from './types';
+import { SentryConfig, SentryProject, SentryTeam, SentryVariableQuery } from './types';
 import { SentryDataSource } from './datasource';
 
 describe('SentryDataSource', () => {
@@ -23,18 +23,34 @@ describe('SentryDataSource', () => {
     });
     it('should return no results when org slug not specified in projects query', async () => {
       const ds = new SentryDataSource({} as DataSourceInstanceSettings<SentryConfig>);
-      ds.postResource = jest.fn(() => Promise.resolve([]));
+      ds.getResource = jest.fn(() => Promise.resolve([]));
       const query = { type: 'projects' } as SentryVariableQuery;
       const results = await ds.metricFindQuery(query);
       expect(results.length).toBe(0);
     });
-    it('should return projects name and id correctly', async () => {
+    it('should return teams slug and name correctly', async () => {
       const ds = new SentryDataSource({} as DataSourceInstanceSettings<SentryConfig>);
-      ds.postResource = jest.fn(() =>
+      ds.getResource = jest.fn(() =>
         Promise.resolve([
           { id: '1', name: 'Foo', slug: 'foo' },
           { id: '2', name: 'Bar', slug: 'bar' },
-        ])
+        ] as SentryTeam[])
+      );
+      const query = { type: 'teams', orgSlug: 'dummy' } as SentryVariableQuery;
+      const results = await ds.metricFindQuery(query);
+      expect(results.length).toBe(2);
+      expect(results).toStrictEqual([
+        { text: 'Foo (foo)', value: 'foo' },
+        { text: 'Bar (bar)', value: 'bar' },
+      ]);
+    });
+    it('should return projects name and id correctly', async () => {
+      const ds = new SentryDataSource({} as DataSourceInstanceSettings<SentryConfig>);
+      ds.getResource = jest.fn(() =>
+        Promise.resolve([
+          { id: '1', name: 'Foo', slug: 'foo' },
+          { id: '2', name: 'Bar', slug: 'bar' },
+        ] as SentryProject[])
       );
       const query = { type: 'projects', orgSlug: 'dummy' } as SentryVariableQuery;
       const results = await ds.metricFindQuery(query);
@@ -46,11 +62,11 @@ describe('SentryDataSource', () => {
     });
     it('should return all unique environments when environments query selected and no projectId passed', async () => {
       const ds = new SentryDataSource({} as DataSourceInstanceSettings<SentryConfig>);
-      ds.postResource = jest.fn(() =>
+      ds.getResource = jest.fn(() =>
         Promise.resolve([
           { id: '1', name: 'Foo', slug: 'foo', environments: ['foo', 'bar', 'baz', 'amma', 'boo'] },
           { id: '2', name: 'Bar', slug: 'bar', environments: ['amma', 'aadu', 'ilai', 'eetti'] },
-        ])
+        ] as SentryProject[])
       );
       const query = { type: 'environments', orgSlug: 'dummy', projectIds: [] } as SentryVariableQuery;
       const results = await ds.metricFindQuery(query);
@@ -58,14 +74,14 @@ describe('SentryDataSource', () => {
     });
     it('should return environments name correctly', async () => {
       const ds = new SentryDataSource({} as DataSourceInstanceSettings<SentryConfig>);
-      ds.postResource = jest.fn(() =>
+      ds.getResource = jest.fn(() =>
         Promise.resolve([
           { id: '1', name: 'Foo', slug: 'foo', environments: ['foo', 'bar', 'baz'] },
           { id: '2', name: 'Bar', slug: 'bar', environments: ['amma', 'aadu', 'ilai', 'eetti'] },
           { id: '3', name: 'Countries', slug: 'countries', environments: ['india', 'uk', 'usa', 'japan', 'egypt'] },
           { id: '4', name: 'Colors', slug: 'colors', environments: ['red', 'yellow', 'green', 'pink'] },
           { id: '5', name: 'Secondary Colors', slug: 'sec-colors', environments: ['yellow', 'purple', 'green'] },
-        ])
+        ] as SentryProject[])
       );
       const query = { type: 'environments', orgSlug: 'dummy', projectIds: ['2', '4', '5'] } as SentryVariableQuery;
       const results = await ds.metricFindQuery(query);
