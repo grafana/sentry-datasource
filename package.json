@@ -7,6 +7,7 @@
   "license": "SEE LICENSE IN LICENSE",
   "private": true,
   "scripts": {
+    "spellcheck": "cspell -c cspell.config.json \"**/*.{ts,tsx,js,go,md,mdx,yml,yaml,json,scss,css}\"",
     "dev": "grafana-toolkit plugin:dev",
     "watch": "grafana-toolkit plugin:dev --watch",
     "start": "yarn watch",
@@ -35,6 +36,7 @@
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^13.1.9",
     "@types/lodash": "^4.14.175",
+    "cspell": "^6.12.0",
     "cypress": "^7.7.0"
   },
   "resolutions": {

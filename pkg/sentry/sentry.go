@@ -75,11 +75,11 @@ func (sc *SentryClient) Fetch(path string, out interface{}) error {
 	} else {
 		var errResponse SentryErrorResponse
 		if err := json.NewDecoder(res.Body).Decode(&errResponse); err != nil {
-			errorMesage := strings.TrimSpace(fmt.Sprintf("%s %s", res.Status, err.Error()))
-			return errors.New(errorMesage)
+			errorMessage := strings.TrimSpace(fmt.Sprintf("%s %s", res.Status, err.Error()))
+			return errors.New(errorMessage)
 		}
-		errorMesage := strings.TrimSpace(fmt.Sprintf("%s %s", res.Status, errResponse.Detail))
-		return errors.New(errorMesage)
+		errorMessage := strings.TrimSpace(fmt.Sprintf("%s %s", res.Status, errResponse.Detail))
+		return errors.New(errorMessage)
 	}
 	return err
 }
