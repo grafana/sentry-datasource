@@ -3,11 +3,13 @@ import { selectors } from '../../src/selectors';
 
 export const e2eSelectors = e2e.getSelectors(selectors.components);
 
-export const PROVISIONING_FILENAME = 'datasources/grafana-sentry-datasource.yaml';
+export const PLUGIN_NAME = 'Sentry';
+export const SENTRY_ORG_SLUG = 'mock-org-slug';
+export const SENTRY_AUTH_TOKEN = 'mock-token';
 export const SENTRY_PROJECTS_COUNT = 6;
-export const SENTRY_E2E_PROJECT_NAME = 'project-e2e';
-export const SENTRY_E2E_PROJECT_ID = '5988308';
-export const SENTRY_E2E_PRODUCTION_PROJECT_NAME = 'project-node';
+export const SENTRY_E2E_PROJECT_NAME = 'project-002';
+export const SENTRY_E2E_PROJECT_ID = 'proj002';
+export const SENTRY_E2E_PRODUCTION_PROJECT_NAME = 'project-004';
 export const SENTRY_E2E_ENVIRONMENT_NAME = 'e2e-only-environment';
 export const SENTRY_E2E_NODE_ONLY_ENVIRONMENT_NAME = `node-only-environment`;
 

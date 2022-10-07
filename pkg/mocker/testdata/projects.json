@@ -1,0 +1,273 @@
+[
+  {
+    "team": {
+      "id": "team001",
+      "slug": "team-001",
+      "name": "Team 001"
+    },
+    "teams": [
+      {
+        "id": "team001",
+        "slug": "team-001",
+        "name": "Team 001"
+      }
+    ],
+    "id": "proj001",
+    "name": "project-001",
+    "slug": "project-001",
+    "isBookmarked": false,
+    "isMember": true,
+    "hasAccess": true,
+    "dateCreated": "2021-10-25T17:43:18.518264Z",
+    "environments": ["prod"],
+    "eventProcessing": {
+      "symbolicationDegraded": false
+    },
+    "features": [
+      "alert-filters",
+      "minidump",
+      "performance-suspect-spans-ingestion",
+      "race-free-group-creation",
+      "similarity-indexing",
+      "similarity-view",
+      "releases"
+    ],
+    "firstEvent": "2021-10-25T17:49:33.354049Z",
+    "firstTransactionEvent": false,
+    "hasSessions": false,
+    "hasProfiles": false,
+    "platform": "javascript-react",
+    "platforms": [],
+    "latestRelease": {
+      "version": "d418d5a30b859f0cfd8bffebc8ef7b217fd0e1fa"
+    },
+    "hasUserReports": false,
+    "latestDeploys": null
+  },
+  {
+    "team": {
+      "id": "1374197",
+      "slug": "demo-team-eagle",
+      "name": "demo-team-eagle"
+    },
+    "teams": [
+      {
+        "id": "1374197",
+        "slug": "demo-team-eagle",
+        "name": "demo-team-eagle"
+      },
+      {
+        "id": "team001",
+        "slug": "team-001",
+        "name": "Team 001"
+      }
+    ],
+    "id": "proj002",
+    "name": "project-002",
+    "slug": "project-002",
+    "isBookmarked": false,
+    "isMember": true,
+    "hasAccess": true,
+    "dateCreated": "2021-10-01T13:23:31.368992Z",
+    "environments": ["dev", "e2e", "e2e-only-environment", "prod", "security", "test"],
+    "eventProcessing": {
+      "symbolicationDegraded": false
+    },
+    "features": [
+      "alert-filters",
+      "minidump",
+      "performance-suspect-spans-ingestion",
+      "race-free-group-creation",
+      "similarity-indexing",
+      "similarity-view"
+    ],
+    "firstEvent": "2021-10-01T13:25:36.724000Z",
+    "firstTransactionEvent": true,
+    "hasSessions": false,
+    "hasProfiles": false,
+    "platform": "node",
+    "platforms": [],
+    "latestRelease": null,
+    "hasUserReports": false,
+    "latestDeploys": null
+  },
+  {
+    "team": {
+      "id": "1374197",
+      "slug": "demo-team-eagle",
+      "name": "demo-team-eagle"
+    },
+    "teams": [
+      {
+        "id": "1374197",
+        "slug": "demo-team-eagle",
+        "name": "demo-team-eagle"
+      },
+      {
+        "id": "team001",
+        "slug": "team-001",
+        "name": "Team 001"
+      }
+    ],
+    "id": "proj003",
+    "name": "project-003",
+    "slug": "project-003",
+    "isBookmarked": false,
+    "isMember": true,
+    "hasAccess": true,
+    "dateCreated": "2021-10-01T08:40:05.587469Z",
+    "environments": ["development", "production"],
+    "eventProcessing": {
+      "symbolicationDegraded": false
+    },
+    "features": [
+      "alert-filters",
+      "minidump",
+      "performance-suspect-spans-ingestion",
+      "race-free-group-creation",
+      "similarity-indexing",
+      "similarity-view",
+      "releases"
+    ],
+    "firstEvent": "2021-10-01T08:41:58.601102Z",
+    "firstTransactionEvent": false,
+    "hasSessions": false,
+    "hasProfiles": false,
+    "platform": "go",
+    "platforms": [],
+    "latestRelease": {
+      "version": "project-go@1.0.3"
+    },
+    "hasUserReports": false,
+    "latestDeploys": null
+  },
+  {
+    "team": {
+      "id": "team001",
+      "slug": "team-001",
+      "name": "Team 001"
+    },
+    "teams": [
+      {
+        "id": "team001",
+        "slug": "team-001",
+        "name": "Team 001"
+      }
+    ],
+    "id": "proj004",
+    "name": "project-004",
+    "slug": "project-004",
+    "isBookmarked": false,
+    "isMember": true,
+    "hasAccess": true,
+    "dateCreated": "2021-09-27T10:53:27.621120Z",
+    "environments": ["development", "node-only-environment", "production", "sit"],
+    "eventProcessing": {
+      "symbolicationDegraded": false
+    },
+    "features": [
+      "alert-filters",
+      "minidump",
+      "performance-suspect-spans-ingestion",
+      "race-free-group-creation",
+      "similarity-indexing",
+      "similarity-view"
+    ],
+    "firstEvent": "2021-10-01T08:45:30.052000Z",
+    "firstTransactionEvent": true,
+    "hasSessions": false,
+    "hasProfiles": false,
+    "platform": "node",
+    "platforms": [],
+    "latestRelease": null,
+    "hasUserReports": false,
+    "latestDeploys": null
+  },
+  {
+    "team": {
+      "id": "team001",
+      "slug": "team-001",
+      "name": "Team 001"
+    },
+    "teams": [
+      {
+        "id": "team001",
+        "slug": "team-001",
+        "name": "Team 001"
+      }
+    ],
+    "id": "proj005",
+    "name": "project-005",
+    "slug": "project-005",
+    "isBookmarked": false,
+    "isMember": true,
+    "hasAccess": true,
+    "dateCreated": "2021-09-29T06:55:51.493025Z",
+    "environments": ["development", "production"],
+    "eventProcessing": {
+      "symbolicationDegraded": false
+    },
+    "features": [
+      "alert-filters",
+      "minidump",
+      "performance-suspect-spans-ingestion",
+      "race-free-group-creation",
+      "similarity-indexing",
+      "similarity-view"
+    ],
+    "firstEvent": "2021-10-01T08:45:52.817000Z",
+    "firstTransactionEvent": true,
+    "hasSessions": false,
+    "hasProfiles": false,
+    "platform": "node",
+    "platforms": [],
+    "latestRelease": null,
+    "hasUserReports": false,
+    "latestDeploys": null
+  },
+  {
+    "team": {
+      "id": "team001",
+      "slug": "team-001",
+      "name": "Team 001"
+    },
+    "teams": [
+      {
+        "id": "team001",
+        "slug": "team-001",
+        "name": "Team 001"
+      }
+    ],
+    "id": "proj006",
+    "name": "project-006",
+    "slug": "project-006",
+    "isBookmarked": false,
+    "isMember": true,
+    "hasAccess": true,
+    "dateCreated": "2022-02-09T15:08:13.380506Z",
+    "environments": ["development", "prod", "production"],
+    "eventProcessing": {
+      "symbolicationDegraded": false
+    },
+    "features": [
+      "alert-filters",
+      "minidump",
+      "performance-suspect-spans-ingestion",
+      "race-free-group-creation",
+      "similarity-indexing",
+      "similarity-view",
+      "releases"
+    ],
+    "firstEvent": "2022-02-09T15:09:06.193306Z",
+    "firstTransactionEvent": true,
+    "hasSessions": false,
+    "hasProfiles": false,
+    "platform": "go",
+    "platforms": ["javascript"],
+    "latestRelease": {
+      "version": "checkout-app@3.2"
+    },
+    "hasUserReports": false,
+    "latestDeploys": null
+  }
+]
