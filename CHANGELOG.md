@@ -1,9 +1,11 @@
 # Changelog
 
-## 1.1.0 (unreleased)
+## 1.1.0 (2022-12-19)
 
 - Teams template variable support
 - Filter projects by team in variables
+- Update go to the latest version (1.19.4)
+- Update grafana backend dependencies
 
 ## 1.0.1 (2022-02-07)
 
