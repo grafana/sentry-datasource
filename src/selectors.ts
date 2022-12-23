@@ -33,7 +33,7 @@ export const Components = {
     QueryType: {
       label: 'Query Type',
       tooltip: 'Choose query type',
-      placeholder: 'Required. Select query type',
+      placeholder: 'Query type',
     },
     Scope: {
       ProjectIDs: {
@@ -68,7 +68,7 @@ export const Components = {
       Field: {
         label: 'Field',
         tooltip: 'stats field',
-        placeholder: 'Required. Select one or more fields to see the stat',
+        placeholder: 'Required',
       },
       GroupBy: {
         label: 'Group By',
