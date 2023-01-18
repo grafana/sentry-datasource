@@ -3,30 +3,33 @@ import { getTemplateSrv } from '@grafana/runtime';
 import type { ScopedVars } from '@grafana/data/types';
 import type { SentryQuery, SentryVariableQuery } from './../types';
 
-export const replaceProjectIDs = (projectIds: string[]): string[] => {
+const interpolateVariable = (query: string, scopedVars?: ScopedVars): string => {
+  return getTemplateSrv().replace(query, scopedVars);
+};
+
+const interpolateVariableArray = (queries: string[], scopedVars?: ScopedVars): string[] => {
   return flatten(
-    (projectIds || []).map((pid) => {
-      return (getTemplateSrv().replace(pid, {}, 'csv') || '').split(',');
+    (queries || []).map((q) => {
+      return (getTemplateSrv().replace(q, scopedVars, 'csv') || '').split(',');
     })
   );
 };
+
+export const replaceProjectIDs = interpolateVariableArray;
 
 export const applyTemplateVariables = (query: SentryQuery, scopedVars: ScopedVars): SentryQuery => {
   switch (query.queryType) {
     case 'issues':
       return {
         ...query,
-        issuesQuery: getTemplateSrv().replace(query.issuesQuery || '', scopedVars),
-        projectIds: flatten(
-          (query.projectIds || []).map((pid) => {
-            return (getTemplateSrv().replace(pid, scopedVars, 'csv') || '').split(',');
-          })
-        ),
-        environments: flatten(
-          (query.environments || []).map((e) => {
-            return (getTemplateSrv().replace(e, scopedVars, 'csv') || '').split(',');
-          })
-        ),
+        issuesQuery: interpolateVariable(query.issuesQuery || '', scopedVars),
+        projectIds: interpolateVariableArray(query.projectIds, scopedVars),
+        environments: interpolateVariableArray(query.environments, scopedVars),
+      };
+    case 'statsV2':
+      return {
+        ...query,
+        projectIds: interpolateVariableArray(query.projectIds, scopedVars),
       };
     default:
       return query;
