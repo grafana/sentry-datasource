@@ -16,7 +16,7 @@
     "e2e": "grafana-e2e run",
     "e2e:open": "grafana-e2e open",
     "e2e:update": "grafana-e2e run --update-screenshots",
-    "build": "grafana-toolkit plugin:build",
+    "build": "NODE_OPTIONS='--max-old-space-size=8192' grafana-toolkit plugin:build",
     "ci-build": "grafana-toolkit plugin:ci-build"
   },
   "dependencies": {
