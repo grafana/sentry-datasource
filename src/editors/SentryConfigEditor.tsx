@@ -87,12 +87,17 @@ export const SentryConfigEditor = (props: SentryConfigEditorProps) => {
           <>
             <Input
               type="password"
+              autoComplete="new-password"
               placeholder={ConfigEditorSelectors.SentrySettings.AuthToken.placeholder}
               aria-label={ConfigEditorSelectors.SentrySettings.AuthToken.ariaLabel}
               value={authToken}
               width={valueWidth * 2}
               onChange={(e) => setAuthToken(e.currentTarget.value)}
-              onBlur={() => onSecureOptionChange('authToken', authToken, true)}
+              onBlur={() => {
+                if (authToken !== '') {
+                  onSecureOptionChange('authToken', authToken, true);
+                }
+              }}
             ></Input>
           </>
         )}
