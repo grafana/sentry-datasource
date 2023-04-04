@@ -19,7 +19,6 @@ import type {
   GetResourceCallGetTeamsProjectsPath,
   GetResourceCallGetTeamsProjects,
 } from './types';
-
 export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryConfig> {
   constructor(private instanceSettings: DataSourceInstanceSettings<SentryConfig>) {
     super(instanceSettings);
@@ -97,7 +96,8 @@ export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryC
     });
   }
   //#region Resource calls
-  getResource<O extends GetResourceCall>(path: O['path'], params?: O['query']): Promise<O['response']> {
+  // TODO: ALYSSA - come back to Promise response type
+  getResource<O extends GetResourceCall>(path: O['path'], params?: O['query']): Promise<O['response'] | any> {
     return super.getResource(path, params);
   }
   getOrganizations(): Promise<SentryOrganization[]> {
