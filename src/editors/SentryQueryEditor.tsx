@@ -5,7 +5,7 @@ import { QueryTypePicker } from './../components/query-editor/QueryTypePicker';
 import { ScopePicker } from './../components/query-editor/ScopePicker';
 import { IssuesEditor } from './../components/query-editor/IssuesEditor';
 import { StatsV2Editor } from './../components/query-editor/StatsV2Editor';
-import type { QueryEditorProps } from '@grafana/data/types';
+import type { QueryEditorProps } from '@grafana/data';
 import type { SentryConfig, SentryQuery } from './../types';
 import './../styles/editor.scss';
 

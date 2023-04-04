@@ -9,6 +9,7 @@ import type { SentryConfig } from './../../types';
 describe('ProjectSelector', () => {
   beforeEach(() => {
     jest.spyOn(runtime, 'getTemplateSrv').mockImplementation(() => ({
+      containsTemplate: jest.fn(),
       updateTimeRange: jest.fn(),
       getVariables: () => [],
       replace: (s: string) => s,

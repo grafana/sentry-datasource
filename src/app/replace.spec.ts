@@ -9,6 +9,7 @@ describe('replace', () => {
   describe('replaceProjectIDs', () => {
     it('default replaceProjectIDs should return valid objects', () => {
       jest.spyOn(runtime, 'getTemplateSrv').mockImplementation(() => ({
+        containsTemplate: jest.fn(),
         updateTimeRange: jest.fn(),
         getVariables: jest.fn(),
         replace: (s: string) => {
@@ -20,6 +21,7 @@ describe('replace', () => {
     });
     it('list with variables passed to replaceProjectIDs should return valid objects', () => {
       jest.spyOn(runtime, 'getTemplateSrv').mockImplementation(() => ({
+        containsTemplate: jest.fn(),
         updateTimeRange: jest.fn(),
         getVariables: jest.fn(),
         replace: (s: string) => {
@@ -31,6 +33,7 @@ describe('replace', () => {
     });
     it('var with multiple value replaceProjectIDs should return valid objects', () => {
       jest.spyOn(runtime, 'getTemplateSrv').mockImplementation(() => ({
+        containsTemplate: jest.fn(),
         updateTimeRange: jest.fn(),
         getVariables: jest.fn(),
         replace: (s: string): any => {
@@ -45,6 +48,7 @@ describe('replace', () => {
   describe('applyTemplateVariables', () => {
     beforeEach(() => {
       jest.spyOn(runtime, 'getTemplateSrv').mockImplementation(() => ({
+        containsTemplate: jest.fn(),
         updateTimeRange: jest.fn(),
         getVariables: jest.fn(),
         replace: (s: string, vars: ScopedVars) => {

@@ -3,7 +3,7 @@ import { InlineFormLabel, Input, Select } from '@grafana/ui';
 import { SentryDataSource } from '../../datasource';
 import { selectors } from '../../selectors';
 import { SentryIssueSortOptions } from '../../constants';
-import type { QueryEditorProps } from '@grafana/data/types';
+import type { QueryEditorProps } from '@grafana/data';
 import type { SentryConfig, SentryQuery, SentryIssueSort } from '../../types';
 
 type IssuesEditorProps = Pick<QueryEditorProps<SentryDataSource, SentryQuery, SentryConfig>, 'query' | 'onChange' | 'onRunQuery'>;

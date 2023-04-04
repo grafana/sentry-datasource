@@ -1,6 +1,6 @@
 import flatten from 'lodash/flatten';
 import { getTemplateSrv } from '@grafana/runtime';
-import type { ScopedVars } from '@grafana/data/types';
+import type { ScopedVars } from '@grafana/data';
 import type { SentryQuery, SentryVariableQuery } from './../types';
 
 const interpolateVariable = (query: string, scopedVars?: ScopedVars): string => {

@@ -1,4 +1,4 @@
-import type { DataSourceJsonData, DataQuery } from '@grafana/data/types';
+import type { DataSourceJsonData, DataQuery } from '@grafana/data';
 
 //#region Sentry Objects
 export type SentryOrganization = {

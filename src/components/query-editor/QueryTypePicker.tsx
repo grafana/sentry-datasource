@@ -3,7 +3,7 @@ import { InlineFormLabel, Select, useTheme } from '@grafana/ui';
 import { SentryDataSource } from './../../datasource';
 import { selectors } from './../../selectors';
 import { QueryTypeOptions } from '../../constants';
-import type { QueryEditorProps } from '@grafana/data/types';
+import type { QueryEditorProps } from '@grafana/data';
 import type { SentryConfig, SentryQuery, QueryType } from './../../types';
 
 type QueryTypePickerProps = Pick<QueryEditorProps<SentryDataSource, SentryQuery, SentryConfig>, 'query' | 'onChange' | 'onRunQuery'>;

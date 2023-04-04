@@ -2,7 +2,7 @@ import { Observable } from 'rxjs';
 import { DataSourceWithBackend, getTemplateSrv } from '@grafana/runtime';
 import { applyTemplateVariables, applyTemplateVariablesToVariableQuery } from './app/replace';
 import { getEnvironmentNamesFromProject } from './app/utils';
-import type { DataSourceInstanceSettings, MetricFindValue, DataQueryRequest, DataQueryResponse, ScopedVars } from '@grafana/data/types';
+import type { DataSourceInstanceSettings, MetricFindValue, DataQueryRequest, DataQueryResponse, ScopedVars } from '@grafana/data';
 import type {
   GetResourceCall,
   SentryConfig,

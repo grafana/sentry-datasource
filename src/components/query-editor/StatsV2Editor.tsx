@@ -8,7 +8,7 @@ import {
   SentryStatsV2QueryCategoryOptions,
   SentryStatsV2QueryOutcomeOptions,
 } from '../../constants';
-import type { QueryEditorProps } from '@grafana/data/types';
+import type { QueryEditorProps } from '@grafana/data';
 import type { SentryConfig, SentryQuery, SentryStatsV2Query } from '../../types';
 
 type StatsV2EditorProps = Pick<QueryEditorProps<SentryDataSource, SentryQuery, SentryConfig>, 'query' | 'onChange' | 'onRunQuery'>;

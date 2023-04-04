@@ -1,4 +1,4 @@
-import type { SelectableValue } from '@grafana/data/types';
+import type { SelectableValue } from '@grafana/data';
 import type {
   QueryType,
   SentryIssueSort,
