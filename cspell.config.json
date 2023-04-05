@@ -23,6 +23,7 @@
     "nolint",
     "testdata",
     "testid",
+    "typecheck",
     "Unmarshaling"
   ]
 }
