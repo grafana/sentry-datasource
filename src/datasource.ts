@@ -4,20 +4,15 @@ import { applyTemplateVariables, applyTemplateVariablesToVariableQuery } from '.
 import { getEnvironmentNamesFromProject } from './app/utils';
 import type { DataSourceInstanceSettings, MetricFindValue, DataQueryRequest, DataQueryResponse, ScopedVars } from '@grafana/data';
 import type {
-  GetResourceCall,
   SentryConfig,
   SentryQuery,
   SentryVariableQuery,
   SentryOrganization,
   SentryProject,
-  GetResourceCallOrganizations,
-  GetResourceCallProjects,
   SentryTeam,
-  GetResourceCallListOrgTeams,
   GetResourceCallProjectsPath,
   GetResourceCallListOrgTeamsPath,
   GetResourceCallGetTeamsProjectsPath,
-  GetResourceCallGetTeamsProjects,
 } from './types';
 export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryConfig> {
   constructor(private instanceSettings: DataSourceInstanceSettings<SentryConfig>) {
