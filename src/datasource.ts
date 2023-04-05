@@ -95,17 +95,13 @@ export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryC
       }
     });
   }
-  //#region Resource calls
-  // TODO: ALYSSA - come back to Promise response type
-  getResource<O extends GetResourceCall>(path: O['path'], params?: O['query']): Promise<O['response'] | any> {
-    return super.getResource(path, params);
-  }
+
   getOrganizations(): Promise<SentryOrganization[]> {
-    return this.getResource<GetResourceCallOrganizations>('api/0/organizations');
+    return this.getResource<SentryOrganization[]>('api/0/organizations');
   }
   getProjects(orgSlug: string): Promise<SentryProject[]> {
     const replacedOrgSlug: string = getTemplateSrv().replace(orgSlug);
-    return this.getResource<GetResourceCallProjects>(`api/0/organizations/${replacedOrgSlug}/projects` as GetResourceCallProjectsPath, {});
+    return this.getResource<SentryProject[]>(`api/0/organizations/${replacedOrgSlug}/projects` as GetResourceCallProjectsPath, {});
   }
   getTeamsProjects(orgSlug: string, teamSlug: string): Promise<SentryProject[]> {
     const replacedOrgSlug: string = getTemplateSrv().replace(orgSlug || '');
@@ -113,14 +109,14 @@ export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryC
     if (replacedOrgSlug === '' || replacedTeamSlug === '') {
       return Promise.reject('invalid arguments');
     }
-    return this.getResource<GetResourceCallGetTeamsProjects>(
+    return this.getResource<SentryProject[]>(
       `api/0/teams/${replacedOrgSlug}/${replacedTeamSlug}/projects` as GetResourceCallGetTeamsProjectsPath,
       {}
     );
   }
   getOrgTeams(orgSlug: string): Promise<SentryTeam[]> {
     const replacedOrgSlug: string = getTemplateSrv().replace(orgSlug);
-    return this.getResource<GetResourceCallListOrgTeams>(
+    return this.getResource<SentryTeam[]>(
       `api/0/organizations/${replacedOrgSlug}/teams` as GetResourceCallListOrgTeamsPath,
       {}
     );
