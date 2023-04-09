@@ -2,24 +2,18 @@ import { Observable } from 'rxjs';
 import { DataSourceWithBackend, getTemplateSrv } from '@grafana/runtime';
 import { applyTemplateVariables, applyTemplateVariablesToVariableQuery } from './app/replace';
 import { getEnvironmentNamesFromProject } from './app/utils';
-import type { DataSourceInstanceSettings, MetricFindValue, DataQueryRequest, DataQueryResponse, ScopedVars } from '@grafana/data/types';
+import type { DataSourceInstanceSettings, MetricFindValue, DataQueryRequest, DataQueryResponse, ScopedVars } from '@grafana/data';
 import type {
-  GetResourceCall,
   SentryConfig,
   SentryQuery,
   SentryVariableQuery,
   SentryOrganization,
   SentryProject,
-  GetResourceCallOrganizations,
-  GetResourceCallProjects,
   SentryTeam,
-  GetResourceCallListOrgTeams,
   GetResourceCallProjectsPath,
   GetResourceCallListOrgTeamsPath,
   GetResourceCallGetTeamsProjectsPath,
-  GetResourceCallGetTeamsProjects,
 } from './types';
-
 export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryConfig> {
   constructor(private instanceSettings: DataSourceInstanceSettings<SentryConfig>) {
     super(instanceSettings);
@@ -96,16 +90,13 @@ export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryC
       }
     });
   }
-  //#region Resource calls
-  getResource<O extends GetResourceCall>(path: O['path'], params?: O['query']): Promise<O['response']> {
-    return super.getResource(path, params);
-  }
+
   getOrganizations(): Promise<SentryOrganization[]> {
-    return this.getResource<GetResourceCallOrganizations>('api/0/organizations');
+    return this.getResource<SentryOrganization[]>('api/0/organizations');
   }
   getProjects(orgSlug: string): Promise<SentryProject[]> {
     const replacedOrgSlug: string = getTemplateSrv().replace(orgSlug);
-    return this.getResource<GetResourceCallProjects>(`api/0/organizations/${replacedOrgSlug}/projects` as GetResourceCallProjectsPath, {});
+    return this.getResource<SentryProject[]>(`api/0/organizations/${replacedOrgSlug}/projects` as GetResourceCallProjectsPath, {});
   }
   getTeamsProjects(orgSlug: string, teamSlug: string): Promise<SentryProject[]> {
     const replacedOrgSlug: string = getTemplateSrv().replace(orgSlug || '');
@@ -113,14 +104,14 @@ export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryC
     if (replacedOrgSlug === '' || replacedTeamSlug === '') {
       return Promise.reject('invalid arguments');
     }
-    return this.getResource<GetResourceCallGetTeamsProjects>(
+    return this.getResource<SentryProject[]>(
       `api/0/teams/${replacedOrgSlug}/${replacedTeamSlug}/projects` as GetResourceCallGetTeamsProjectsPath,
       {}
     );
   }
   getOrgTeams(orgSlug: string): Promise<SentryTeam[]> {
     const replacedOrgSlug: string = getTemplateSrv().replace(orgSlug);
-    return this.getResource<GetResourceCallListOrgTeams>(
+    return this.getResource<SentryTeam[]>(
       `api/0/organizations/${replacedOrgSlug}/teams` as GetResourceCallListOrgTeamsPath,
       {}
     );

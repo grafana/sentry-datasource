@@ -1,11 +1,12 @@
 import * as runtime from '@grafana/runtime';
 import { SentryDataSource } from './datasource';
-import type { DataSourceInstanceSettings } from '@grafana/data/types';
+import type { DataSourceInstanceSettings } from '@grafana/data';
 import type { SentryConfig, SentryProject, SentryTeam, SentryVariableQuery } from './types';
 
 describe('SentryDataSource', () => {
   beforeEach(() => {
     jest.spyOn(runtime, 'getTemplateSrv').mockImplementation(() => ({
+      containsTemplate: jest.fn(),
       updateTimeRange: jest.fn(),
       getVariables: jest.fn(),
       replace: (s: string) => {
@@ -23,14 +24,14 @@ describe('SentryDataSource', () => {
     });
     it('should return no results when org slug not specified in projects query', async () => {
       const ds = new SentryDataSource({} as DataSourceInstanceSettings<SentryConfig>);
-      ds.getResource = jest.fn(() => Promise.resolve([]));
+      ds.getProjects = jest.fn(() => Promise.resolve([]));
       const query = { type: 'projects' } as SentryVariableQuery;
       const results = await ds.metricFindQuery(query);
       expect(results.length).toBe(0);
     });
     it('should return teams slug and name correctly', async () => {
       const ds = new SentryDataSource({} as DataSourceInstanceSettings<SentryConfig>);
-      ds.getResource = jest.fn(() =>
+      ds.getOrgTeams = jest.fn(() =>
         Promise.resolve([
           { id: '1', name: 'Foo', slug: 'foo' },
           { id: '2', name: 'Bar', slug: 'bar' },
@@ -46,7 +47,7 @@ describe('SentryDataSource', () => {
     });
     it('should return projects name and id correctly', async () => {
       const ds = new SentryDataSource({} as DataSourceInstanceSettings<SentryConfig>);
-      ds.getResource = jest.fn(() =>
+      ds.getProjects = jest.fn(() =>
         Promise.resolve([
           { id: '1', name: 'Foo', slug: 'foo' },
           { id: '2', name: 'Bar', slug: 'bar' },
@@ -62,7 +63,7 @@ describe('SentryDataSource', () => {
     });
     it('should return all unique environments when environments query selected and no projectId passed', async () => {
       const ds = new SentryDataSource({} as DataSourceInstanceSettings<SentryConfig>);
-      ds.getResource = jest.fn(() =>
+      ds.getProjects = jest.fn(() =>
         Promise.resolve([
           { id: '1', name: 'Foo', slug: 'foo', environments: ['foo', 'bar', 'baz', 'amma', 'boo'] },
           { id: '2', name: 'Bar', slug: 'bar', environments: ['amma', 'aadu', 'ilai', 'eetti'] },
@@ -74,7 +75,7 @@ describe('SentryDataSource', () => {
     });
     it('should return environments name correctly', async () => {
       const ds = new SentryDataSource({} as DataSourceInstanceSettings<SentryConfig>);
-      ds.getResource = jest.fn(() =>
+      ds.getProjects = jest.fn(() =>
         Promise.resolve([
           { id: '1', name: 'Foo', slug: 'foo', environments: ['foo', 'bar', 'baz'] },
           { id: '2', name: 'Bar', slug: 'bar', environments: ['amma', 'aadu', 'ilai', 'eetti'] },

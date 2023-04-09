@@ -8,6 +8,7 @@ import type { SentryVariableQuery } from './../types';
 describe('SentryVariableEditor', () => {
   beforeEach(() => {
     jest.spyOn(runtime, 'getTemplateSrv').mockImplementation(() => ({
+      containsTemplate: jest.fn(),
       updateTimeRange: jest.fn(),
       getVariables: () => {
         return [];

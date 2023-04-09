@@ -9,6 +9,7 @@ import type { SentryConfig } from './../../types';
 describe('ProjectSelector', () => {
   beforeEach(() => {
     jest.spyOn(runtime, 'getTemplateSrv').mockImplementation(() => ({
+      containsTemplate: jest.fn(),
       updateTimeRange: jest.fn(),
       getVariables: () => [],
       replace: (s: string) => s,
@@ -16,7 +17,7 @@ describe('ProjectSelector', () => {
   });
   it('should render without error', () => {
     const datasource = new SentryDataSource({} as DataSourceInstanceSettings<SentryConfig>);
-    datasource.getResource = jest.fn(() => Promise.resolve([]));
+    datasource.getProjects = jest.fn(() => Promise.resolve([]));
     const onChange = jest.fn();
     const result = render(<ProjectSelector datasource={datasource} onValuesChange={onChange} mode="id" orgSlug="foo" values={[]} />);
     waitFor(() => {

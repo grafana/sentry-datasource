@@ -1,7 +1,7 @@
 import React from 'react';
 import { InlineFormLabel, Select } from '@grafana/ui';
 import { selectors } from '../../selectors';
-import type { SelectableValue } from '@grafana/data/types';
+import type { SelectableValue } from '@grafana/data';
 import type { VariableQueryType } from '../../types';
 
 export const TypeSelector = (props: { variableQueryType: VariableQueryType; onChange: (type: VariableQueryType) => void }) => {
