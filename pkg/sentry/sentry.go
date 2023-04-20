@@ -10,38 +10,11 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/build"
 )
 
-type apiProvider interface {
-	// Fetch is general purpose api
-	Fetch(path string, out interface{}) error
-
-	// GetOrganizations list the organizations
-	// https://docs.sentry.io/api/organizations/list-your-organizations/
-	GetOrganizations() ([]SentryOrganization, error)
-
-	// ListOrganizationTeams lists the teams for an organization
-	// https://docs.sentry.io/api/teams/list-an-organizations-teams/
-	ListOrganizationTeams(organizationSlug string) ([]SentryTeam, error)
-
-	// GetProjects List an Organization's Projects
-	// https://docs.sentry.io/api/organizations/list-an-organizations-projects/
-	GetProjects(organizationSlug string) ([]SentryProject, error)
-
-	// GetIssues list the issues for an organization
-	// Organization Slug is the mandatory parameter
-	// From and To times will be grafana dashboard's range
-	// https://github.com/getsentry/sentry/blob/master/src/sentry/api/endpoints/organization_group_index.py#L158
-	GetIssues(gii GetIssuesInput) ([]SentryIssue, string, error)
-
-	// GetStatsV2 list the stats for an organization
-	GetStatsV2(args GetStatsV2Input) (StatsV2Response, string, error)
-}
-
 type SentryClient struct {
 	BaseURL          string
 	OrgSlug          string
 	authToken        string
 	sentryHttpClient HTTPClient
-	apiProvider
 }
 
 func NewSentryClient(baseURL string, orgSlug string, authToken string, doerClient doer) (*SentryClient, error) {
