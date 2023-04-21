@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.0 (2023-04-20)
+
+- Update backend dependencies
+
 ## 1.1.0 (2022-12-19)
 
 - Teams template variable support
