@@ -6,6 +6,7 @@ import { SentryConfigEditor } from './editors/SentryConfigEditor';
 import { SentryQueryEditor } from './editors/SentryQueryEditor';
 import { SentryVariableEditor } from './editors/SentryVariableEditor';
 import type { SentryConfig, SentrySecureConfig, SentryQuery } from './types';
+import pluginJson from './plugin.json';
 
 export const plugin = new DataSourcePlugin<SentryDataSource, SentryQuery, SentryConfig, SentrySecureConfig>(SentryDataSource)
   .setConfigEditor(SentryConfigEditor)
@@ -24,6 +25,7 @@ getAppEvents().subscribe<DashboardLoadedEvent<SentryQuery>>(
     };
 
     trackSentryDashboardLoaded({
+      sentry_plugin_version: pluginJson.info.version,
       dashboardId: dashboardId,
       grafanaVersion: grafanaVersion,
       orgId: orgId,
