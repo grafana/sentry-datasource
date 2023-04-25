@@ -16,8 +16,7 @@ export const plugin = new DataSourcePlugin<SentryDataSource, SentryQuery, Sentry
 // Track dashboard loads to RudderStack
 getAppEvents().subscribe<DashboardLoadedEvent<SentryQuery>>(
   DashboardLoadedEvent,
-  (props) => {
-    const { payload: { dashboardId, orgId, grafanaVersion, queries } } = props;
+  ({ payload: { dashboardId, orgId, grafanaVersion, queries } }) => {
     const sentryQueries = queries["grafana-sentry-datasource"];
 
     if (!sentryQueries?.length) {
