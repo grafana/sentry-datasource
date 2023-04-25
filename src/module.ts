@@ -19,6 +19,10 @@ getAppEvents().subscribe<DashboardLoadedEvent<SentryQuery>>(
     const { payload } = props;
     const sentryQueries = payload.queries["grafana-sentry-datasource"];
 
+    if (!sentryQueries?.length) {
+      return;
+    };
+
     trackSentryDashboardLoaded({
       dashboardId: payload.dashboardId,
       grafanaVersion: payload.grafanaVersion,
