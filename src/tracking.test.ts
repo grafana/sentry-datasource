@@ -12,7 +12,7 @@ describe('analyzeQueries', () => {
         stats_query: 0,
         stats_query_outcome_filter: 0,
         stats_query_reason_filter: 0,
-        stats_query_groupby: 0 
+        stats_query_group_by: 0 
       },
     },
     {
@@ -24,7 +24,7 @@ describe('analyzeQueries', () => {
         stats_query: 0,
         stats_query_outcome_filter: 0,
         stats_query_reason_filter: 0,
-        stats_query_groupby: 0 
+        stats_query_group_by: 0 
       },
     },
     {
@@ -36,7 +36,7 @@ describe('analyzeQueries', () => {
         stats_query: 1,
         stats_query_outcome_filter: 0,
         stats_query_reason_filter: 0,
-        stats_query_groupby: 0 
+        stats_query_group_by: 0 
       },
     },
     {
@@ -48,7 +48,7 @@ describe('analyzeQueries', () => {
         stats_query: 1,
         stats_query_outcome_filter: 1,
         stats_query_reason_filter: 0,
-        stats_query_groupby: 0 
+        stats_query_group_by: 0 
       },
     },
     {
@@ -60,7 +60,7 @@ describe('analyzeQueries', () => {
         stats_query: 1,
         stats_query_outcome_filter: 0,
         stats_query_reason_filter: 1,
-        stats_query_groupby: 0 
+        stats_query_group_by: 0 
       },
     },
     {
@@ -72,7 +72,7 @@ describe('analyzeQueries', () => {
         stats_query: 1,
         stats_query_outcome_filter: 0,
         stats_query_reason_filter: 0,
-        stats_query_groupby: 1 
+        stats_query_group_by: 1 
       },
     },
     {
@@ -84,7 +84,7 @@ describe('analyzeQueries', () => {
         stats_query: 1,
         stats_query_outcome_filter: 1,
         stats_query_reason_filter: 1,
-        stats_query_groupby: 1 
+        stats_query_group_by: 1 
       },
     },
     {
