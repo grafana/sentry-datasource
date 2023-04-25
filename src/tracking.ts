@@ -2,8 +2,7 @@ import { reportInteraction } from '@grafana/runtime';
 import { SentryQuery } from 'types';
 
 export const trackSentryDashboardLoaded = (props: SentryDashboardLoadedProps) => {
-  console.log('trackSentryDashboardLoaded props', props);
-  reportInteraction('grafana_ds_clickhouse_dashboard_loaded', props);
+  reportInteraction('grafana_ds_sentry_dashboard_loaded', props);
 };
 
 export type SentryCounters = {
@@ -25,7 +24,7 @@ export const analyzeQueries = (queries: SentryQuery[]): SentryCounters => {
     stats_query: 0,
     stats_query_outcome_filter: 0,
     stats_query_reason_filter: 0,
-    stats_query_groupby: 0
+    stats_query_group_by: 0
   };
   
   queries.forEach((query) => {
@@ -45,7 +44,7 @@ export const analyzeQueries = (queries: SentryQuery[]): SentryCounters => {
           counters.stats_query_reason_filter++
         }
         if (query.statsGroupBy?.length > 0) {
-          counters.stats_query_groupby++
+          counters.stats_query_group_by++
         }
         break;
     }
