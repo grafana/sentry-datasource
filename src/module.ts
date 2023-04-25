@@ -16,17 +16,17 @@ export const plugin = new DataSourcePlugin<SentryDataSource, SentryQuery, Sentry
 getAppEvents().subscribe<DashboardLoadedEvent<SentryQuery>>(
   DashboardLoadedEvent,
   (props) => {
-    const { payload } = props;
-    const sentryQueries = payload.queries["grafana-sentry-datasource"];
+    const { payload: { dashboardId, orgId, grafanaVersion, queries } } = props;
+    const sentryQueries = queries["grafana-sentry-datasource"];
 
     if (!sentryQueries?.length) {
       return;
     };
 
     trackSentryDashboardLoaded({
-      dashboardId: payload.dashboardId,
-      grafanaVersion: payload.grafanaVersion,
-      orgId: payload.orgId,
+      dashboardId: dashboardId,
+      grafanaVersion: grafanaVersion,
+      orgId: orgId,
       ...analyzeQueries(sentryQueries),
     });
   }
