@@ -43,6 +43,7 @@ export type SentryIssueSort = 'inbox' | 'new' | 'date' | 'priority' | 'freq' | '
 export interface SentryConfig extends DataSourceJsonData {
   url: string;
   orgSlug: string;
+  enableSecureSocksProxy?: boolean;
 }
 export interface SentrySecureConfig {
   authToken: string;
