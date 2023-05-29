@@ -45,7 +45,7 @@ func getInstance(s backend.DataSourceInstanceSettings) (instancemgmt.Instance, e
 		return nil, err
 	}
 
-	// we need this optinos to load the secure proxy configuration
+	// we need this options to load the secure proxy configuration
 	opt, err := s.HTTPClientOptions()
 	if err != nil {
 		return nil, err
