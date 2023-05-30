@@ -24,6 +24,7 @@
     "testdata",
     "testid",
     "typecheck",
-    "Unmarshaling"
+    "Unmarshaling",
+    "proxying"
   ]
 }

@@ -20,7 +20,7 @@ type SentryDatasource struct {
 }
 
 func (ds *SentryDatasource) getDatasourceInstance(ctx context.Context, pluginCtx backend.PluginContext) (*SentryPlugin, error) {
-	s, err := ds.IM.Get(pluginCtx)
+	s, err := ds.IM.Get(ctx, pluginCtx)
 	if err != nil {
 		return nil, err
 	}
@@ -44,10 +44,18 @@ func getInstance(s backend.DataSourceInstanceSettings) (instancemgmt.Instance, e
 	if err != nil {
 		return nil, err
 	}
-	hc, err := httpclient.New(httpclient.Options{})
+
+	// we need this options to load the secure proxy configuration
+	opt, err := s.HTTPClientOptions()
 	if err != nil {
 		return nil, err
 	}
+
+	hc, err := httpclient.New(opt)
+	if err != nil {
+		return nil, err
+	}
+
 	sc, err := sentry.NewSentryClient(settings.URL, settings.OrgSlug, settings.authToken, hc)
 	if err != nil {
 		return nil, err

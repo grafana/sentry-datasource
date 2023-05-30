@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
-import { InlineFormLabel, Input, Button } from '@grafana/ui';
+import { InlineFormLabel, Input, Button, Switch, useTheme } from '@grafana/ui';
 import { Components } from './../selectors';
 import { DEFAULT_SENTRY_URL } from './../constants';
+import { config } from '@grafana/runtime';
+import { gte } from 'semver';
+
 import type { DataSourcePluginOptionsEditorProps } from '@grafana/data';
 import type { SentryConfig, SentrySecureConfig } from './../types';
 
 type SentryConfigEditorProps = {} & DataSourcePluginOptionsEditorProps<SentryConfig, SentrySecureConfig>;
 
 export const SentryConfigEditor = (props: SentryConfigEditorProps) => {
+  const theme = useTheme();
   const { options, onOptionsChange } = props;
   const { jsonData, secureJsonFields } = options;
   const secureJsonData: SentrySecureConfig = (options.secureJsonData || {}) as SentrySecureConfig;
@@ -15,7 +19,7 @@ export const SentryConfigEditor = (props: SentryConfigEditorProps) => {
   const [orgSlug, setOrgSlug] = useState<string>(jsonData?.orgSlug || '');
   const [authToken, setAuthToken] = useState<string>('');
   const { ConfigEditor: ConfigEditorSelectors } = Components;
-  const labelWidth = 10;
+  const labelWidth = 13;
   const valueWidth = 20;
   const onOptionChange = <Key extends keyof SentryConfig, Value extends SentryConfig[Key]>(option: Key, value: Value) => {
     onOptionsChange({
@@ -34,6 +38,13 @@ export const SentryConfigEditor = (props: SentryConfigEditorProps) => {
       secureJsonFields: { ...secureJsonFields, [option]: set },
     });
   };
+  const switchContainerStyle: React.CSSProperties = {
+    padding: `0 ${theme.spacing.sm}`,
+    height: `${theme.spacing.formInputHeight}px`,
+    display: 'flex',
+    alignItems: 'center',
+  };
+
   return (
     <div className="grafana-sentry-datasource config-editor">
       <h4 className="heading">{ConfigEditorSelectors.SentrySettings.GroupTitle}</h4>
@@ -103,6 +114,24 @@ export const SentryConfigEditor = (props: SentryConfigEditorProps) => {
         )}
       </div>
       <br />
+      {config.featureToggles['secureSocksDSProxyEnabled'] && gte(config.buildInfo.version, '10.0.0') && (
+          <div className="gf-form-group">
+            <h4>Additional Properties</h4>
+            <div className="gf-form">
+              <InlineFormLabel width={labelWidth} tooltip={Components.ConfigEditor.SecureSocksProxy.tooltip}>
+                {Components.ConfigEditor.SecureSocksProxy.label}
+              </InlineFormLabel>
+              <div style={switchContainerStyle}>
+                <Switch
+                  className="gf-form"
+                  value={jsonData.enableSecureSocksProxy || false}
+                  onChange={(e) => onOptionChange('enableSecureSocksProxy', e.currentTarget.checked)}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
     </div>
   );
 };

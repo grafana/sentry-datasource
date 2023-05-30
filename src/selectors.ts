@@ -28,6 +28,10 @@ export const Components = {
         },
       },
     },
+    SecureSocksProxy: {
+      label: 'Enable Secure Socks Proxy',
+      tooltip: 'Enable proxying the datasource connection through the secure socks proxy to a different network.',
+    },
   },
   QueryEditor: {
     QueryType: {
