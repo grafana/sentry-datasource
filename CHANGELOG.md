@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0 (2023-08-29)
+
+- Add support for the secure socks proxy
+- Updates sdk version to 0.171.0
+- Upgrade moment
+
 ## 1.2.1 (2023-05-03)
 
 - Build with latest Go version 1.20.4
