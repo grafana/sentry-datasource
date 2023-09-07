@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
-import { InlineFormLabel, Input, Button, Switch, useTheme } from '@grafana/ui';
+import { Field, Input, Button, Switch } from '@grafana/ui';
 import { Components } from './../selectors';
 import { DEFAULT_SENTRY_URL } from './../constants';
-import { config } from '@grafana/runtime';
-import { gte } from 'semver';
 
+import { config } from '@grafana/runtime';
+import { DataSourceDescription, ConfigSection } from '@grafana/experimental';
 import type { DataSourcePluginOptionsEditorProps } from '@grafana/data';
+
 import type { SentryConfig, SentrySecureConfig } from './../types';
+import { Divider } from 'components/Divider';
+import { isVersionGtOrEq } from 'utils/version';
 
 type SentryConfigEditorProps = {} & DataSourcePluginOptionsEditorProps<SentryConfig, SentrySecureConfig>;
 
 export const SentryConfigEditor = (props: SentryConfigEditorProps) => {
-  const theme = useTheme();
   const { options, onOptionsChange } = props;
   const { jsonData, secureJsonFields } = options;
   const secureJsonData: SentrySecureConfig = (options.secureJsonData || {}) as SentrySecureConfig;
@@ -19,9 +21,11 @@ export const SentryConfigEditor = (props: SentryConfigEditorProps) => {
   const [orgSlug, setOrgSlug] = useState<string>(jsonData?.orgSlug || '');
   const [authToken, setAuthToken] = useState<string>('');
   const { ConfigEditor: ConfigEditorSelectors } = Components;
-  const labelWidth = 13;
   const valueWidth = 20;
-  const onOptionChange = <Key extends keyof SentryConfig, Value extends SentryConfig[Key]>(option: Key, value: Value) => {
+  const onOptionChange = <Key extends keyof SentryConfig, Value extends SentryConfig[Key]>(
+    option: Key,
+    value: Value
+  ) => {
     onOptionsChange({
       ...options,
       jsonData: { ...jsonData, [option]: value },
@@ -38,64 +42,80 @@ export const SentryConfigEditor = (props: SentryConfigEditorProps) => {
       secureJsonFields: { ...secureJsonFields, [option]: set },
     });
   };
-  const switchContainerStyle: React.CSSProperties = {
-    padding: `0 ${theme.spacing.sm}`,
-    height: `${theme.spacing.formInputHeight}px`,
-    display: 'flex',
-    alignItems: 'center',
-  };
 
   return (
-    <div className="grafana-sentry-datasource config-editor">
-      <h4 className="heading">{ConfigEditorSelectors.SentrySettings.GroupTitle}</h4>
-      <div className="gf-form" data-testid="sentry-config-editor-url-row">
-        <InlineFormLabel tooltip={ConfigEditorSelectors.SentrySettings.URL.tooltip} width={labelWidth}>
-          {ConfigEditorSelectors.SentrySettings.URL.label}
-        </InlineFormLabel>
-        <Input
+    <>
+      <DataSourceDescription
+        dataSourceName="Sentry"
+        docsLink="https://grafana.com/grafana/plugins/grafana-sentry-datasource/"
+        hasRequiredFields
+      />
+      <Divider />
+      <ConfigSection title={ConfigEditorSelectors.SentrySettings.GroupTitle}>
+        <Field
+          required
+          label={ConfigEditorSelectors.SentrySettings.URL.label}
+          description={ConfigEditorSelectors.SentrySettings.URL.tooltip}
+          invalid={!jsonData.url}
+          error={'URL is required'}
           data-testid="sentry-config-editor-url"
-          placeholder={ConfigEditorSelectors.SentrySettings.URL.placeholder}
-          aria-label={ConfigEditorSelectors.SentrySettings.URL.ariaLabel}
-          value={url}
-          onChange={(e) => setURL(e.currentTarget.value)}
-          onBlur={() => onOptionChange('url', url)}
-          width={valueWidth * 2}
-        ></Input>
-      </div>
-      <div className="gf-form" data-testid="sentry-config-editor-org-slug-row">
-        <InlineFormLabel tooltip={ConfigEditorSelectors.SentrySettings.OrgSlug.tooltip} width={labelWidth}>
-          {ConfigEditorSelectors.SentrySettings.OrgSlug.label}
-        </InlineFormLabel>
-        <Input
+        >
+          <Input
+            placeholder={ConfigEditorSelectors.SentrySettings.URL.placeholder}
+            aria-label={ConfigEditorSelectors.SentrySettings.URL.ariaLabel}
+            value={url}
+            onChange={(e) => setURL(e.currentTarget.value)}
+            onBlur={() => onOptionChange('url', url)}
+            width={valueWidth * 2}
+          />
+        </Field>
+        <Field
+          description={ConfigEditorSelectors.SentrySettings.OrgSlug.tooltip}
+          label={ConfigEditorSelectors.SentrySettings.OrgSlug.label}
+          required
+          invalid={!jsonData.orgSlug}
+          error={'Organisation is required'}
           data-testid="sentry-config-editor-org-slug"
-          placeholder={ConfigEditorSelectors.SentrySettings.OrgSlug.placeholder}
-          aria-label={ConfigEditorSelectors.SentrySettings.OrgSlug.ariaLabel}
-          value={orgSlug}
-          onChange={(e) => setOrgSlug(e.currentTarget.value)}
-          onBlur={() => onOptionChange('orgSlug', orgSlug)}
-          width={valueWidth * 2}
-        ></Input>
-      </div>
-      <div className="gf-form" data-testid="sentry-config-editor-auth-token-row">
-        <InlineFormLabel tooltip={ConfigEditorSelectors.SentrySettings.AuthToken.tooltip} width={labelWidth}>
-          {ConfigEditorSelectors.SentrySettings.AuthToken.label}
-        </InlineFormLabel>
+        >
+          <Input
+            placeholder={ConfigEditorSelectors.SentrySettings.OrgSlug.placeholder}
+            aria-label={ConfigEditorSelectors.SentrySettings.OrgSlug.ariaLabel}
+            value={orgSlug}
+            onChange={(e) => setOrgSlug(e.currentTarget.value)}
+            onBlur={() => onOptionChange('orgSlug', orgSlug)}
+            width={valueWidth * 2}
+          ></Input>
+        </Field>
         {secureJsonFields?.authToken ? (
-          <>
-            <Input type="text" value="Configured" disabled={true} width={valueWidth * 2}></Input>
-            <Button
-              variant="secondary"
-              className="reset-button"
-              onClick={() => {
-                setAuthToken('');
-                onSecureOptionChange('authToken', authToken, false);
-              }}
-            >
-              {ConfigEditorSelectors.SentrySettings.AuthToken.Reset.label}
-            </Button>
-          </>
+          <Field
+            label={ConfigEditorSelectors.SentrySettings.AuthToken.label}
+            description={ConfigEditorSelectors.SentrySettings.AuthToken.tooltip}
+            required
+            data-testid="sentry-config-editor-auth-token"
+          >
+            <div className="width-30" style={{ display: 'flex', gap: '4px' }}>
+              <Input type="text" value="Configured" disabled={true} width={valueWidth * 2}></Input>
+              <Button
+                variant="secondary"
+                className="reset-button"
+                onClick={() => {
+                  setAuthToken('');
+                  onSecureOptionChange('authToken', authToken, false);
+                }}
+              >
+                {ConfigEditorSelectors.SentrySettings.AuthToken.Reset.label}
+              </Button>
+            </div>
+          </Field>
         ) : (
-          <>
+          <Field
+            label={ConfigEditorSelectors.SentrySettings.AuthToken.label}
+            description={ConfigEditorSelectors.SentrySettings.AuthToken.tooltip}
+            required
+            invalid={!secureJsonData.authToken || !secureJsonFields?.authToken}
+            error={'Auth token is required'}
+            data-testid="sentry-config-editor-auth-token"
+          >
             <Input
               type="password"
               autoComplete="new-password"
@@ -110,28 +130,29 @@ export const SentryConfigEditor = (props: SentryConfigEditorProps) => {
                 }
               }}
             ></Input>
-          </>
+          </Field>
         )}
-      </div>
-      <br />
-      {config.featureToggles['secureSocksDSProxyEnabled'] && gte(config.buildInfo.version, '10.0.0') && (
-          <div className="gf-form-group">
-            <h4>Additional Properties</h4>
-            <div className="gf-form">
-              <InlineFormLabel width={labelWidth} tooltip={Components.ConfigEditor.SecureSocksProxy.tooltip}>
-                {Components.ConfigEditor.SecureSocksProxy.label}
-              </InlineFormLabel>
-              <div style={switchContainerStyle}>
-                <Switch
-                  className="gf-form"
-                  value={jsonData.enableSecureSocksProxy || false}
-                  onChange={(e) => onOptionChange('enableSecureSocksProxy', e.currentTarget.checked)}
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-    </div>
+      </ConfigSection>
+      <Divider />
+      {config.featureToggles['secureSocksDSProxyEnabled'] && isVersionGtOrEq(config.buildInfo.version, '10.0.0') && (
+        <ConfigSection
+          title="Additional settings"
+          description="Additional settings are optional settings that can be configured for more control over your data source. This includes enabling the secure socks proxy."
+          isCollapsible
+          isInitiallyOpen={jsonData.enableSecureSocksProxy}
+        >
+          <Field
+            label={Components.ConfigEditor.SecureSocksProxy.label}
+            description={Components.ConfigEditor.SecureSocksProxy.tooltip}
+          >
+            <Switch
+              className="gf-form"
+              value={jsonData.enableSecureSocksProxy || false}
+              onChange={(e) => onOptionChange('enableSecureSocksProxy', e.currentTarget.checked)}
+            />
+          </Field>
+        </ConfigSection>
+      )}
+    </>
   );
 };
