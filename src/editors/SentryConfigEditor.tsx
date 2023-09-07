@@ -56,7 +56,7 @@ export const SentryConfigEditor = (props: SentryConfigEditorProps) => {
           required
           label={ConfigEditorSelectors.SentrySettings.URL.label}
           description={ConfigEditorSelectors.SentrySettings.URL.tooltip}
-          invalid={!jsonData.url}
+          invalid={!url}
           error={'URL is required'}
           data-testid="sentry-config-editor-url"
         >
