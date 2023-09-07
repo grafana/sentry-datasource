@@ -74,7 +74,7 @@ export const SentryConfigEditor = (props: SentryConfigEditorProps) => {
           label={ConfigEditorSelectors.SentrySettings.OrgSlug.label}
           required
           invalid={!jsonData.orgSlug}
-          error={'Organisation is required'}
+          error={'Organization is required'}
           data-testid="sentry-config-editor-org-slug"
         >
           <Input
