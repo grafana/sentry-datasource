@@ -13,6 +13,13 @@ export const SENTRY_E2E_PRODUCTION_PROJECT_NAME = 'project-004';
 export const SENTRY_E2E_ENVIRONMENT_NAME = 'e2e-only-environment';
 export const SENTRY_E2E_NODE_ONLY_ENVIRONMENT_NAME = `node-only-environment`;
 
+export const openDashboardSettings = (sectionName = 'Variables') => {
+  e2e.components.PageToolbar.item('Dashboard settings').click();
+  cy.get('.dashboard-settings__aside').within(() => {
+    cy.contains(sectionName).should('be.visible').click();
+  });
+};
+
 export const selectDropdown = (container: Cypress.Chainable<JQuery<HTMLElement>>, text: string, wait = 0) => {
   container.within(() => e2e().get('[class$="-input-suffix"]').click());
   e2e.components.Select.option().should('be.visible').contains(text).click();

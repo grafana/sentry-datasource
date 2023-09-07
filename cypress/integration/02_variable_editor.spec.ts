@@ -3,6 +3,7 @@ import {
   selectDropdown,
   fillSentryConfigurationForm,
   variableEditorPreviewValuesCheck,
+  openDashboardSettings,
   e2eSelectors,
   PLUGIN_NAME,
   SENTRY_ORG_SLUG,
@@ -27,15 +28,11 @@ e2e.scenario({
       })
       .then((ds) => {
         e2e.flows.addDashboard().then(() => {
-          e2e.components.PageToolbar.item('Dashboard settings').click();
-          e2e.components.Tab.title('Variables').click();
+          openDashboardSettings('Variables');
           e2e.pages.Dashboard.Settings.Variables.List.addVariableCTAV2().click();
           e2e.pages.Dashboard.Settings.Variables.Edit.General.generalNameInput().clear().type('variable1');
           cy.wait(6 * 1000); // When clearing the variable name, the validation popup comes and hides the datasource picker. so wait sometime till the popup closes.
-          selectDropdown(
-            e2e.pages.Dashboard.Settings.Variables.Edit.QueryVariable.queryOptionsDataSourceSelect(),
-            ds.config.name
-          );
+          selectDropdown(e2e.pages.Dashboard.Settings.Variables.Edit.QueryVariable.queryOptionsDataSourceSelect(), ds.config.name);
           // Get list of projects
           selectDropdown(e2eSelectors.VariablesEditor.QueryType.container.ariaLabel(), 'Projects');
           cy.wait(2 * 1000);
@@ -47,10 +44,7 @@ e2e.scenario({
           selectDropdown(e2eSelectors.VariablesEditor.Project.container.ariaLabel(), SENTRY_E2E_PROJECT_NAME);
           cy.wait(2 * 1000);
           variableEditorPreviewValuesCheck([SENTRY_E2E_ENVIRONMENT_NAME], [SENTRY_E2E_NODE_ONLY_ENVIRONMENT_NAME]);
-          selectDropdown(
-            e2eSelectors.VariablesEditor.Project.container.ariaLabel(),
-            SENTRY_E2E_PRODUCTION_PROJECT_NAME
-          );
+          selectDropdown(e2eSelectors.VariablesEditor.Project.container.ariaLabel(), SENTRY_E2E_PRODUCTION_PROJECT_NAME);
           cy.wait(2 * 1000);
           variableEditorPreviewValuesCheck([SENTRY_E2E_ENVIRONMENT_NAME, SENTRY_E2E_NODE_ONLY_ENVIRONMENT_NAME]);
         });
