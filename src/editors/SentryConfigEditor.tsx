@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
-import { Field, Input, Button, Switch } from '@grafana/ui';
+import { Field, Input, Button } from '@grafana/ui';
 import { Components } from './../selectors';
 import { DEFAULT_SENTRY_URL } from './../constants';
 
-import { config } from '@grafana/runtime';
 import { DataSourceDescription, ConfigSection } from '@grafana/experimental';
 import type { DataSourcePluginOptionsEditorProps } from '@grafana/data';
 
 import type { SentryConfig, SentrySecureConfig } from './../types';
-import { Divider } from 'components/Divider';
-import { isVersionGtOrEq } from 'utils/version';
+import { Divider } from 'components/config-editor/Divider';
+import { AdditionalSettings } from 'components/config-editor/AdditionalSettings';
 
 type SentryConfigEditorProps = {} & DataSourcePluginOptionsEditorProps<SentryConfig, SentrySecureConfig>;
 
@@ -133,26 +132,7 @@ export const SentryConfigEditor = (props: SentryConfigEditorProps) => {
           </Field>
         )}
       </ConfigSection>
-      <Divider />
-      {config.featureToggles['secureSocksDSProxyEnabled'] && isVersionGtOrEq(config.buildInfo.version, '10.0.0') && (
-        <ConfigSection
-          title="Additional settings"
-          description="Additional settings are optional settings that can be configured for more control over your data source. This includes enabling the secure socks proxy."
-          isCollapsible
-          isInitiallyOpen={jsonData.enableSecureSocksProxy}
-        >
-          <Field
-            label={Components.ConfigEditor.SecureSocksProxy.label}
-            description={Components.ConfigEditor.SecureSocksProxy.tooltip}
-          >
-            <Switch
-              className="gf-form"
-              value={jsonData.enableSecureSocksProxy || false}
-              onChange={(e) => onOptionChange('enableSecureSocksProxy', e.currentTarget.checked)}
-            />
-          </Field>
-        </ConfigSection>
-      )}
+      <AdditionalSettings jsonData={jsonData} onOptionChange={onOptionChange} />
     </>
   );
 };
