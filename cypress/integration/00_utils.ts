@@ -31,18 +31,21 @@ export const selectDropdown = (container: Cypress.Chainable<JQuery<HTMLElement>>
 export const fillSentryConfigurationForm = (password: string, url?: string, orgSlug?: string) => {
   if (url) {
     e2eSelectors.ConfigEditor.SentrySettings.URL.ariaLabel().clear();
-    e2eSelectors.ConfigEditor.SentrySettings.URL.ariaLabel().type(url);
+    e2eSelectors.ConfigEditor.SentrySettings.URL.ariaLabel().type(url).blur();
   }
   if (orgSlug) {
     e2eSelectors.ConfigEditor.SentrySettings.OrgSlug.ariaLabel().clear();
-    e2eSelectors.ConfigEditor.SentrySettings.OrgSlug.ariaLabel().type(orgSlug);
+    e2eSelectors.ConfigEditor.SentrySettings.OrgSlug.ariaLabel().type(orgSlug).blur();
   }
   if (password) {
-    e2eSelectors.ConfigEditor.SentrySettings.AuthToken.ariaLabel().type(password);
+    e2eSelectors.ConfigEditor.SentrySettings.AuthToken.ariaLabel().type(password).blur();
   }
 };
 
-export const variableEditorPreviewValuesCheck = (stringsShouldPresent: string[] = [], stringsShouldNotPresent: string[] = []) => {
+export const variableEditorPreviewValuesCheck = (
+  stringsShouldPresent: string[] = [],
+  stringsShouldNotPresent: string[] = []
+) => {
   e2e.pages.Dashboard.Settings.Variables.Edit.General.previewOfValuesOption()
     .should('exist')
     .within((previewOfValues) => {
