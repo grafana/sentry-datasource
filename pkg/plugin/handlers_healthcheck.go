@@ -20,7 +20,7 @@ func (ds *SentryDatasource) CheckHealth(ctx context.Context, req *backend.CheckH
 }
 
 func CheckHealth(sentryClient sentry.SentryClient) (*backend.CheckHealthResult, error) {
-	projects, err := sentryClient.GetProjects(sentryClient.OrgSlug)
+	projects, err := sentryClient.GetProjects(sentryClient.OrgSlug, false)
 	if err != nil {
 		errorMessage := err.Error()
 		return &backend.CheckHealthResult{

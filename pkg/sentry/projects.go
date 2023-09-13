@@ -26,33 +26,29 @@ type SentryProject struct {
 	} `json:"teams"`
 }
 
-// fetch first 100 projects
-func (sc *SentryClient) GetProjects(organizationSlug string) ([]SentryProject, error) {
-	out := []SentryProject{}
+func (sc *SentryClient) GetProjects(organizationSlug string, withPagination bool) ([]SentryProject, error) {
+	projects := []SentryProject{}
 	if organizationSlug == "" {
 		organizationSlug = sc.OrgSlug
-	}
-	err := sc.Fetch("/api/0/organizations/"+organizationSlug+"/projects/", &out)
-	return out, err
-}
-
-// Fetch all projects, checking if a link for the next page is specified in the headers
-func (sc *SentryClient) GetAllProjects(organizationSlug string) ([]SentryProject, error) {
-	allProjects := []SentryProject{}
+	}	
 	url := "/api/0/organizations/" + organizationSlug + "/projects/"
-
-	for (url != "") {
-		projects := []SentryProject{}
-		nextURL, err := sc.FetchWithPagination(url, &projects)
-		if err != nil {
-			return nil, err
+	
+	if (withPagination) {
+		for (url != "") {
+			batch := []SentryProject{}
+			nextURL, err := sc.FetchWithPagination(url, &batch)
+			if err != nil {
+				return nil, err
+			}
+	
+			projects = append(projects, batch...)
+			url = nextURL
 		}
-
-		allProjects = append(allProjects, projects...)
-		url = nextURL
+		return projects, nil
+	} else {
+		err := sc.Fetch(url, &projects)
+		return projects, err		
 	}
-
-	return allProjects, nil
 }
 
 func (sc *SentryClient) GetTeamsProjects(organizationSlug string, teamSlug string) ([]SentryProject, error) {
