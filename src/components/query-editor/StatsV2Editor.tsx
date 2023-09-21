@@ -1,6 +1,5 @@
 import React from 'react';
-import { InlineFormLabel, Select, MultiSelect, Input, useTheme } from '@grafana/ui';
-import { SentryDataSource } from '../../datasource';
+import { Select, MultiSelect, Input } from '@grafana/ui';
 import { Components } from '../../selectors';
 import {
   SentryStatsV2QueryFieldOptions,
@@ -8,100 +7,87 @@ import {
   SentryStatsV2QueryCategoryOptions,
   SentryStatsV2QueryOutcomeOptions,
 } from '../../constants';
-import type { QueryEditorProps } from '@grafana/data';
-import type { SentryConfig, SentryQuery, SentryStatsV2Query } from '../../types';
+import type { SentryStatsV2Query } from '../../types';
+import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/experimental';
 
-type StatsV2EditorProps = Pick<QueryEditorProps<SentryDataSource, SentryQuery, SentryConfig>, 'query' | 'onChange' | 'onRunQuery'>;
+interface StatsV2EditorProps {
+  query: SentryStatsV2Query;
+  onChange: (value: SentryStatsV2Query) => void;
+  onRunQuery: () => void;
+}
 
-export const StatsV2Editor = (props: StatsV2EditorProps) => {
-  const { query, onChange, onRunQuery } = props;
-  const theme = useTheme();
+export const StatsV2Editor = ({ query, onChange, onRunQuery }: StatsV2EditorProps) => {
   const { StatsV2: StatsV2Selectors } = Components.QueryEditor;
-  if (query.queryType !== 'statsV2') {
-    return <></>;
-  }
+
   const onPropChange = <T extends keyof SentryStatsV2Query, V extends SentryStatsV2Query[T]>(prop: T, value: V) => {
     onChange({ ...query, [prop]: value });
     onRunQuery();
   };
   return (
     <>
-      <div
-        className="gf-form"
-        style={{ borderLeft: !(query.statsFields && query.statsFields.length > 0) ? `1px solid ${theme.palette.red}` : '' }}
-      >
-        <InlineFormLabel width={10} className="query-keyword" tooltip={StatsV2Selectors.Field.tooltip}>
-          {StatsV2Selectors.Field.label}
-        </InlineFormLabel>
-        <Select
-          value={query.statsFields?.[0] || ''}
-          options={SentryStatsV2QueryFieldOptions}
-          onChange={(e) => onPropChange('statsFields', [e.value!])}
-          placeholder={StatsV2Selectors.Field.placeholder}
-        ></Select>
-      </div>
-      <div
-        className="gf-form"
-        style={{ borderLeft: !(query.statsCategory && query.statsCategory.length > 0) ? `1px solid ${theme.palette.red}` : '' }}
-      >
-        <InlineFormLabel width={10} className="query-keyword" tooltip={StatsV2Selectors.Category.tooltip}>
-          {StatsV2Selectors.Category.label}
-        </InlineFormLabel>
-        <Select
-          value={query.statsCategory?.[0] || ''}
-          options={SentryStatsV2QueryCategoryOptions}
-          onChange={(e) => onPropChange('statsCategory', [e.value!])}
-          placeholder={StatsV2Selectors.Category.placeholder}
-        ></Select>
-      </div>
-      <div className="gf-form">
-        <InlineFormLabel width={10} className="query-keyword" tooltip={StatsV2Selectors.Outcome.tooltip}>
-          {StatsV2Selectors.Outcome.label}
-        </InlineFormLabel>
-        <MultiSelect
-          value={query.statsOutcome || []}
-          options={SentryStatsV2QueryOutcomeOptions}
-          placeholder={StatsV2Selectors.Outcome.placeholder}
-          onChange={(e) =>
-            onPropChange(
-              'statsOutcome',
-              e.map((item) => item.value!)
-            )
-          }
-        ></MultiSelect>
-      </div>
-      <div className="gf-form">
-        <InlineFormLabel width={10} className="query-keyword" tooltip={StatsV2Selectors.Reason.tooltip}>
-          {StatsV2Selectors.Reason.label}
-        </InlineFormLabel>
-        <Input
-          value={query.statsReason || []}
-          placeholder={StatsV2Selectors.Reason.placeholder}
-          onChange={(e) =>
-            onPropChange(
-              'statsReason',
-              (e.currentTarget.value || '').split(',').map((r) => r.trim())
-            )
-          }
-        ></Input>
-      </div>
-      <div className="gf-form">
-        <InlineFormLabel width={10} className="query-keyword" tooltip={StatsV2Selectors.GroupBy.tooltip}>
-          {StatsV2Selectors.GroupBy.label}
-        </InlineFormLabel>
-        <MultiSelect
-          value={query.statsGroupBy || []}
-          isClearable={true}
-          options={SentryStatsV2QueryGroupByOptions}
-          placeholder={StatsV2Selectors.GroupBy.placeholder}
-          onChange={(e) =>
-            onPropChange(
-              'statsGroupBy',
-              e.map((item) => item.value!)
-            )
-          }
-        ></MultiSelect>
-      </div>
+      <EditorRow>
+        <EditorFieldGroup>
+          <EditorField tooltip={StatsV2Selectors.Field.tooltip} label={StatsV2Selectors.Field.label} width={50}>
+            <Select
+              value={query.statsFields?.[0] || ''}
+              options={SentryStatsV2QueryFieldOptions}
+              onChange={(e) => onPropChange('statsFields', [e.value!])}
+              placeholder={StatsV2Selectors.Field.placeholder}
+            />
+          </EditorField>
+          <EditorField tooltip={StatsV2Selectors.Category.tooltip} label={StatsV2Selectors.Category.label} width={50}>
+            <Select
+              value={query.statsCategory?.[0] || ''}
+              options={SentryStatsV2QueryCategoryOptions}
+              onChange={(e) => onPropChange('statsCategory', [e.value!])}
+              placeholder={StatsV2Selectors.Category.placeholder}
+            />
+          </EditorField>
+        </EditorFieldGroup>
+      </EditorRow>
+      <EditorRow>
+        <EditorFieldGroup>
+          <EditorField tooltip={StatsV2Selectors.Outcome.tooltip} label={StatsV2Selectors.Outcome.label} width={50}>
+            <MultiSelect
+              value={query.statsOutcome || []}
+              options={SentryStatsV2QueryOutcomeOptions}
+              placeholder={StatsV2Selectors.Outcome.placeholder}
+              onChange={(e) =>
+                onPropChange(
+                  'statsOutcome',
+                  e.map((item) => item.value!)
+                )
+              }
+            />
+          </EditorField>
+          <EditorField tooltip={StatsV2Selectors.Reason.tooltip} label={StatsV2Selectors.Reason.label} width={50}>
+            <Input
+              value={query.statsReason || []}
+              placeholder={StatsV2Selectors.Reason.placeholder}
+              onChange={(e) =>
+                onPropChange(
+                  'statsReason',
+                  (e.currentTarget.value || '').split(',').map((r) => r.trim())
+                )
+              }
+            />
+          </EditorField>
+          <EditorField tooltip={StatsV2Selectors.GroupBy.tooltip} label={StatsV2Selectors.GroupBy.label} width={50}>
+            <MultiSelect
+              value={query.statsGroupBy || []}
+              isClearable={true}
+              options={SentryStatsV2QueryGroupByOptions}
+              placeholder={StatsV2Selectors.GroupBy.placeholder}
+              onChange={(e) =>
+                onPropChange(
+                  'statsGroupBy',
+                  e.map((item) => item.value!)
+                )
+              }
+            />
+          </EditorField>
+        </EditorFieldGroup>
+      </EditorRow>
     </>
   );
 };

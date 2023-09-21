@@ -1,15 +1,18 @@
 import React from 'react';
-import { InlineFormLabel, Select, useTheme } from '@grafana/ui';
+import { Select } from '@grafana/ui';
 import { SentryDataSource } from './../../datasource';
 import { selectors } from './../../selectors';
 import { QueryTypeOptions } from '../../constants';
 import type { QueryEditorProps } from '@grafana/data';
 import type { SentryConfig, SentryQuery, QueryType } from './../../types';
+import { EditorField, EditorRow } from '@grafana/experimental';
 
-type QueryTypePickerProps = Pick<QueryEditorProps<SentryDataSource, SentryQuery, SentryConfig>, 'query' | 'onChange' | 'onRunQuery'>;
+type QueryTypePickerProps = Pick<
+  QueryEditorProps<SentryDataSource, SentryQuery, SentryConfig>,
+  'query' | 'onChange' | 'onRunQuery'
+>;
 
 export const QueryTypePicker = ({ query, onChange, onRunQuery }: QueryTypePickerProps) => {
-  const theme = useTheme();
   const onQueryTypeChange = (queryType?: QueryType) => {
     if (queryType) {
       onChange({ ...query, queryType } as SentryQuery);
@@ -17,18 +20,19 @@ export const QueryTypePicker = ({ query, onChange, onRunQuery }: QueryTypePicker
     }
   };
   return (
-    <div className="gf-form" style={{ borderLeft: !query.queryType ? `1px solid ${theme.palette.red}` : '' }}>
-      <InlineFormLabel width={10} className="query-keyword" tooltip={selectors.components.QueryEditor.QueryType.tooltip}>
-        {selectors.components.QueryEditor.QueryType.label}
-      </InlineFormLabel>
-      <Select<QueryType>
-        options={QueryTypeOptions}
-        value={query.queryType}
-        onChange={(e) => onQueryTypeChange(e.value)}
-        className="inline-element"
-        placeholder={selectors.components.QueryEditor.QueryType.placeholder}
-        width={28}
-      ></Select>
-    </div>
+    <EditorRow>
+      <EditorField
+        tooltip={selectors.components.QueryEditor.QueryType.tooltip}
+        label={selectors.components.QueryEditor.QueryType.label}
+      >
+        <Select<QueryType>
+          options={QueryTypeOptions}
+          value={query.queryType}
+          onChange={(e) => onQueryTypeChange(e.value)}
+          placeholder={selectors.components.QueryEditor.QueryType.placeholder}
+          width={30}
+        ></Select>
+      </EditorField>
+    </EditorRow>
   );
 };

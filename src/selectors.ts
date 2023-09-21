@@ -55,7 +55,7 @@ export const Components = {
       Query: {
         label: 'Query',
         tooltip: 'Sentry query to filter the results',
-        placeholder: 'is:unresolved',
+        placeholder: 'Enter a Sentry query (run with Shift+Enter)',
       },
       Sort: {
         label: 'Sort By',
