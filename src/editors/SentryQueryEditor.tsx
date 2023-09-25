@@ -8,11 +8,12 @@ import { StatsV2Editor } from './../components/query-editor/StatsV2Editor';
 import type { QueryEditorProps } from '@grafana/data';
 import type { SentryConfig, SentryQuery } from './../types';
 import './../styles/editor.scss';
+import { EditorRows } from '@grafana/experimental';
 
 type SentryQueryEditorProps = {} & QueryEditorProps<SentryDataSource, SentryQuery, SentryConfig>;
 
 export const SentryQueryEditor = (props: SentryQueryEditorProps) => {
-  const { query, datasource } = props;
+  const { query, datasource, onChange, onRunQuery } = props;
   const orgSlug = datasource.getOrgSlug();
   if (!orgSlug) {
     return (
@@ -20,11 +21,13 @@ export const SentryQueryEditor = (props: SentryQueryEditorProps) => {
     );
   }
   return (
-    <div className="grafana-sentry-datasource query-editor">
+    <EditorRows>
       <QueryTypePicker {...props} />
       <ScopePicker {...props} hideEnvironments={query.queryType === 'statsV2'} />
-      {query.queryType === 'issues' ? <IssuesEditor {...props} /> : null}
-      {query.queryType === 'statsV2' ? <StatsV2Editor {...props} /> : null}
-    </div>
+      {query.queryType === 'issues' ? <IssuesEditor query={query} onChange={onChange} onRunQuery={onRunQuery} /> : null}
+      {query.queryType === 'statsV2' ? (
+        <StatsV2Editor query={query} onChange={onChange} onRunQuery={onRunQuery} />
+      ) : null}
+    </EditorRows>
   );
 };
