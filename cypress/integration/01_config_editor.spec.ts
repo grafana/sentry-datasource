@@ -1,5 +1,11 @@
 import { e2e } from '@grafana/e2e';
-import { fillSentryConfigurationForm, PLUGIN_NAME, SENTRY_ORG_SLUG, SENTRY_AUTH_TOKEN, SENTRY_PROJECTS_COUNT } from './00_utils';
+import {
+  fillSentryConfigurationForm,
+  PLUGIN_NAME,
+  SENTRY_ORG_SLUG,
+  SENTRY_AUTH_TOKEN,
+  SENTRY_PROJECTS_COUNT,
+} from './00_utils';
 
 describe('config editor', () => {
   beforeEach(() => e2e.flows.login(e2e.env('USERNAME'), e2e.env('PASSWORD')));
