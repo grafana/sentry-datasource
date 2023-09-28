@@ -86,6 +86,18 @@ export const StatsV2Editor = ({ query, onChange, onRunQuery }: StatsV2EditorProp
               }
             />
           </EditorField>
+          <EditorField tooltip={StatsV2Selectors.Interval.tooltip} label={StatsV2Selectors.Interval.label} width={50}>
+            <Input
+              value={query.statsInterval || ''}
+              placeholder={StatsV2Selectors.Interval.placeholder}
+              onChange={(e) =>
+                onPropChange(
+                  'statsInterval',
+                  e.currentTarget.value || ''
+                )
+              }
+            />
+          </EditorField>
         </EditorFieldGroup>
       </EditorRow>
     </>
