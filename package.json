@@ -32,7 +32,7 @@
     "lodash": "^4.17.21",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "rxjs": "6.3.3",
+    "rxjs": "7.8.1",
     "tslib": "2.5.3"
   },
   "devDependencies": {
@@ -76,7 +76,7 @@
     "webpack-livereload-plugin": "^3.0.2"
   },
   "resolutions": {
-    "rxjs": "6.3.3"
+    "rxjs": "7.8.1"
   },
   "packageManager": "yarn@1.22.19"
 }
