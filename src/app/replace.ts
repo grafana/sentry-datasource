@@ -26,6 +26,12 @@ export const applyTemplateVariables = (query: SentryQuery, scopedVars: ScopedVar
         projectIds: interpolateVariableArray(query.projectIds, scopedVars),
         environments: interpolateVariableArray(query.environments, scopedVars),
       };
+    case 'events':
+      return {
+        ...query,
+        projectIds: interpolateVariableArray(query.projectIds, scopedVars),
+        environments: interpolateVariableArray(query.environments, scopedVars),
+      };
     case 'statsV2':
       return {
         ...query,

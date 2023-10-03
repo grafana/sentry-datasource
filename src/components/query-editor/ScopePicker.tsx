@@ -17,7 +17,7 @@ type ScopePickerProps = { hideEnvironments?: boolean } & Pick<
 export const ScopePicker = (props: ScopePickerProps) => {
   const { query, onChange, onRunQuery, datasource, hideEnvironments = false } = props;
   const { projectIds } = query;
-  const environments = query.queryType === 'issues' ? query.environments : [];
+  const environments = query.queryType === 'issues' || query.queryType === 'events' ? query.environments : [];
   const [projects, setProjects] = useState<SentryProject[]>([]);
   const [allEnvironments, setAllEnvironments] = useState<string[]>([]);
   const orgSlug = datasource.getOrgSlug();

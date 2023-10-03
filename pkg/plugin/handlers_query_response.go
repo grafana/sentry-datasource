@@ -27,6 +27,17 @@ func UpdateFrameMeta(frame *data.Frame, executedQueryString string, query Sentry
 				},
 			}
 		}
+		if frame.Fields[i].Name == "ID" && query.QueryType == "events" {
+			frame.Fields[i].Config = &data.FieldConfig{
+				Links: []data.DataLink{
+					{
+						Title:       "Open in Sentry",
+						URL:         fmt.Sprintf("https://%s.sentry.io/discover/${__data.fields[\"Project\"]}:${__data.fields[\"ID\"]}/", orgSlug),
+						TargetBlank: true,
+					},
+				},
+			}
+		}	
 	}
 	return frame
 }
