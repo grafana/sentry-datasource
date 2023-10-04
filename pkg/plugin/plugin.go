@@ -39,7 +39,7 @@ func NewDatasource() datasource.ServeOpts {
 	}
 }
 
-func getInstance(s backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
+func getInstance(ctx context.Context, s backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
 	settings, err := GetSettings(s)
 	if err != nil {
 		return nil, err
