@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/gorilla/mux v1.8.0
-	github.com/grafana/grafana-plugin-sdk-go v0.179.0
+	github.com/grafana/grafana-plugin-sdk-go v0.180.0
 	github.com/stretchr/testify v1.8.4
 )
 
