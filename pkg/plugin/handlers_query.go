@@ -16,6 +16,9 @@ type SentryQuery struct {
 	IssuesQuery   string   `json:"issuesQuery,omitempty"`
 	IssuesSort    string   `json:"issuesSort,omitempty"`
 	IssuesLimit   int64    `json:"issuesLimit,omitempty"`
+	EventsQuery   string   `json:"eventsQuery,omitempty"`
+	EventsSort    string   `json:"eventsSort,omitempty"`
+	EventsLimit   int64    `json:"eventsLimit,omitempty"`	
 	StatsCategory []string `json:"statsCategory,omitempty"`
 	StatsFields   []string `json:"statsFields,omitempty"`
 	StatsGroupBy  []string `json:"statsGroupBy,omitempty"`
@@ -73,6 +76,29 @@ func QueryData(ctx context.Context, pCtx backend.PluginContext, backendQuery bac
 		}
 		frame = UpdateFrameMeta(frame, executedQueryString, query, client.BaseURL, client.OrgSlug)
 		response.Frames = append(response.Frames, frame)
+	case "events":
+		if client.OrgSlug == "" {
+			return GetErrorResponse(response, "", ErrorInvalidOrganizationSlug)
+		}
+		events, executedQueryString, err := client.GetEvents(sentry.GetEventsInput{
+			OrganizationSlug: client.OrgSlug,
+			ProjectIds:       query.ProjectIds,
+			Environments:     query.Environments,
+			Query:            query.EventsQuery,
+			Sort:             query.EventsSort,
+			Limit:            query.EventsLimit,
+			From:             backendQuery.TimeRange.From,
+			To:               backendQuery.TimeRange.To,
+		})
+		if err != nil {
+			return GetErrorResponse(response, executedQueryString, err)
+		}
+		frame, err := framestruct.ToDataFrame(GetFrameName("Events", backendQuery.RefID), events)
+		if err != nil {
+			return GetErrorResponse(response, executedQueryString, err)
+		}
+		frame = UpdateFrameMeta(frame, executedQueryString, query, client.BaseURL, client.OrgSlug)
+		response.Frames = append(response.Frames, frame)	
 	case "statsV2":
 		if client.OrgSlug == "" {
 			return GetErrorResponse(response, "", ErrorInvalidOrganizationSlug)

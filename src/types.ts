@@ -37,6 +37,7 @@ export type SentryTeam = {
   status?: string;
 };
 export type SentryIssueSort = 'inbox' | 'new' | 'date' | 'priority' | 'freq' | 'user';
+export type SentryEventSort = 'last_seen()' | 'count()' | 'epm()' | 'failure_rate()' | 'level';
 //#endregion
 
 //#region Config
@@ -51,7 +52,7 @@ export interface SentrySecureConfig {
 //#endregion
 
 //#region Query
-export type QueryType = 'issues' | 'statsV2';
+export type QueryType = 'issues' | 'events' | 'statsV2';
 export type SentryQueryBase<T extends QueryType> = { queryType: T } & DataQuery;
 export type SentryIssuesQuery = {
   projectIds: string[];
@@ -60,6 +61,13 @@ export type SentryIssuesQuery = {
   issuesSort?: SentryIssueSort;
   issuesLimit?: number;
 } & SentryQueryBase<'issues'>;
+export type SentryEventsQuery = {
+  projectIds: string[];
+  environments: string[];
+  eventsQuery: string;
+  eventsSort?: SentryEventSort;
+  eventsLimit?: number;
+} & SentryQueryBase<'events'>;
 export type SentryStatsV2QueryField = 'sum(quantity)' | 'sum(times_seen)';
 export type SentryStatsV2QueryGroupBy = 'outcome' | 'reason' | 'category';
 export type SentryStatsV2QueryCategory = 'transaction' | 'error' | 'attachment' | 'default' | 'session' | 'security';
@@ -72,7 +80,7 @@ export type SentryStatsV2Query = {
   statsOutcome: SentryStatsV2QueryOutcome[];
   statsReason: string[];
 } & SentryQueryBase<'statsV2'>;
-export type SentryQuery = SentryIssuesQuery | SentryStatsV2Query;
+export type SentryQuery = SentryIssuesQuery | SentryEventsQuery | SentryStatsV2Query;
 //#endregion
 
 //#region Variable Query

@@ -68,6 +68,23 @@ export const Components = {
         placeholder: '100',
       },
     },
+    Events: {
+      Query: {
+        label: 'Query',
+        tooltip: 'Sentry query to filter the results',
+        placeholder: 'Enter a Sentry query (run with Shift+Enter)',
+      },
+      Sort: {
+        label: 'Sort By',
+        tooltip: 'Sort results',
+        placeholder: 'Optional',
+      },
+      Limit: {
+        label: 'Limit',
+        tooltip: 'Number of results (100 max)',
+        placeholder: '100',
+      },
+    },    
     StatsV2: {
       Field: {
         label: 'Field',
