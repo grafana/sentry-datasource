@@ -4,6 +4,7 @@ import { Error } from '../components/Error';
 import { QueryTypePicker } from './../components/query-editor/QueryTypePicker';
 import { ScopePicker } from './../components/query-editor/ScopePicker';
 import { IssuesEditor } from './../components/query-editor/IssuesEditor';
+import { EventsEditor } from './../components/query-editor/EventsEditor';
 import { StatsV2Editor } from './../components/query-editor/StatsV2Editor';
 import type { QueryEditorProps } from '@grafana/data';
 import type { SentryConfig, SentryQuery } from './../types';
@@ -28,6 +29,7 @@ export const SentryQueryEditor = (props: SentryQueryEditorProps) => {
       {query.queryType === 'statsV2' ? (
         <StatsV2Editor query={query} onChange={onChange} onRunQuery={onRunQuery} />
       ) : null}
+      {query.queryType === 'events' ? <EventsEditor query={query} onChange={onChange} onRunQuery={onRunQuery} /> : null}      
     </EditorRows>
   );
 };
