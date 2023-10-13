@@ -25,6 +25,7 @@
     "testid",
     "typecheck",
     "Unmarshaling",
-    "proxying"
+    "proxying",
+    "peterhellberg"
   ]
 }
