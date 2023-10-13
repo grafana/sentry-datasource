@@ -39,20 +39,21 @@ export const SentryVariableEditor = ({ query, onChange, datasource }: SentryVari
     <>
       <TypeSelector variableQueryType={query.type} onChange={onVariableQueryTypeChange}></TypeSelector>
       {query.type === 'projects' && (
-        <div className="gf-form" data-testid="variable-query-editor-projects-filter">
-          <TeamSelector datasource={datasource} orgSlug={orgSlug || ''} teamSlug={query.teamSlug || ''} onValuesChange={onTeamSlugChange} />
-        </div>
+        <TeamSelector
+          datasource={datasource}
+          orgSlug={orgSlug || ''}
+          teamSlug={query.teamSlug || ''}
+          onValuesChange={onTeamSlugChange}
+        />
       )}
       {query.type === 'environments' && (
-        <div className="gf-form" data-testid="variable-query-editor-environments-filter">
-          <ProjectSelector
-            mode="id"
-            datasource={datasource}
-            orgSlug={orgSlug || ''}
-            values={query.projectIds || []}
-            onValuesChange={onProjectIdsChange}
-          ></ProjectSelector>
-        </div>
+        <ProjectSelector
+          mode="id"
+          datasource={datasource}
+          orgSlug={orgSlug || ''}
+          values={query.projectIds || []}
+          onValuesChange={onProjectIdsChange}
+        />
       )}
     </>
   );

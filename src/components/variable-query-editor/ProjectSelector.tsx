@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { InlineFormLabel, MultiSelect } from '@grafana/ui';
+import { Field, MultiSelect } from '@grafana/ui';
 import { getTemplateSrv } from '@grafana/runtime';
 import { SentryDataSource } from '../../datasource';
 import { selectors } from '../../selectors';
@@ -15,7 +15,7 @@ export const ProjectSelector = (props: {
   tooltip?: string;
 }) => {
   const { datasource, values: projectIds, orgSlug, mode } = props;
-  const { label, tooltip, container } = selectors.components.VariablesEditor.Project;
+  const { label, tooltip } = selectors.components.VariablesEditor.Project;
   const [projects, setProjects] = useState<SentryProject[]>([]);
   useEffect(() => {
     if (orgSlug) {
@@ -48,16 +48,17 @@ export const ProjectSelector = (props: {
     props.onValuesChange(projectIds);
   };
   return (
-    <>
-      <InlineFormLabel tooltip={props.tooltip || tooltip}>{props.label || label}</InlineFormLabel>
-      <div data-testid="variable-query-editor-project-select-container" aria-label={container.ariaLabel}>
-        <MultiSelect
-          value={projectIds}
-          options={getOptions()}
-          onChange={(e) => onProjectIdsChange(e.map((ei) => ei.value!))}
-          className="width-30"
-        ></MultiSelect>
-      </div>
-    </>
+    <Field
+      description={props.tooltip || tooltip}
+      label={props.label || label}
+      data-testid="variable-query-editor-project-select-container"
+    >
+      <MultiSelect
+        value={projectIds}
+        options={getOptions()}
+        onChange={(e) => onProjectIdsChange(e.map((ei) => ei.value!))}
+        width={25}
+      />
+    </Field>
   );
 };

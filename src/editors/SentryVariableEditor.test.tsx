@@ -66,7 +66,7 @@ describe('SentryVariableEditor', () => {
       await waitFor(() => {
         expect(result.container.firstChild).not.toBeNull();
         expect(result.queryByTestId('error-message')).not.toBeInTheDocument();
-        expect(result.getByTestId('variable-query-editor-environments-filter')).toBeInTheDocument();
+        expect(result.getByTestId('variable-query-editor-project-select-container')).toBeInTheDocument();
       });
     });
   });

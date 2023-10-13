@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { InlineFormLabel, Select } from '@grafana/ui';
+import { Field, Select } from '@grafana/ui';
 import { getTemplateSrv } from '@grafana/runtime';
 import { SentryDataSource } from '../../datasource';
 import { selectors } from '../../selectors';
@@ -35,9 +35,14 @@ export const TeamSelector = (props: {
     return [...templateVariables, ...teamsVariables];
   };
   return (
-    <>
-      <InlineFormLabel tooltip={tooltip}>{label}</InlineFormLabel>
-      <Select value={teamSlug || ''} isClearable={true} options={getOptions()} onChange={(e) => onValuesChange(e?.value || null)}></Select>
-    </>
+    <Field description={tooltip} label={label}>
+      <Select
+        value={teamSlug || ''}
+        isClearable={true}
+        options={getOptions()}
+        onChange={(e) => onValuesChange(e?.value || null)}
+        width={25}
+      />
+    </Field>
   );
 };
