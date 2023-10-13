@@ -121,7 +121,7 @@ export const Components = {
     QueryType: {
       label: 'Query Type',
       tooltip: 'Choose query type to get the relevant filters and results',
-      id: 'variable-query-editor-query-type-select-container',
+      id: 'variable-query-editor-query-type-select',
     },
     Organization: {
       label: 'Organization',

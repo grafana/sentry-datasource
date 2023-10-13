@@ -4,6 +4,7 @@ import { render, waitFor } from '@testing-library/react';
 import { SentryDataSource } from './../datasource';
 import { SentryVariableEditor } from './SentryVariableEditor';
 import type { SentryVariableQuery } from './../types';
+import { selectors } from 'selectors';
 
 describe('SentryVariableEditor', () => {
   beforeEach(() => {
@@ -66,7 +67,7 @@ describe('SentryVariableEditor', () => {
       await waitFor(() => {
         expect(result.container.firstChild).not.toBeNull();
         expect(result.queryByTestId('error-message')).not.toBeInTheDocument();
-        expect(result.getByTestId('variable-query-editor-project-select-container')).toBeInTheDocument();
+        expect(result.getByTestId(selectors.components.VariablesEditor.Project.id)).toBeInTheDocument();
       });
     });
   });

@@ -12,7 +12,7 @@ export const TeamSelector = (props: {
   onValuesChange: (teamSlug: string | null) => void;
 }) => {
   const { datasource, orgSlug, teamSlug, onValuesChange } = props;
-  const { label, tooltip } = selectors.components.VariablesEditor.Team;
+  const { label, tooltip, id } = selectors.components.VariablesEditor.Team;
   const [teams, setTeams] = useState<SentryTeam[]>([]);
   useEffect(() => {
     datasource.getOrgTeams(orgSlug).then(setTeams);
@@ -35,9 +35,8 @@ export const TeamSelector = (props: {
     return [...templateVariables, ...teamsVariables];
   };
   return (
-    <Field description={tooltip} label={label}>
+    <Field description={tooltip} label={label} data-testid={id}>
       <Select
-        data-testid={selectors.components.VariablesEditor.Team.id}
         value={teamSlug || ''}
         isClearable={true}
         options={getOptions()}

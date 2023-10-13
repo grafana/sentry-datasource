@@ -13,15 +13,14 @@ export const TypeSelector = (props: {
     { value: 'environments', label: 'Environments' },
     { value: 'teams', label: 'Teams' },
   ];
-  const { label, tooltip } = selectors.components.VariablesEditor.QueryType;
+  const { label, tooltip, id } = selectors.components.VariablesEditor.QueryType;
   return (
-    <Field description={tooltip} label={label}>
+    <Field description={tooltip} label={label} data-testid={id}>
       <Select<VariableQueryType>
         value={props.variableQueryType}
         options={options}
         onChange={(e) => props.onChange(e.value as VariableQueryType)}
         width={25}
-        data-testid="variable-query-editor-query-type-select-container"
       />
     </Field>
   );

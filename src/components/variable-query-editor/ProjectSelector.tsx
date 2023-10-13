@@ -15,7 +15,7 @@ export const ProjectSelector = (props: {
   tooltip?: string;
 }) => {
   const { datasource, values: projectIds, orgSlug, mode } = props;
-  const { label, tooltip } = selectors.components.VariablesEditor.Project;
+  const { label, tooltip, id } = selectors.components.VariablesEditor.Project;
   const [projects, setProjects] = useState<SentryProject[]>([]);
   useEffect(() => {
     if (orgSlug) {
@@ -48,13 +48,12 @@ export const ProjectSelector = (props: {
     props.onValuesChange(projectIds);
   };
   return (
-    <Field description={props.tooltip || tooltip} label={props.label || label}>
+    <Field description={props.tooltip || tooltip} label={props.label || label} data-testid={id}>
       <MultiSelect
         value={projectIds}
         options={getOptions()}
         onChange={(e) => onProjectIdsChange(e.map((ei) => ei.value!))}
         width={25}
-        data-testid={selectors.components.VariablesEditor.Project.id}
       />
     </Field>
   );
