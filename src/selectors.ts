@@ -84,7 +84,7 @@ export const Components = {
         tooltip: 'Number of results (100 max)',
         placeholder: '100',
       },
-    },    
+    },
     StatsV2: {
       Field: {
         label: 'Field',
@@ -121,9 +121,7 @@ export const Components = {
     QueryType: {
       label: 'Query Type',
       tooltip: 'Choose query type to get the relevant filters and results',
-      container: {
-        ariaLabel: 'Select your sentry variable query type here',
-      },
+      id: 'variable-query-editor-query-type-select-container',
     },
     Organization: {
       label: 'Organization',
@@ -135,16 +133,12 @@ export const Components = {
     Team: {
       label: 'Team slug',
       tooltip: 'Select the team slug',
-      container: {
-        ariaLabel: 'Select the sentry team slug here',
-      },
+      id: 'variable-query-editor-team-select',
     },
     Project: {
       label: 'Project ID',
       tooltip: 'Select the project id',
-      container: {
-        ariaLabel: 'Select the sentry project here',
-      },
+      id: 'variable-query-editor-project-select',
     },
   },
 };

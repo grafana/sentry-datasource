@@ -37,6 +37,7 @@ export const TeamSelector = (props: {
   return (
     <Field description={tooltip} label={label}>
       <Select
+        data-testid={selectors.components.VariablesEditor.Team.id}
         value={teamSlug || ''}
         isClearable={true}
         options={getOptions()}

@@ -48,16 +48,13 @@ export const ProjectSelector = (props: {
     props.onValuesChange(projectIds);
   };
   return (
-    <Field
-      description={props.tooltip || tooltip}
-      label={props.label || label}
-      data-testid="variable-query-editor-project-select-container"
-    >
+    <Field description={props.tooltip || tooltip} label={props.label || label}>
       <MultiSelect
         value={projectIds}
         options={getOptions()}
         onChange={(e) => onProjectIdsChange(e.map((ei) => ei.value!))}
         width={25}
+        data-testid={selectors.components.VariablesEditor.Project.id}
       />
     </Field>
   );
