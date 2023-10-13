@@ -2,6 +2,7 @@ import type { SelectableValue } from '@grafana/data';
 import type {
   QueryType,
   SentryIssueSort,
+  SentryEventSort,  
   SentryStatsV2QueryField,
   SentryStatsV2QueryGroupBy,
   SentryStatsV2QueryCategory,
@@ -10,6 +11,7 @@ import type {
 
 export const QueryTypeOptions: Array<SelectableValue<QueryType>> = [
   { value: 'issues', label: 'Issues' },
+  { value: 'events', label: 'Events' },  
   { value: 'statsV2', label: 'Stats' },
 ];
 export const SentryIssueSortOptions: Array<SelectableValue<SentryIssueSort>> = [
@@ -19,6 +21,13 @@ export const SentryIssueSortOptions: Array<SelectableValue<SentryIssueSort>> = [
   { value: 'priority', label: 'Priority' },
   { value: 'freq', label: 'Events' },
   { value: 'user', label: 'Users' },
+];
+export const SentryEventSortOptions: Array<SelectableValue<SentryEventSort>> = [
+  { value: 'last_seen()', label: 'Last Seen' },
+  { value: 'count()', label: 'Count' },
+  { value: 'epm()', label: 'Events per minute' },
+  { value: 'failure_rate()', label: 'Failure rate' },
+  { value: 'level', label: 'Level' },
 ];
 export const SentryStatsV2QueryFieldOptions: Array<SelectableValue<SentryStatsV2QueryField>> = [
   { value: 'sum(quantity)', label: 'sum(quantity)' },

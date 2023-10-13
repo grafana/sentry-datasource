@@ -12,7 +12,7 @@ The Sentry data source has the following requirements:
 
 ## Known limitations
 
-With the Grafana Sentry data source plugin, you are able to visualize issues or usage statistics within an organization. For more information, see [Issues](https://docs.sentry.io/product/issues/) and [Org Stats](https://docs.sentry.io/product/accounts/quotas/org-stats/).
+With the Grafana Sentry data source plugin, you are able to visualize issues, events or usage statistics within an organization. For more information, see [Issues](https://docs.sentry.io/product/issues/), [Events](https://docs.sentry.io/product/discover-queries/) and [Org Stats](https://docs.sentry.io/product/accounts/quotas/org-stats/).
 
 ## Install the Sentry data source plugin
 
@@ -65,7 +65,7 @@ datasources:
 
 ## Query the data source
 
-The query editor allows you to query Sentry, get sentry issues and stats and display them in Grafana dashboard panels. You can choose one of the following query types, to get the relevant data.
+The query editor allows you to query Sentry, get sentry issues, events and stats and display them in Grafana dashboard panels. You can choose one of the following query types, to get the relevant data.
 
 ### Sentry issues
 
@@ -79,6 +79,19 @@ To get the list of Sentry issues, select **Sentry Issues** as the query type. Is
 | Query        | (optional) Enter your sentry query to get the relevant results.   |
 | Sort By      | (optional) Select the order of results you want to display.       |
 | Limit        | (optional) Limit the number of results displayed.                 |
+
+### Sentry events
+
+To get the list of Sentry events, select **Sentry Events** as the query type. Events are filtered based on Grafana’s selected time range.
+
+| Field        | Description                                                                                                                                  |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Query Type   | Choose **Events** as query type.                                                                                                             |
+| Projects     | (optional) Select one or more projects to filter the results.                                                                                |
+| Environments | (optional) Select one or more environments to filter the results.                                                                            |
+| Query        | (optional) Enter your sentry query to get the relevant results. More on [query syntax](https://docs.sentry.io/product/sentry-basics/search/) |
+| Sort By      | (optional) Select the order of results you want to display.                                                                                  |
+| Limit        | (optional) Limit the number of results displayed. Max limit - 100.                                                                           |
 
 ### Sentry Org stats
 

@@ -1,6 +1,6 @@
 import { ScopedVars } from '@grafana/data';
 import * as runtime from '@grafana/runtime';
-import { SentryIssuesQuery, SentryStatsV2Query } from 'types';
+import { SentryIssuesQuery, SentryEventsQuery, SentryStatsV2Query } from 'types';
 import { applyTemplateVariables, replaceProjectIDs } from './replace';
 
 describe('replace', () => {
@@ -72,6 +72,21 @@ describe('replace', () => {
       const output = applyTemplateVariables(query, { foo: { value: 'bar', text: 'bar' } }) as SentryIssuesQuery;
       expect(output.projectIds).toStrictEqual(['bar', 'baz']);
       expect(output.issuesQuery).toStrictEqual('hello bar');
+    });
+
+    it('should interpolate template variables for events', () => {
+      const query: SentryEventsQuery = {
+        refId: '',
+        queryType: 'events',
+        projectIds: ['${foo}', 'baz'],
+        environments: ['${foo}', 'baz'],
+        eventsQuery: 'hello ${foo}',
+      };
+
+      const output = applyTemplateVariables(query, { foo: { value: 'bar', text: 'bar' } }) as SentryEventsQuery;
+      expect(output.projectIds).toStrictEqual(['bar', 'baz']);
+      expect(output.environments).toStrictEqual(['bar', 'baz']);
+      expect(output.eventsQuery).toStrictEqual('hello bar');
     });
 
     it('should interpolate template variables for statsV2', () => {
