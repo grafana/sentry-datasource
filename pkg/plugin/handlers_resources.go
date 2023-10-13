@@ -33,7 +33,7 @@ func GetProjectsHandler(client *sentry.SentryClient) http.HandlerFunc {
 			http.Error(rw, "invalid orgSlug", http.StatusBadRequest)
 			return
 		}
-		orgs, err := client.GetProjects(orgSlug)
+		orgs, err := client.GetProjects(orgSlug, true)
 		writeResponse(orgs, err, rw)
 	}
 }
