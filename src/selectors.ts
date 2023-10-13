@@ -121,7 +121,7 @@ export const Components = {
     QueryType: {
       label: 'Query Type',
       tooltip: 'Choose query type to get the relevant filters and results',
-      id: 'variable-query-editor-query-type-select',
+      id: 'data-testid variable-query-editor-query-type-select',
     },
     Organization: {
       label: 'Organization',
@@ -133,12 +133,12 @@ export const Components = {
     Team: {
       label: 'Team slug',
       tooltip: 'Select the team slug',
-      id: 'variable-query-editor-team-select',
+      id: 'data-testid variable-query-editor-team-select',
     },
     Project: {
       label: 'Project ID',
       tooltip: 'Select the project id',
-      id: 'variable-query-editor-project-select',
+      id: 'data-testid variable-query-editor-project-select',
     },
   },
 };
