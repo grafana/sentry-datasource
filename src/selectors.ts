@@ -99,7 +99,7 @@ export const Components = {
       Interval: {
         label: 'Interval',
         tooltip: 'interval',
-        placeholder: 'Optional. Enter the interval to group the results',
+        placeholder: 'Optional. Enter the interval to group the results (expected format `[number][unit]` where unit is `m` for minutes, `h` for hours, `d` for days, or `w` for weeks)',
       },
       Category: {
         label: 'Category Filter',
