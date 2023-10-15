@@ -189,7 +189,7 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 		require.Equal(t, "ID", frame.Fields[0].Name)
 		require.Equal(t, "Title", frame.Fields[1].Name)
 	})
-    t.Run("stats query with incorrect interval by should throw error", func(t *testing.T) {
+	t.Run("stats query with incorrect interval by should throw error", func(t *testing.T) {
 		sc := NewFakeClient(fakeDoer{Body: `{
 			"start":"2021-07-15T15:00:00Z",
 			"end":"2021-10-13T15:59:00Z",
@@ -204,10 +204,10 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 			"statsCategory" : ["error"],
 			"statsInterval": "30mins"
 		}`)}, *sc)
-        assert.NotNil(t, res.Error)
+		assert.NotNil(t, res.Error)
 		assert.Equal(t, `"interval" should be in the format [number][unit] where unit is one of m/h/d/w`, res.Error.Error())
 	})
-    t.Run("valid stats query with valid interval by should produce correct result", func(t *testing.T) {
+	t.Run("valid stats query with valid interval by should produce correct result", func(t *testing.T) {
 		sc := NewFakeClient(fakeDoer{Body: `{
 			"start":"2021-07-15T15:00:00Z",
 			"end":"2021-10-13T15:59:00Z",
@@ -230,5 +230,5 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 		require.Equal(t, "Timestamp", res.Frames[0].Fields[0].Name)
 		require.Equal(t, "Sum (Quantity)", res.Frames[0].Fields[1].Name)
 		require.Equal(t, "", res.Frames[0].Fields[1].Labels.String())
-    })
+	})
 }

@@ -92,7 +92,7 @@ func (sc *SentryClient) GetStatsV2(args GetStatsV2Input) (StatsV2Response, strin
 		return out, "", errors.New(`at least one "category" is required`)
 	}
 	if args.Interval != "" && !regexp.MustCompile("^\\d+[mhdw]$").MatchString(args.Interval) {
-	    return out, "", errors.New(`"interval" should be in the format [number][unit] where unit is one of m/h/d/w`)
+		return out, "", errors.New(`"interval" should be in the format [number][unit] where unit is one of m/h/d/w`)
 	}
 	executedQueryString := args.ToQuery()
 	err := sc.Fetch(executedQueryString, &out)
