@@ -20,6 +20,7 @@
     "httpadapter",
     "httpclient",
     "instancemgmt",
+    "mhdw",
     "nolint",
     "testdata",
     "testid",
