@@ -21,7 +21,7 @@ export const openDashboardSettings = (sectionName = 'Variables') => {
 };
 
 export const selectDropdown = (container: Cypress.Chainable<JQuery<HTMLElement>>, text: string, wait = 0) => {
-  container.within(() => e2e().get('[class$="-input-suffix"]').click());
+  container.find('input').click();
   e2e.components.Select.option().should('be.visible').contains(text).click();
   if (wait > 0) {
     e2e().wait(wait);

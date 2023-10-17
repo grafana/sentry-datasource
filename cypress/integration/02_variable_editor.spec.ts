@@ -42,20 +42,17 @@ e2e.scenario({
             e2e.pages.Dashboard.Settings.Variables.Edit.General.generalNameInputV2().clear().type('variable1');
             e2e.components.DataSourcePicker.inputV2().type(`${ds.config.name}{enter}`);
             // Get list of projects
-            selectDropdown(e2eSelectors.VariablesEditor.QueryType.container.ariaLabel(), 'Projects');
+            selectDropdown(e2eSelectors.VariablesEditor.QueryType.id(), 'Projects');
             cy.wait(2 * 1000);
             variableEditorPreviewValuesCheck([`${SENTRY_E2E_PROJECT_NAME} (${SENTRY_E2E_PROJECT_ID})`]);
             // Get list of environments
-            selectDropdown(e2eSelectors.VariablesEditor.QueryType.container.ariaLabel(), 'Environments');
+            selectDropdown(e2eSelectors.VariablesEditor.QueryType.id(), 'Environments');
             cy.wait(2 * 1000);
             variableEditorPreviewValuesCheck([SENTRY_E2E_ENVIRONMENT_NAME, SENTRY_E2E_NODE_ONLY_ENVIRONMENT_NAME]);
-            selectDropdown(e2eSelectors.VariablesEditor.Project.container.ariaLabel(), SENTRY_E2E_PROJECT_NAME);
+            selectDropdown(e2eSelectors.VariablesEditor.Project.id(), SENTRY_E2E_PROJECT_NAME);
             cy.wait(2 * 1000);
             variableEditorPreviewValuesCheck([SENTRY_E2E_ENVIRONMENT_NAME], [SENTRY_E2E_NODE_ONLY_ENVIRONMENT_NAME]);
-            selectDropdown(
-              e2eSelectors.VariablesEditor.Project.container.ariaLabel(),
-              SENTRY_E2E_PRODUCTION_PROJECT_NAME
-            );
+            selectDropdown(e2eSelectors.VariablesEditor.Project.id(), SENTRY_E2E_PRODUCTION_PROJECT_NAME);
             cy.wait(2 * 1000);
             variableEditorPreviewValuesCheck([SENTRY_E2E_ENVIRONMENT_NAME, SENTRY_E2E_NODE_ONLY_ENVIRONMENT_NAME]);
           });
