@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"time"	
+	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/build"
 	"github.com/grafana/sentry-datasource/pkg/mocker"

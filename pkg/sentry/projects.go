@@ -30,24 +30,24 @@ func (sc *SentryClient) GetProjects(organizationSlug string, withPagination bool
 	projects := []SentryProject{}
 	if organizationSlug == "" {
 		organizationSlug = sc.OrgSlug
-	}	
+	}
 	url := "/api/0/organizations/" + organizationSlug + "/projects/"
-	
-	if (withPagination) {
-		for (url != "") {
+
+	if withPagination {
+		for url != "" {
 			batch := []SentryProject{}
 			nextURL, err := sc.FetchWithPagination(url, &batch)
 			if err != nil {
 				return nil, err
 			}
-	
+
 			projects = append(projects, batch...)
 			url = nextURL
 		}
 		return projects, nil
 	} else {
 		err := sc.Fetch(url, &projects)
-		return projects, err		
+		return projects, err
 	}
 }
 
