@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.4.0 (2023-11-15)
+
+- Security and dependencies updates
+- Support for Sentry Events ([#100](https://github.com/grafana/sentry-datasource/pull/100))
+- Support for pagination ([#77](https://github.com/grafana/sentry-datasource/pull/77))
+- Updates to Editors
+
 ## 1.3.0 (2023-08-29)
 
 - Add support for the secure socks proxy
