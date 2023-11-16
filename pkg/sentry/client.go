@@ -22,11 +22,8 @@ type HTTPClient struct {
 	authToken string
 }
 
-// BuildInfoProvider is a function that returns the build.Info for the plugin
-type BuildInfoProvider func() (build.Info, error)
-
 // NewHTTPClient creates a new AuthHTTP client
-func NewHTTPClient(d doer, pluginId string, b BuildInfoProvider, authToken string) HTTPClient {
+func NewHTTPClient(d doer, pluginId string, b build.InfoGetterFunc, authToken string) HTTPClient {
 	info, err := b()
 	version := info.Version
 	if err != nil {
