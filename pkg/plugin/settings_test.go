@@ -27,6 +27,11 @@ func TestGetSettings(t *testing.T) {
 		assert.NotNil(t, err)
 		assert.Equal(t, plugin.ErrorInvalidAuthToken, err)
 	})
+	t.Run("auth token should be set from env", func(t *testing.T) {
+		t.Setenv("SENTRY_AUTH_TOKEN", "bar")
+		_, err := plugin.GetSettings(backend.DataSourceInstanceSettings{JSONData: []byte(`{ "orgSlug": "foo" }`)})
+		assert.Nil(t, err)
+	})
 	t.Run("valid settings should correctly parsed and default url should apply", func(t *testing.T) {
 		settings, err := plugin.GetSettings(backend.DataSourceInstanceSettings{JSONData: []byte(`{ "orgSlug": "foo" }`), DecryptedSecureJSONData: map[string]string{"authToken": "bar"}})
 		assert.Nil(t, err)
@@ -53,11 +58,5 @@ func TestSentryConfig_validate(t *testing.T) {
 		err := sc.Validate()
 		assert.NotNil(t, err)
 		assert.Equal(t, plugin.ErrorInvalidOrganizationSlug, err)
-	})
-	t.Run("invalid password should throw error", func(t *testing.T) {
-		sc := &plugin.SentryConfig{URL: "https://foo.com", OrgSlug: "foo"}
-		err := sc.Validate()
-		assert.NotNil(t, err)
-		assert.Equal(t, plugin.ErrorInvalidAuthToken, err)
 	})
 }

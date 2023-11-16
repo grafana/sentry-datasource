@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"encoding/json"
+	"os"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 )
@@ -19,9 +20,6 @@ func (sc *SentryConfig) Validate() error {
 	if sc.OrgSlug == "" {
 		return ErrorInvalidOrganizationSlug
 	}
-	if sc.authToken == "" {
-		return ErrorInvalidAuthToken
-	}
 	return nil
 }
 
@@ -38,9 +36,11 @@ func GetSettings(s backend.DataSourceInstanceSettings) (*SentryConfig, error) {
 	if config.OrgSlug == "" {
 		return nil, ErrorInvalidOrganizationSlug
 	}
-	if authToken, ok := s.DecryptedSecureJSONData["authToken"]; ok {
-		config.authToken = authToken
+	authToken, ok := s.DecryptedSecureJSONData["authToken"]
+	if !ok {
+		authToken = os.Getenv("SENTRY_AUTH_TOKEN")
 	}
+	config.authToken = authToken
 	if config.authToken == "" {
 		backend.Logger.Error(ErrorInvalidAuthToken.Error())
 		return nil, ErrorInvalidAuthToken
