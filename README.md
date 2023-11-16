@@ -63,6 +63,8 @@ datasources:
       authToken: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
+If the auth token is not set, the data source try to obtain it through the environment variable.
+
 ## Query the data source
 
 The query editor allows you to query Sentry, get sentry issues, events and stats and display them in Grafana dashboard panels. You can choose one of the following query types, to get the relevant data.
