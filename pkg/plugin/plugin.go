@@ -46,7 +46,7 @@ func getInstance(ctx context.Context, s backend.DataSourceInstanceSettings) (ins
 	}
 
 	// we need this options to load the secure proxy configuration
-	opt, err := s.HTTPClientOptions()
+	opt, err := s.HTTPClientOptions(ctx)
 	if err != nil {
 		return nil, err
 	}
