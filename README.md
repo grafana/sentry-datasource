@@ -63,7 +63,7 @@ datasources:
       authToken: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-If the auth token is not set, the data source try to obtain it through the environment variable.
+If the auth token is not set, the data source try to obtain it through the `SENTRY_AUTH_TOKEN` environment variable.
 
 ## Query the data source
 
