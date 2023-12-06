@@ -22,6 +22,7 @@ type SentryQuery struct {
 	StatsCategory []string `json:"statsCategory,omitempty"`
 	StatsFields   []string `json:"statsFields,omitempty"`
 	StatsGroupBy  []string `json:"statsGroupBy,omitempty"`
+	StatsInterval string   `json:"statsInterval,omitempty"`
 	StatsOutcome  []string `json:"statsOutcome,omitempty"`
 	StatsReason   []string `json:"statsReason,omitempty"`
 }
@@ -111,6 +112,7 @@ func QueryData(ctx context.Context, pCtx backend.PluginContext, backendQuery bac
 			Category:         query.StatsCategory,
 			Fields:           query.StatsFields,
 			GroupBy:          query.StatsGroupBy,
+			Interval:         query.StatsInterval,
 			Outcome:          query.StatsOutcome,
 			Reason:           query.StatsReason,
 		})

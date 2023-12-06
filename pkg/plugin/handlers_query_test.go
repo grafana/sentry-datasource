@@ -189,4 +189,46 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 		require.Equal(t, "ID", frame.Fields[0].Name)
 		require.Equal(t, "Title", frame.Fields[1].Name)
 	})
+	t.Run("stats query with incorrect interval by should throw error", func(t *testing.T) {
+		sc := NewFakeClient(fakeDoer{Body: `{
+			"start":"2021-07-15T15:00:00Z",
+			"end":"2021-10-13T15:59:00Z",
+			"intervals": ["2021-07-15T15:00:00Z","2021-07-15T15:30:00Z"],
+			"groups":[
+				{ "by": {}, "series": { "sum(quantity)" : [ 11, 22 ]} }
+			]
+		}`})
+		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(`{
+			"queryType" : "statsV2",
+			"statsFields" : ["sum(quantity)"],
+			"statsCategory" : ["error"],
+			"statsInterval": "30mins"
+		}`)}, *sc)
+		assert.NotNil(t, res.Error)
+		assert.Equal(t, `"interval" should be in the format [number][unit] where unit is one of m/h/d/w`, res.Error.Error())
+	})
+	t.Run("valid stats query with valid interval by should produce correct result", func(t *testing.T) {
+		sc := NewFakeClient(fakeDoer{Body: `{
+			"start":"2021-07-15T15:00:00Z",
+			"end":"2021-10-13T15:59:00Z",
+			"intervals": ["2021-07-15T15:00:00Z","2021-07-15T15:30:00Z"],
+			"groups":[
+				{ "by": {}, "series": { "sum(quantity)" : [ 11, 22 ]} }
+			]
+		}`})
+		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(`{
+			"queryType" : "statsV2",
+			"statsFields" : ["sum(quantity)"],
+			"statsCategory" : ["error"],
+			"statsInterval": "30m"
+		}`)}, *sc)
+		assert.Nil(t, res.Error)
+		require.Equal(t, 1, len(res.Frames))
+		assert.Equal(t, "Stats (A)", res.Frames[0].Name)
+		require.Equal(t, 2, len(res.Frames[0].Fields))
+		require.Equal(t, 2, res.Frames[0].Fields[0].Len())
+		require.Equal(t, "Timestamp", res.Frames[0].Fields[0].Name)
+		require.Equal(t, "Sum (Quantity)", res.Frames[0].Fields[1].Name)
+		require.Equal(t, "", res.Frames[0].Fields[1].Labels.String())
+	})
 }

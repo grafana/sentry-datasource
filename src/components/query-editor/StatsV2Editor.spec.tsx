@@ -10,6 +10,7 @@ describe('StatsV2Editor', () => {
       projectIds: [],
       statsFields: [],
       statsGroupBy: [],
+      statsInterval: '',
       statsCategory: [],
       statsOutcome: [],
       statsReason: [],
