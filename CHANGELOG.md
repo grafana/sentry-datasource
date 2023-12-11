@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.5.0 (2023-12-11)
+
+- Add interval to statsV2
+- Bump github.com/grafana/grafana-plugin-sdk-go from 0.179.0 to 0.196.0
+- Add getRequiredFields function
+- Other dependency updates
+
 ## 1.4.0 (2023-11-15)
 
 - Security and dependencies updates
