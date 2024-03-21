@@ -53,7 +53,7 @@ describe('replace', () => {
         getVariables: jest.fn(),
         replace: (s: string, vars: ScopedVars) => {
           for (const key in vars) {
-            s = s.replace('${' + key + '}', vars[key].value);
+            s = s.replace('${' + key + '}', vars[key]?.value);
           }
           return s;
         },
