@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.0 (2024-03-22)
+
+- Dependency updates
+  
 ## 1.5.0 (2023-12-11)
 
 - Add interval to statsV2
