@@ -14,7 +14,7 @@ interface AdditionalSettingsProps {
 }
 
 export function AdditionalSettings({ jsonData, onOptionChange }: AdditionalSettingsProps) {
-  return config.featureToggles['secureSocksDSProxyEnabled'] && isVersionGtOrEq(config.buildInfo.version, '10.0.0') ? (
+  return config.secureSocksDSProxyEnabled && isVersionGtOrEq(config.buildInfo.version, '10.0.0') ? (
     <>
       <Divider />
       <ConfigSection
