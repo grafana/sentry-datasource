@@ -135,7 +135,7 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 		require.Equal(t, "Category=foo2, Reason=bar", res.Frames[0].Fields[3].Labels.String())
 		require.Equal(t, "Category=foo2, Reason=bar", res.Frames[0].Fields[4].Labels.String())
 	})
-	t.Run("valid events query should produce correct result", func(t *testing.T) {	
+	t.Run("valid events query should produce correct result", func(t *testing.T) {
 		sc := NewFakeClient(fakeDoer{Body: `{
 			"data": [
 				{
@@ -175,19 +175,344 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 			"eventsLimit" : 10
 		}`
 		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(query)}, *sc)
-	
+
 		// Assert that there are no errors and the data frame is correctly formed
 		assert.Nil(t, res.Error)
 		require.Equal(t, 1, len(res.Frames))
-		assert.Equal(t, "Events (A)", res.Frames[0].Name)	
+		assert.Equal(t, "Events (A)", res.Frames[0].Name)
 
 		// Assert the content of the data frame
 		frame := res.Frames[0]
 		require.NotNil(t, frame.Fields)
-		require.Equal(t, 11, len(frame.Fields))			
-		assert.Equal(t, 3, frame.Fields[0].Len()) 
+		require.Equal(t, 11, len(frame.Fields))
+		assert.Equal(t, 3, frame.Fields[0].Len())
 		require.Equal(t, "ID", frame.Fields[0].Name)
 		require.Equal(t, "Title", frame.Fields[1].Name)
+	})
+	t.Run("valid events stats query should produce correct result", func(t *testing.T) {
+		sc := NewFakeClient(fakeDoer{Body: `{
+			"": {
+				"data": [
+					[
+						1,
+						[
+							{
+								"count": 123.0
+							}
+						]
+					],
+					[
+						2,
+						[
+							{
+								"count": 234.0
+							}
+						]
+					]
+				],
+				"order": 0,
+				"isMetricsData": false,
+				"start": 1,
+				"end": 2,
+				"meta": {
+					"fields": {},
+					"units": {},
+					"isMetricsData": false,
+					"isMetricsExtractedData": false,
+					"tips": {},
+					"datasetReason": "unchanged",
+					"dataset": "discover"
+				}
+			}
+		}`})
+		query := `{
+			"queryType" : "eventsStats",
+			"projectIds" : ["project_id"],
+			"environments" : ["dev"],
+			"eventsStatsQuery" : "event_query",
+			"eventsStatsYAxis": ["event_yaxis"],
+			"eventsStatsGroups": [],
+			"eventsStatsSort" : "event_sort",
+			"eventsStatsLimit" : 10
+		}`
+		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(query)}, *sc)
+
+		// Assert that there are no errors and the data frame is correctly formed
+		assert.Nil(t, res.Error)
+		require.Equal(t, 1, len(res.Frames))
+		assert.Equal(t, "EventsStats (A)", res.Frames[0].Name)
+
+		// Assert the content of the data frame
+		frame := res.Frames[0]
+		require.NotNil(t, frame.Fields)
+		require.Equal(t, 2, len(frame.Fields))
+		assert.Equal(t, 2, frame.Fields[0].Len())
+		require.Equal(t, "Timestamp", frame.Fields[0].Name)
+		require.Equal(t, "", frame.Fields[1].Name)
+	})
+	t.Run("valid grouped events stats query should produce correct result", func(t *testing.T) {
+		sc := NewFakeClient(fakeDoer{Body: `{
+			"Group A": {
+				"data": [
+					[
+						1,
+						[
+							{
+								"count": 123.0
+							}
+						]
+					],
+					[
+						2,
+						[
+							{
+								"count": 234.0
+							}
+						]
+					]
+				],
+				"order": 0,
+				"isMetricsData": false,
+				"start": 1,
+				"end": 2,
+				"meta": {
+					"fields": {},
+					"units": {},
+					"isMetricsData": false,
+					"isMetricsExtractedData": false,
+					"tips": {},
+					"datasetReason": "unchanged",
+					"dataset": "discover"
+				}
+			},
+			"Group B": {
+				"data": [
+					[
+						1,
+						[
+							{
+								"count": 345.0
+							}
+						]
+					],
+					[
+						2,
+						[
+							{
+								"count": 696.0
+							}
+						]
+					]
+				],
+				"order": 1,
+				"isMetricsData": false,
+				"start": 1,
+				"end": 2,
+				"meta": {
+					"fields": {},
+					"units": {},
+					"isMetricsData": false,
+					"isMetricsExtractedData": false,
+					"tips": {},
+					"datasetReason": "unchanged",
+					"dataset": "discover"
+				}
+			}
+		}`})
+		query := `{
+			"queryType" : "eventsStats",
+			"projectIds" : ["project_id"],
+			"environments" : ["dev"],
+			"eventsStatsQuery" : "event_query",
+			"eventsStatsYAxis": ["event_yaxis"],
+			"eventsStatsGroups": ["event_group"],
+			"eventsStatsSort" : "event_sort",
+			"eventsStatsLimit" : 10
+		}`
+		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(query)}, *sc)
+
+		// Assert that there are no errors and the data frame is correctly formed
+		assert.Nil(t, res.Error)
+		require.Equal(t, 1, len(res.Frames))
+		assert.Equal(t, "EventsStats (A)", res.Frames[0].Name)
+
+		// Assert the content of the data frame
+		frame := res.Frames[0]
+		require.NotNil(t, frame.Fields)
+		require.Equal(t, 3, len(frame.Fields))
+		assert.Equal(t, 2, frame.Fields[0].Len())
+		require.Equal(t, "Timestamp", frame.Fields[0].Name)
+		require.Equal(t, "Group A", frame.Fields[1].Name)
+		require.Equal(t, "Group B", frame.Fields[2].Name)
+	})
+	t.Run("valid multiple yAxis events stats query should produce correct result", func(t *testing.T) {
+		sc := NewFakeClient(fakeDoer{Body: `{
+			"Group A": {
+				"event_yaxis_a": {
+					"data": [
+						[
+							1,
+							[
+								{
+									"count": 885.0
+								}
+							]
+						],
+						[
+							2,
+							[
+								{
+									"count": 951.0
+								}
+							]
+						]
+					],
+					"order": 0,
+					"isMetricsData": false,
+					"start": 1,
+					"end": 2,
+					"meta": {
+						"fields": {},
+						"units": {},
+						"isMetricsData": false,
+						"isMetricsExtractedData": false,
+						"tips": {},
+						"datasetReason": "unchanged",
+						"dataset": "discover"
+					}
+				},
+				"event_yaxis_b": {
+					"data": [
+						[
+							1,
+							[
+								{
+									"count": 146
+								}
+							]
+						],
+						[
+							2,
+							[
+								{
+									"count": 53
+								}
+							]
+						]
+					],
+					"order": 1,
+					"isMetricsData": false,
+					"start": 1,
+					"end": 2,
+					"meta": {
+						"fields": {},
+						"units": {},
+						"isMetricsData": false,
+						"isMetricsExtractedData": false,
+						"tips": {},
+						"datasetReason": "unchanged",
+						"dataset": "discover"
+					}
+				},
+				"order": 0
+			},
+			"Group B": {
+				"event_yaxis_a": {
+					"data": [
+						[
+							1,
+							[
+								{
+									"count": 697.0
+								}
+							]
+						],
+						[
+							2,
+							[
+								{
+									"count": 696.0
+								}
+							]
+						]
+					],
+					"order": 0,
+					"isMetricsData": false,
+					"start": 1,
+					"end": 2,
+					"meta": {
+						"fields": {},
+						"units": {},
+						"isMetricsData": false,
+						"isMetricsExtractedData": false,
+						"tips": {},
+						"datasetReason": "unchanged",
+						"dataset": "discover"
+					}
+				},
+				"event_yaxis_b": {
+					"data": [
+						[
+							1,
+							[
+								{
+									"count": 395
+								}
+							]
+						],
+						[
+							2,
+							[
+								{
+									"count": 150
+								}
+							]
+						]
+					],
+					"order": 1,
+					"isMetricsData": false,
+					"start": 1,
+					"end": 2,
+					"meta": {
+						"fields": {},
+						"units": {},
+						"isMetricsData": false,
+						"isMetricsExtractedData": false,
+						"tips": {},
+						"datasetReason": "unchanged",
+						"dataset": "discover"
+					}
+				},
+				"order": 1
+			}
+		}`})
+		query := `{
+			"queryType" : "eventsStats",
+			"projectIds" : ["project_id"],
+			"environments" : ["dev"],
+			"eventsStatsQuery" : "event_query",
+			"eventsStatsYAxis": ["event_yaxis_a", "event_yaxis_b"],
+			"eventsStatsGroups": ["event_group"],
+			"eventsStatsSort" : "event_sort",
+			"eventsStatsLimit" : 10
+		}`
+		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(query)}, *sc)
+
+		// Assert that there are no errors and the data frame is correctly formed
+		assert.Nil(t, res.Error)
+		require.Equal(t, 1, len(res.Frames))
+		assert.Equal(t, "EventsStats (A)", res.Frames[0].Name)
+
+		// Assert the content of the data frame
+		frame := res.Frames[0]
+		require.NotNil(t, frame.Fields)
+		require.Equal(t, 5, len(frame.Fields))
+		assert.Equal(t, 2, frame.Fields[0].Len())
+		require.Equal(t, "Timestamp", frame.Fields[0].Name)
+		require.Equal(t, "Group A: event_yaxis_a", frame.Fields[1].Name)
+		require.Equal(t, "Group A: event_yaxis_b", frame.Fields[2].Name)
+		require.Equal(t, "Group B: event_yaxis_a", frame.Fields[3].Name)
+		require.Equal(t, "Group B: event_yaxis_b", frame.Fields[4].Name)
 	})
 	t.Run("stats query with incorrect interval by should throw error", func(t *testing.T) {
 		sc := NewFakeClient(fakeDoer{Body: `{

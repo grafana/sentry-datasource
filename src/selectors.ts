@@ -85,6 +85,33 @@ export const Components = {
         placeholder: '100',
       },
     },
+    EventsStats: {
+      Query: {
+        label: 'Query',
+        tooltip: 'Sentry query to filter the results',
+        placeholder: 'Enter a Sentry query (run with Shift+Enter)',
+      },
+      YAxis: {
+        label: 'Y-axis',
+        tooltip: 'Choose what to plot in the y-axis. Required',
+        placeholder: 'Required. Enter one or more fields to see the events (enter key to add)',
+      },
+      Groups: {
+        label: 'Group',
+        tooltip: 'Group your results by field or tag',
+        placeholder: 'Optional. Enter one or more fields to group values (enter key to add)',
+      },
+      Sort: {
+        label: 'Sort By',
+        tooltip: 'Sort results',
+        placeholder: 'Optional',
+      },
+      Limit: {
+        label: 'Limit',
+        tooltip: 'Number of results (10 max)',
+        placeholder: '10',
+      },
+    },
     StatsV2: {
       Field: {
         label: 'Field',

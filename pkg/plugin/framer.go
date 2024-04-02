@@ -1,6 +1,9 @@
 package plugin
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/grafana/sentry-datasource/pkg/sentry"
 )
@@ -48,6 +51,64 @@ func ConvertStatsV2ResponseToFrame(frameName string, stats sentry.StatsV2Respons
 				field.Labels["Reason"] = group.By.Reason
 			}
 			frame.Fields = append(frame.Fields, field)
+		}
+	}
+	return frame, nil
+}
+
+type SentryEventsStatsSet struct {
+	Data [][]interface{} `json:"data"`
+}
+
+func ConvertEventStatsSetToTimestampField(rawData interface{}) *data.Field {
+	set := rawData.([]interface{})
+	field := data.NewFieldFromFieldType(data.FieldTypeTime, len(set))
+	field.Name = "Timestamp"
+	for index, value := range set {
+		row := value.([]interface{})
+		field.Set(index, time.Unix(int64(row[0].(float64)), 0))
+	}
+	return field
+}
+
+func ConvertEventStatsSetToField(fieldName string, rawData interface{}) *data.Field {
+	set := rawData.([]interface{})
+	field := data.NewFieldFromFieldType(data.FieldTypeFloat64, len(set))
+	field.Name = fieldName
+	for index, value := range set {
+		row := value.([]interface{})
+		field.Set(index, row[1].(([]interface{}))[0].(map[string]interface{})["count"])
+	}
+	return field
+}
+
+func ConvertEventsStatsResponseToFrame(frameName string, eventsStats sentry.SentryEventsStats) (*data.Frame, error) {
+	if len(eventsStats) == 0 {
+		return data.NewFrameOfFieldTypes(frameName, 0), nil
+	}
+	frame := data.NewFrameOfFieldTypes(frameName, 0)
+
+	var isFirst bool = true
+	for groupName, dataSetOrGroup := range eventsStats {
+		dataSet := dataSetOrGroup["data"]
+		if dataSet != nil {
+			if isFirst {
+				frame.Fields = append(frame.Fields, ConvertEventStatsSetToTimestampField(dataSet))
+				isFirst = false
+			}
+			frame.Fields = append(frame.Fields, ConvertEventStatsSetToField(groupName, dataSet))
+		} else if groupName != "order" {
+			for fieldName, wrappedData := range dataSetOrGroup {
+				parsed, ok := wrappedData.(map[string]interface{})
+				if ok {
+					dataSet := parsed["data"]
+					if isFirst {
+						frame.Fields = append(frame.Fields, ConvertEventStatsSetToTimestampField(dataSet))
+						isFirst = false
+					}
+					frame.Fields = append(frame.Fields, ConvertEventStatsSetToField(fmt.Sprintf("%s: %s", groupName, fieldName), dataSet))
+				}
+			}
 		}
 	}
 	return frame, nil
