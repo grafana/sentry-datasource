@@ -73,11 +73,15 @@ func ConvertEventStatsSetToTimestampField(rawData interface{}) *data.Field {
 
 func ConvertEventStatsSetToField(fieldName string, rawData interface{}) *data.Field {
 	set := rawData.([]interface{})
-	field := data.NewFieldFromFieldType(data.FieldTypeFloat64, len(set))
+	field := data.NewFieldFromFieldType(data.FieldTypeNullableFloat64, len(set))
 	field.Name = fieldName
 	for index, value := range set {
 		row := value.([]interface{})
-		field.Set(index, row[1].(([]interface{}))[0].(map[string]interface{})["count"])
+		rawCount := row[1].(([]interface{}))[0].(map[string]interface{})["count"]
+		count, ok := rawCount.(float64)
+		if ok {
+			field.Set(index, &count)
+		}
 	}
 	return field
 }

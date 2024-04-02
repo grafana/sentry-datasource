@@ -514,6 +514,65 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 		require.Equal(t, "Group B: event_yaxis_a", frame.Fields[3].Name)
 		require.Equal(t, "Group B: event_yaxis_b", frame.Fields[4].Name)
 	})
+	t.Run("events stats with null values should be handled gracefully", func(t *testing.T) {
+		sc := NewFakeClient(fakeDoer{Body: `{
+			"": {
+				"data": [
+					[
+						1,
+						[
+							{
+								"count": null
+							}
+						]
+					],
+					[
+						2,
+						[
+							{
+								"count": 234.0
+							}
+						]
+					]
+				],
+				"order": 0,
+				"isMetricsData": false,
+				"start": 1,
+				"end": 2,
+				"meta": {
+					"fields": {},
+					"units": {},
+					"isMetricsData": false,
+					"isMetricsExtractedData": false,
+					"tips": {},
+					"datasetReason": "unchanged",
+					"dataset": "discover"
+				}
+			}
+		}`})
+		query := `{
+			"queryType" : "eventsStats",
+			"projectIds" : ["project_id"],
+			"environments" : ["dev"],
+			"eventsStatsQuery" : "event_query",
+			"eventsStatsYAxis": ["event_yaxis"],
+			"eventsStatsGroups": [],
+			"eventsStatsSort" : "event_sort",
+			"eventsStatsLimit" : 10
+		}`
+		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(query)}, *sc)
+
+		// Assert that there are no errors and the data frame is correctly formed
+		assert.Nil(t, res.Error)
+
+		// Assert the content of the data frame
+		frame := res.Frames[0]
+		firstValue, _ := frame.Fields[1].NullableFloatAt(0)
+		secondValue, _ := frame.Fields[1].NullableFloatAt(1)
+		require.Nil(t, firstValue)
+		require.NotNil(t, secondValue)
+	})
+
 	t.Run("stats query with incorrect interval by should throw error", func(t *testing.T) {
 		sc := NewFakeClient(fakeDoer{Body: `{
 			"start":"2021-07-15T15:00:00Z",
