@@ -12,7 +12,6 @@ test.describe('Sentry variables', () => {
     });
 });
 
-
 // sample test:
 
 //   variableEditPage.mockResourceResponse('api/v1/labels?*', prometheusLabels);
