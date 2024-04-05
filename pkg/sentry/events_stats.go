@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-type SentryEventsStats = map[string]map[string]interface{}
+type SentryEventsStats = map[string]interface{}
 
 type GetEventsStatsInput struct {
 	OrganizationSlug string

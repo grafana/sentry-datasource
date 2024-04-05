@@ -516,38 +516,36 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 	})
 	t.Run("events stats with null values should be handled gracefully", func(t *testing.T) {
 		sc := NewFakeClient(fakeDoer{Body: `{
-			"": {
-				"data": [
+			"data": [
+				[
+					1,
 					[
-						1,
-						[
-							{
-								"count": null
-							}
-						]
-					],
-					[
-						2,
-						[
-							{
-								"count": 234.0
-							}
-						]
+						{
+							"count": null
+						}
 					]
 				],
-				"order": 0,
+				[
+					2,
+					[
+						{
+							"count": 234.0
+						}
+					]
+				]
+			],
+			"order": 0,
+			"isMetricsData": false,
+			"start": 1,
+			"end": 2,
+			"meta": {
+				"fields": {},
+				"units": {},
 				"isMetricsData": false,
-				"start": 1,
-				"end": 2,
-				"meta": {
-					"fields": {},
-					"units": {},
-					"isMetricsData": false,
-					"isMetricsExtractedData": false,
-					"tips": {},
-					"datasetReason": "unchanged",
-					"dataset": "discover"
-				}
+				"isMetricsExtractedData": false,
+				"tips": {},
+				"datasetReason": "unchanged",
+				"dataset": "discover"
 			}
 		}`})
 		query := `{

@@ -57,25 +57,24 @@ func ConvertStatsV2ResponseToFrame(frameName string, stats sentry.StatsV2Respons
 }
 
 type SentryEventsStatsSet struct {
-	Data [][]interface{} `json:"data"`
+	Name string
+	Data []interface{}
 }
 
-func ConvertEventStatsSetToTimestampField(rawData interface{}) *data.Field {
-	set := rawData.([]interface{})
-	field := data.NewFieldFromFieldType(data.FieldTypeTime, len(set))
+func ConvertEventStatsSetToTimestampField(set SentryEventsStatsSet) (*data.Field){
+	field := data.NewFieldFromFieldType(data.FieldTypeTime, len(set.Data))
 	field.Name = "Timestamp"
-	for index, value := range set {
+	for index, value := range set.Data {
 		row := value.([]interface{})
 		field.Set(index, time.Unix(int64(row[0].(float64)), 0))
 	}
 	return field
 }
 
-func ConvertEventStatsSetToField(fieldName string, rawData interface{}) *data.Field {
-	set := rawData.([]interface{})
-	field := data.NewFieldFromFieldType(data.FieldTypeNullableFloat64, len(set))
-	field.Name = fieldName
-	for index, value := range set {
+func ConvertEventStatsSetToField(set SentryEventsStatsSet) (*data.Field){
+	field := data.NewFieldFromFieldType(data.FieldTypeNullableFloat64, len(set.Data))
+	field.Name = set.Name
+	for index, value := range set.Data {
 		row := value.([]interface{})
 		rawCount := row[1].(([]interface{}))[0].(map[string]interface{})["count"]
 		count, ok := rawCount.(float64)
@@ -87,33 +86,39 @@ func ConvertEventStatsSetToField(fieldName string, rawData interface{}) *data.Fi
 }
 
 func ConvertEventsStatsResponseToFrame(frameName string, eventsStats sentry.SentryEventsStats) (*data.Frame, error) {
-	if len(eventsStats) == 0 {
-		return data.NewFrameOfFieldTypes(frameName, 0), nil
-	}
+	sets := ExtractDataSets("", eventsStats)
 	frame := data.NewFrameOfFieldTypes(frameName, 0)
 
-	var isFirst bool = true
-	for groupName, dataSetOrGroup := range eventsStats {
-		dataSet := dataSetOrGroup["data"]
-		if dataSet != nil {
-			if isFirst {
-				frame.Fields = append(frame.Fields, ConvertEventStatsSetToTimestampField(dataSet))
-				isFirst = false
-			}
-			frame.Fields = append(frame.Fields, ConvertEventStatsSetToField(groupName, dataSet))
-		} else if groupName != "order" {
-			for fieldName, wrappedData := range dataSetOrGroup {
-				parsed, ok := wrappedData.(map[string]interface{})
-				if ok {
-					dataSet := parsed["data"]
-					if isFirst {
-						frame.Fields = append(frame.Fields, ConvertEventStatsSetToTimestampField(dataSet))
-						isFirst = false
-					}
-					frame.Fields = append(frame.Fields, ConvertEventStatsSetToField(fmt.Sprintf("%s: %s", groupName, fieldName), dataSet))
-				}
-			}
+	for index, set := range sets {
+		if index == 0 {
+			frame.Fields = append(frame.Fields, ConvertEventStatsSetToTimestampField(set))
 		}
+		frame.Fields = append(frame.Fields, ConvertEventStatsSetToField(set))
 	}
 	return frame, nil
+}
+
+func ExtractDataSets(namePrefix string, rawData map[string]interface{}) ([]SentryEventsStatsSet) {
+	var sets []SentryEventsStatsSet
+	for key, dataSetOrGroup := range rawData {
+		if key == "data" {
+			return append(sets, SentryEventsStatsSet{
+				Name: namePrefix,
+				Data: dataSetOrGroup.([]interface{}),
+			})
+		}
+		if key == "order" {
+			continue
+		}
+		child, isObject := dataSetOrGroup.(map[string]interface{})
+		if !isObject {
+			continue
+		}
+		name := key
+		if len(namePrefix) != 0 && len(key) != 0 {
+			name = fmt.Sprintf("%s: %s", namePrefix, key)
+		}
+		sets = append(sets, ExtractDataSets(name, child)...)
+	}
+	return sets
 }
