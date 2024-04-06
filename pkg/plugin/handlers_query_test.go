@@ -193,36 +193,12 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 		sc := NewFakeClient(fakeDoer{Body: `{
 			"": {
 				"data": [
-					[
-						1,
-						[
-							{
-								"count": 123.0
-							}
-						]
-					],
-					[
-						2,
-						[
-							{
-								"count": 234.0
-							}
-						]
-					]
+					[1, [{ "count": 123.0 }]],
+					[2, [{ "count": 234.0 }]]
 				],
 				"order": 0,
 				"isMetricsData": false,
-				"start": 1,
-				"end": 2,
-				"meta": {
-					"fields": {},
-					"units": {},
-					"isMetricsData": false,
-					"isMetricsExtractedData": false,
-					"tips": {},
-					"datasetReason": "unchanged",
-					"dataset": "discover"
-				}
+				"meta": {}
 			}
 		}`})
 		query := `{
@@ -254,69 +230,21 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 		sc := NewFakeClient(fakeDoer{Body: `{
 			"Group A": {
 				"data": [
-					[
-						1,
-						[
-							{
-								"count": 123.0
-							}
-						]
-					],
-					[
-						2,
-						[
-							{
-								"count": 234.0
-							}
-						]
-					]
+					[1, [{ "count": 123.0 }]],
+					[2, [{ "count": 234.0 }]]
 				],
 				"order": 0,
 				"isMetricsData": false,
-				"start": 1,
-				"end": 2,
-				"meta": {
-					"fields": {},
-					"units": {},
-					"isMetricsData": false,
-					"isMetricsExtractedData": false,
-					"tips": {},
-					"datasetReason": "unchanged",
-					"dataset": "discover"
-				}
+				"meta": {}
 			},
 			"Group B": {
 				"data": [
-					[
-						1,
-						[
-							{
-								"count": 345.0
-							}
-						]
-					],
-					[
-						2,
-						[
-							{
-								"count": 696.0
-							}
-						]
-					]
+					[1, [{ "count": 345.0 }]],
+					[2, [{ "count": 696.0 }]]
 				],
 				"order": 1,
 				"isMetricsData": false,
-				"start": 1,
-				"end": 2,
-				"meta": {
-					"fields": {},
-					"units": {},
-					"isMetricsData": false,
-					"isMetricsExtractedData": false,
-					"tips": {},
-					"datasetReason": "unchanged",
-					"dataset": "discover"
-				}
+				"meta": {}
 			}
 		}`})
 		query := `{
@@ -350,138 +278,42 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 			"Group A": {
 				"event_yaxis_a": {
 					"data": [
-						[
-							1,
-							[
-								{
-									"count": 885.0
-								}
-							]
-						],
-						[
-							2,
-							[
-								{
-									"count": 951.0
-								}
-							]
-						]
+						[1, [{ "count": 885.0 }]],
+						[2, [{ "count": 951.0 }]]
 					],
 					"order": 0,
 					"isMetricsData": false,
-					"start": 1,
-					"end": 2,
-					"meta": {
-						"fields": {},
-						"units": {},
-						"isMetricsData": false,
-						"isMetricsExtractedData": false,
-						"tips": {},
-						"datasetReason": "unchanged",
-						"dataset": "discover"
-					}
+					"meta": {}
 				},
 				"event_yaxis_b": {
 					"data": [
-						[
-							1,
-							[
-								{
-									"count": 146
-								}
-							]
-						],
-						[
-							2,
-							[
-								{
-									"count": 53
-								}
-							]
-						]
+						[1, [{ "count": 146 }]],
+						[2, [{ "count": 53 }]]
 					],
 					"order": 1,
 					"isMetricsData": false,
-					"start": 1,
-					"end": 2,
-					"meta": {
-						"fields": {},
-						"units": {},
-						"isMetricsData": false,
-						"isMetricsExtractedData": false,
-						"tips": {},
-						"datasetReason": "unchanged",
-						"dataset": "discover"
-					}
+					"meta": {}
 				},
 				"order": 0
 			},
 			"Group B": {
 				"event_yaxis_a": {
 					"data": [
-						[
-							1,
-							[
-								{
-									"count": 697.0
-								}
-							]
-						],
-						[
-							2,
-							[
-								{
-									"count": 696.0
-								}
-							]
-						]
+						[1, [{ "count": 697.0 }]],
+						[2, [{ "count": 696.0 }]]
 					],
 					"order": 0,
 					"isMetricsData": false,
-					"start": 1,
-					"end": 2,
-					"meta": {
-						"fields": {},
-						"units": {},
-						"isMetricsData": false,
-						"isMetricsExtractedData": false,
-						"tips": {},
-						"datasetReason": "unchanged",
-						"dataset": "discover"
-					}
+					"meta": {}
 				},
 				"event_yaxis_b": {
 					"data": [
-						[
-							1,
-							[
-								{
-									"count": 395
-								}
-							]
-						],
-						[
-							2,
-							[
-								{
-									"count": 150
-								}
-							]
-						]
+						[1, [{ "count": 395 }]],
+						[2, [{ "count": 150 }]]
 					],
 					"order": 1,
 					"isMetricsData": false,
-					"start": 1,
-					"end": 2,
-					"meta": {
-						"fields": {},
-						"units": {},
-						"isMetricsData": false,
-						"isMetricsExtractedData": false,
-						"tips": {},
-						"datasetReason": "unchanged",
-						"dataset": "discover"
-					}
+					"meta": {}
 				},
 				"order": 1
 			}
@@ -517,22 +349,8 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 	t.Run("events stats with null values should be handled gracefully", func(t *testing.T) {
 		sc := NewFakeClient(fakeDoer{Body: `{
 			"data": [
-				[
-					1,
-					[
-						{
-							"count": null
-						}
-					]
-				],
-				[
-					2,
-					[
-						{
-							"count": 234.0
-						}
-					]
-				]
+				[1, [{ "count": null }]],
+				[2, [{ "count": 234.0 }]]
 			],
 			"order": 0,
 			"isMetricsData": false,
