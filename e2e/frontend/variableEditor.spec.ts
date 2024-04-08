@@ -18,16 +18,3 @@ test.describe('Sentry variables', () => {
         // ).toDisplayPreviews([`${SENTRY_E2E_PROJECT_NAME} (${SENTRY_E2E_PROJECT_ID})`]);
     });
 });
-
-// sample test:
-
-//   variableEditPage.mockResourceResponse('api/v1/labels?*', prometheusLabels);
-//   await variableEditPage.datasource.set('gdev-prometheus');
-//   await variableEditPage.getByTestIdOrAriaLabel('Query type').fill('Label names');
-//   await page.keyboard.press('Tab');
-//   await variableEditPage.runQuery();
-//   await expect(
-//     variableEditPage,
-//     formatExpectError('Expected variable edit page to display certain label names after query execution')
-//   ).toDisplayPreviews(prometheusLabels.data);
-
