@@ -11,8 +11,8 @@ test.describe('Test config editor', () => {
     await expect(configPage.saveAndTest()).not.toBeOK();
     await expect(page.getByTestId('data-testid Alert error')).toHaveText('invalid or empty organization slug');
     
-    await page.getByTestId('Data source settings page Delete button').click();
-    await page.getByTestId('data-testid Confirm Modal Danger Button').click();
+    // await page.getByTestId('Data source settings page Delete button').click();
+    // await page.getByTestId('data-testid Confirm Modal Danger Button').click();
   });
 
   test('empty auth token should throw valid error', async ({ createDataSourceConfigPage, page }) => {
@@ -22,8 +22,8 @@ test.describe('Test config editor', () => {
     await expect(configPage.saveAndTest()).not.toBeOK();
     await expect(page.getByTestId('data-testid Alert error')).toHaveText('empty or invalid auth token found');
   
-    await page.getByTestId('Data source settings page Delete button').click();
-    await page.getByTestId('data-testid Confirm Modal Danger Button').click();
+    // await page.getByTestId('Data source settings page Delete button').click();
+    // await page.getByTestId('data-testid Confirm Modal Danger Button').click();
 });
 
   test('invalid auth token should throw valid error', async ({ createDataSourceConfigPage, page }) => {
@@ -34,12 +34,12 @@ test.describe('Test config editor', () => {
     await expect(configPage.saveAndTest()).not.toBeOK();
     await expect(page.getByTestId('data-testid Alert error')).toHaveText('404 Not Found EOF');
 
-    await page.getByTestId('Data source settings page Delete button').click();
-    await page.getByTestId('data-testid Confirm Modal Danger Button').click();
+//     await page.getByTestId('Data source settings page Delete button').click();
+//     await page.getByTestId('data-testid Confirm Modal Danger Button').click();
   });
 
   test('valid configuration should return valid health check', async ({ createDataSourceConfigPage, page }) => {
-    const configPage = await createDataSourceConfigPage({ type: 'grafana-sentry-datasource', name: 'Sentry' });
+    const configPage = await createDataSourceConfigPage({ type: 'grafana-sentry-datasource' });
     configPage.mockHealthCheckResponse({ status: 200 });
 
     await page.getByPlaceholder('https://sentry.io').fill('https://sentry.io');
