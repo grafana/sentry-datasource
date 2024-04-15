@@ -20,6 +20,7 @@
     "httpadapter",
     "httpclient",
     "instancemgmt",
+    "jackspeak",
     "mhdw",
     "nolint",
     "testdata",
