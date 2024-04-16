@@ -16,7 +16,7 @@ export const Components = {
         label: 'Sentry Org',
         placeholder: 'Sentry org slug',
         ariaLabel: `Enter your Sentry Organization slug here`,
-        tooltip: `Sentry Org slug. Typically this will be in the url https://sentry.io/organizations/{organization_slug}/`,
+        tooltip: `Sentry Org slug. Typically this will be the last segment of the URL: https://sentry.io/organizations/{organization_slug}/ - only the slug should be entered here`,
       },
       AuthToken: {
         label: 'Sentry Auth Token',
