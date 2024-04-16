@@ -24,7 +24,7 @@ To configure the Sentry data source plugin within Grafana, get an internal integ
 
 1. Go to `https://sentry.io`.
 2. Navigate to **Organization Settings**
-3. Under **Developer Settings** select **Custom Integration**.
+3. Under **Developer Settings** select **Custom Integrations**.
 4. Click **Create New Integration** and then select **Internal Integration**
 5. Use a valid name such as _Grafana_.
 6. Go to **PERMISSIONS**, provide **Read** permissions to the required resources such as "Project", "Issue and Event", and "Organization".
