@@ -8,6 +8,11 @@ import (
 	"github.com/grafana/sentry-datasource/pkg/sentry"
 )
 
+type SentryEventsStatsSet struct {
+	Name string
+	Data []interface{}
+}
+
 func ConvertStatsV2ResponseToFrame(frameName string, stats sentry.StatsV2Response) (*data.Frame, error) {
 	if len(stats.Intervals) == 0 {
 		return data.NewFrameOfFieldTypes(frameName, 0), nil
@@ -56,56 +61,85 @@ func ConvertStatsV2ResponseToFrame(frameName string, stats sentry.StatsV2Respons
 	return frame, nil
 }
 
-type SentryEventsStatsSet struct {
-	Name string
-	Data []interface{}
-}
-
-func ConvertEventStatsSetToTimestampField(set SentryEventsStatsSet) (*data.Field){
+func ConvertEventStatsSetToTimestampField(set SentryEventsStatsSet) (*data.Field, error) {
 	field := data.NewFieldFromFieldType(data.FieldTypeTime, len(set.Data))
 	field.Name = "Timestamp"
 	for index, value := range set.Data {
-		row := value.([]interface{})
-		field.Set(index, time.Unix(int64(row[0].(float64)), 0))
+		row, isArray := value.([]interface{})
+		if !isArray {
+			return nil, fmt.Errorf("expected array, got %T", value)
+		}
+		timestamp, isFloat64 := row[0].(float64)
+		if !isFloat64 {
+			return nil, fmt.Errorf("expected float64, got %T", row[0])
+		}
+		field.Set(index, time.Unix(int64(timestamp), 0))
 	}
-	return field
+	return field, nil
 }
 
-func ConvertEventStatsSetToField(set SentryEventsStatsSet) (*data.Field){
+func ConvertEventStatsSetToField(set SentryEventsStatsSet) (*data.Field, error) {
 	field := data.NewFieldFromFieldType(data.FieldTypeNullableFloat64, len(set.Data))
 	field.Name = set.Name
 	for index, value := range set.Data {
-		row := value.([]interface{})
-		rawCount := row[1].(([]interface{}))[0].(map[string]interface{})["count"]
-		count, ok := rawCount.(float64)
+		row, isArray := value.([]interface{})
+		if !isArray {
+			return nil, fmt.Errorf("expected array, got %T", value)
+		}
+		valueArray, isArray := row[1].([]interface{})
+		if !isArray {
+			return nil, fmt.Errorf("expected array, got %T", row[1])
+		}
+		valueObject, isObject := valueArray[0].(map[string]interface{})
+		if !isObject {
+			return nil, fmt.Errorf("expected JSON object, got %T", valueArray[0])
+		}
+		count, ok := valueObject["count"].(float64)
 		if ok {
 			field.Set(index, &count)
+		} else if valueObject["count"] != nil {
+			return nil, fmt.Errorf("expected float64 or null, got %T", valueObject["count"])
 		}
 	}
-	return field
+	return field, nil
 }
 
 func ConvertEventsStatsResponseToFrame(frameName string, eventsStats sentry.SentryEventsStats) (*data.Frame, error) {
-	sets := ExtractDataSets("", eventsStats)
+	sets, error := ExtractDataSets("", eventsStats)
+	if error != nil {
+		return nil, error
+	}
 	frame := data.NewFrameOfFieldTypes(frameName, 0)
 
 	for index, set := range sets {
 		if index == 0 {
-			frame.Fields = append(frame.Fields, ConvertEventStatsSetToTimestampField(set))
+			timestampField, error := ConvertEventStatsSetToTimestampField(set)
+			if error != nil {
+				return nil, error
+			}
+			frame.Fields = append(frame.Fields, timestampField)
 		}
-		frame.Fields = append(frame.Fields, ConvertEventStatsSetToField(set))
+		field, error := ConvertEventStatsSetToField(set)
+		if error != nil {
+			return nil, error
+		}
+		frame.Fields = append(frame.Fields, field)
 	}
 	return frame, nil
 }
 
-func ExtractDataSets(namePrefix string, rawData map[string]interface{}) ([]SentryEventsStatsSet) {
+func ExtractDataSets(namePrefix string, rawData map[string]interface{}) ([]SentryEventsStatsSet, error) {
 	var sets []SentryEventsStatsSet
 	for key, dataSetOrGroup := range rawData {
 		if key == "data" {
+			set, isArray := dataSetOrGroup.([]interface{})
+			if !isArray {
+				return nil, fmt.Errorf("expected array, got %T", dataSetOrGroup)
+			}
 			return append(sets, SentryEventsStatsSet{
 				Name: namePrefix,
-				Data: dataSetOrGroup.([]interface{}),
-			})
+				Data: set,
+			}), nil
 		}
 		if key == "order" {
 			continue
@@ -118,7 +152,11 @@ func ExtractDataSets(namePrefix string, rawData map[string]interface{}) ([]Sentr
 		if len(namePrefix) != 0 && len(key) != 0 {
 			name = fmt.Sprintf("%s: %s", namePrefix, key)
 		}
-		sets = append(sets, ExtractDataSets(name, child)...)
+		nestedSets, error := ExtractDataSets(name, child)
+		if error != nil {
+			return nil, error
+		}
+		sets = append(sets, nestedSets...)
 	}
-	return sets
+	return sets, nil
 }
