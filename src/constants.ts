@@ -13,6 +13,7 @@ export const QueryTypeOptions: Array<SelectableValue<QueryType>> = [
   { value: 'issues', label: 'Issues' },
   { value: 'events', label: 'Events' },  
   { value: 'statsV2', label: 'Stats' },
+  { value: 'eventsStats', label: 'Events Stats' },
 ];
 export const SentryIssueSortOptions: Array<SelectableValue<SentryIssueSort>> = [
   // { value: 'inbox', label: 'Date Added' },
