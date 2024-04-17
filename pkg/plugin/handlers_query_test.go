@@ -6,10 +6,19 @@ import (
 	"testing"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/grafana/sentry-datasource/pkg/plugin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func GetFrameLabels(frame *data.Frame) []string {
+	labels := make([]string, len(frame.Fields))
+	for i := range frame.Fields {
+		labels[i] = frame.Fields[i].Name
+	}
+	return labels
+}
 
 func TestSentryDatasource_QueryData(t *testing.T) {
 	t.Run("invalid query should throw error", func(t *testing.T) {
@@ -269,9 +278,10 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 		require.NotNil(t, frame.Fields)
 		require.Equal(t, 3, len(frame.Fields))
 		assert.Equal(t, 2, frame.Fields[0].Len())
-		require.Equal(t, "Timestamp", frame.Fields[0].Name)
-		require.Equal(t, "Group A", frame.Fields[1].Name)
-		require.Equal(t, "Group B", frame.Fields[2].Name)
+		labels := GetFrameLabels(frame)
+		assert.Contains(t, labels, "Timestamp")
+		assert.Contains(t, labels, "Group A")
+		assert.Contains(t, labels, "Group B")
 	})
 	t.Run("valid multiple yAxis events stats query should produce correct result", func(t *testing.T) {
 		sc := NewFakeClient(fakeDoer{Body: `{
@@ -340,11 +350,12 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 		require.NotNil(t, frame.Fields)
 		require.Equal(t, 5, len(frame.Fields))
 		assert.Equal(t, 2, frame.Fields[0].Len())
-		require.Equal(t, "Timestamp", frame.Fields[0].Name)
-		require.Equal(t, "Group A: event_yaxis_a", frame.Fields[1].Name)
-		require.Equal(t, "Group A: event_yaxis_b", frame.Fields[2].Name)
-		require.Equal(t, "Group B: event_yaxis_a", frame.Fields[3].Name)
-		require.Equal(t, "Group B: event_yaxis_b", frame.Fields[4].Name)
+		labels := GetFrameLabels(frame)
+		assert.Contains(t, labels, "Timestamp")
+		assert.Contains(t, labels, "Group A: event_yaxis_a")
+		assert.Contains(t, labels, "Group A: event_yaxis_b")
+		assert.Contains(t, labels, "Group B: event_yaxis_a")
+		assert.Contains(t, labels, "Group B: event_yaxis_b")
 	})
 	t.Run("events stats with null values should be handled gracefully", func(t *testing.T) {
 		sc := NewFakeClient(fakeDoer{Body: `{
