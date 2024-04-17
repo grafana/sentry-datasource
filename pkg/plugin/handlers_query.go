@@ -10,21 +10,26 @@ import (
 )
 
 type SentryQuery struct {
-	QueryType     string   `json:"queryType"`
-	ProjectIds    []string `json:"projectIds,omitempty"`
-	Environments  []string `json:"environments,omitempty"`
-	IssuesQuery   string   `json:"issuesQuery,omitempty"`
-	IssuesSort    string   `json:"issuesSort,omitempty"`
-	IssuesLimit   int64    `json:"issuesLimit,omitempty"`
-	EventsQuery   string   `json:"eventsQuery,omitempty"`
-	EventsSort    string   `json:"eventsSort,omitempty"`
-	EventsLimit   int64    `json:"eventsLimit,omitempty"`	
-	StatsCategory []string `json:"statsCategory,omitempty"`
-	StatsFields   []string `json:"statsFields,omitempty"`
-	StatsGroupBy  []string `json:"statsGroupBy,omitempty"`
-	StatsInterval string   `json:"statsInterval,omitempty"`
-	StatsOutcome  []string `json:"statsOutcome,omitempty"`
-	StatsReason   []string `json:"statsReason,omitempty"`
+	QueryType         string   `json:"queryType"`
+	ProjectIds        []string `json:"projectIds,omitempty"`
+	Environments      []string `json:"environments,omitempty"`
+	IssuesQuery       string   `json:"issuesQuery,omitempty"`
+	IssuesSort        string   `json:"issuesSort,omitempty"`
+	IssuesLimit       int64    `json:"issuesLimit,omitempty"`
+	EventsQuery       string   `json:"eventsQuery,omitempty"`
+	EventsSort        string   `json:"eventsSort,omitempty"`
+	EventsLimit       int64    `json:"eventsLimit,omitempty"`
+	EventsStatsQuery  string   `json:"eventsStatsQuery,omitempty"`
+	EventsStatsYAxis  []string `json:"eventsStatsYAxis,omitempty"`
+	EventsStatsGroups []string `json:"eventsStatsGroups,omitempty"`
+	EventsStatsSort   string   `json:"eventsStatsSort,omitempty"`
+	EventsStatsLimit  int64    `json:"eventsStatsLimit,omitempty"`
+	StatsCategory     []string `json:"statsCategory,omitempty"`
+	StatsFields       []string `json:"statsFields,omitempty"`
+	StatsGroupBy      []string `json:"statsGroupBy,omitempty"`
+	StatsInterval     string   `json:"statsInterval,omitempty"`
+	StatsOutcome      []string `json:"statsOutcome,omitempty"`
+	StatsReason       []string `json:"statsReason,omitempty"`
 }
 
 func GetQuery(query backend.DataQuery) (SentryQuery, error) {
@@ -99,7 +104,33 @@ func QueryData(ctx context.Context, pCtx backend.PluginContext, backendQuery bac
 			return GetErrorResponse(response, executedQueryString, err)
 		}
 		frame = UpdateFrameMeta(frame, executedQueryString, query, client.BaseURL, client.OrgSlug)
-		response.Frames = append(response.Frames, frame)	
+		response.Frames = append(response.Frames, frame)
+	case "eventsStats":
+		if client.OrgSlug == "" {
+			return GetErrorResponse(response, "", ErrorInvalidOrganizationSlug)
+		}
+		eventsStats, executedQueryString, err := client.GetEventsStats(sentry.GetEventsStatsInput{
+			OrganizationSlug: client.OrgSlug,
+			ProjectIds:       query.ProjectIds,
+			Environments:     query.Environments,
+			Query:            query.EventsStatsQuery,
+			Fields:           append(query.EventsStatsYAxis, query.EventsStatsGroups...),
+			YAxis:            query.EventsStatsYAxis,
+			Sort:             query.EventsStatsSort,
+			Limit:            query.EventsStatsLimit,
+			Interval:         backendQuery.Interval,
+			From:             backendQuery.TimeRange.From,
+			To:               backendQuery.TimeRange.To,
+		})
+		if err != nil {
+			return GetErrorResponse(response, executedQueryString, err)
+		}
+		frame, err := ConvertEventsStatsResponseToFrame(GetFrameName("EventsStats", backendQuery.RefID), eventsStats)
+		if err != nil {
+			return GetErrorResponse(response, executedQueryString, err)
+		}
+		frame = UpdateFrameMeta(frame, executedQueryString, query, client.BaseURL, client.OrgSlug)
+		response.Frames = append(response.Frames, frame)
 	case "statsV2":
 		if client.OrgSlug == "" {
 			return GetErrorResponse(response, "", ErrorInvalidOrganizationSlug)
