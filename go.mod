@@ -6,7 +6,7 @@ toolchain go1.21.4
 
 require (
 	github.com/gorilla/mux v1.8.1
-	github.com/grafana/grafana-plugin-sdk-go v0.224.0
+	github.com/grafana/grafana-plugin-sdk-go v0.225.0
 	github.com/peterhellberg/link v1.2.0
 	github.com/stretchr/testify v1.9.0
 )
@@ -83,7 +83,7 @@ require (
 	go.opentelemetry.io/proto/otlp v1.1.0 // indirect
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
 	golang.org/x/mod v0.13.0 // indirect
-	golang.org/x/net v0.22.0 // indirect
+	golang.org/x/net v0.23.0 // indirect
 	golang.org/x/sys v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/tools v0.14.0 // indirect
