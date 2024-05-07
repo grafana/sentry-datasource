@@ -22,11 +22,12 @@
     "instancemgmt",
     "mhdw",
     "nolint",
+    "oblador",
+    "peterhellberg",
+    "proxying",
     "testdata",
     "testid",
     "typecheck",
-    "Unmarshaling",
-    "proxying",
-    "peterhellberg"
+    "Unmarshaling"
   ]
 }
