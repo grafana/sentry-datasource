@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.0 (2024-05-07)
+
+- Add support for Events Stats queries (with thanks to @oblador) ([#225](https://github.com/grafana/sentry-datasource/pull/225))
+- Minor update to tooltip text when entering an organization slug
+- Dependency updates
+
 ## 1.6.0 (2024-03-22)
 
 - Dependency updates
