@@ -24,6 +24,12 @@ type SentryQuery struct {
 	EventsStatsGroups []string `json:"eventsStatsGroups,omitempty"`
 	EventsStatsSort   string   `json:"eventsStatsSort,omitempty"`
 	EventsStatsLimit  int64    `json:"eventsStatsLimit,omitempty"`
+	MetricsField      string   `json:"metricsField,omitempty"`
+	MetricsQuery      string   `json:"metricsQuery,omitempty"`
+	MetricsGroupBy    string   `json:"metricsGroupBy,omitempty"`
+	MetricsSort       string   `json:"metricsSort,omitempty"`
+	MetricsOrder      string   `json:"metricsOrder,omitempty"`
+	MetricsLimit      int64    `json:"metricsLimit,omitempty"`
 	StatsCategory     []string `json:"statsCategory,omitempty"`
 	StatsFields       []string `json:"statsFields,omitempty"`
 	StatsGroupBy      []string `json:"statsGroupBy,omitempty"`
@@ -126,6 +132,33 @@ func QueryData(ctx context.Context, pCtx backend.PluginContext, backendQuery bac
 			return GetErrorResponse(response, executedQueryString, err)
 		}
 		frame, err := ConvertEventsStatsResponseToFrame(GetFrameName("EventsStats", backendQuery.RefID), eventsStats)
+		if err != nil {
+			return GetErrorResponse(response, executedQueryString, err)
+		}
+		frame = UpdateFrameMeta(frame, executedQueryString, query, client.BaseURL, client.OrgSlug)
+		response.Frames = append(response.Frames, frame)
+	case "metrics":
+		if client.OrgSlug == "" {
+			return GetErrorResponse(response, "", ErrorInvalidOrganizationSlug)
+		}
+		metrics, executedQueryString, err := client.GetMetrics(sentry.GetMetricsInput{
+			OrganizationSlug: client.OrgSlug,
+			ProjectIds:       query.ProjectIds,
+			Environments:     query.Environments,
+			Field:            query.MetricsField,
+			Query:            query.MetricsQuery,
+			GroupBy:          query.MetricsGroupBy,
+			Sort:             query.MetricsSort,
+			Order:            query.MetricsOrder,
+			Limit:            query.MetricsLimit,
+			Interval:         backendQuery.Interval,
+			From:             backendQuery.TimeRange.From,
+			To:               backendQuery.TimeRange.To,
+		})
+		if err != nil {
+			return GetErrorResponse(response, executedQueryString, err)
+		}
+		frame, err := ConvertMetricsResponseToFrame(GetFrameName("Metrics", backendQuery.RefID), metrics)
 		if err != nil {
 			return GetErrorResponse(response, executedQueryString, err)
 		}
