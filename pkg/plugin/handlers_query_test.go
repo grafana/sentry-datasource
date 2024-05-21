@@ -442,4 +442,81 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 		require.Equal(t, "Sum (Quantity)", res.Frames[0].Fields[1].Name)
 		require.Equal(t, "", res.Frames[0].Fields[1].Labels.String())
 	})
+	t.Run("valid metrics query should produce correct result", func(t *testing.T) {
+		sc := NewFakeClient(fakeDoer{Body: `{
+			"start": "2021-07-15T15:00:00Z",
+			"end": "2021-10-13T15:59:00Z",
+			"intervals": ["2021-07-15T15:00:00Z", "2021-07-15T15:30:00Z"],
+			"groups":[{ "by": {}, "series": { "session.crash_rate" : [ 0.0002941324772677614, 0.0002764405454278872 ] } }],
+			"meta": [],
+			"query": ""
+		}`})
+		query := `{
+			"queryType" : "metrics",
+			"projectIds" : ["project_id"],
+			"environments" : ["dev"],
+			"metricsQuery" : "metrics_query",
+			"metricsField" : "metrics_field"
+		}`
+		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(query)}, *sc)
+
+		// Assert that there are no errors and the data frame is correctly formed
+		assert.Nil(t, res.Error)
+		require.Equal(t, 1, len(res.Frames))
+		assert.Equal(t, "Metrics (A)", res.Frames[0].Name)
+
+		// Assert the content of the data frame
+		frame := res.Frames[0]
+		require.NotNil(t, frame.Fields)
+		require.Equal(t, 2, len(frame.Fields))
+		assert.Equal(t, 2, frame.Fields[0].Len())
+		require.Equal(t, "Timestamp", frame.Fields[0].Name)
+		require.Equal(t, "session.crash_rate", frame.Fields[1].Name)
+	})
+	t.Run("grouped metrics query should handle null values", func(t *testing.T) {
+		sc := NewFakeClient(fakeDoer{Body: `{
+			"start": "2021-07-15T15:00:00Z",
+			"end": "2021-10-13T15:59:00Z",
+			"intervals": ["2021-07-15T15:00:00Z", "2021-07-15T15:30:00Z"],
+			"groups":[
+				{ 
+					"by": { "release": "version-1.0" }, 
+					"series": { "count_unique(sentry.sessions.user)" : [ 0.0002941324772677614, 0.0002764405454278872 ] }
+				},
+				{ 
+					"by": { "release": "version-1.1" }, 
+					"series": { "count_unique(sentry.sessions.user)" : [ null, 0.0002764405454278872 ] }
+				}
+			],
+			"meta": [],
+			"query": "metrics_query"
+		}`})
+		query := `{
+			"queryType" : "metrics",
+			"projectIds" : ["project_id"],
+			"environments" : ["dev"],
+			"metricsQuery" : "metrics_query",
+			"metricsField" : "metrics_field",
+			"metricsGroup" : "metrics_group",
+			"metricsSort" : "metrics_sort",
+			"metricsOrder" : "metrics_order",
+			"metricsLimit" : 5
+		}`
+		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(query)}, *sc)
+
+		// Assert that there are no errors and the data frame is correctly formed
+		assert.Nil(t, res.Error)
+		require.Equal(t, 1, len(res.Frames))
+		assert.Equal(t, "Metrics (A)", res.Frames[0].Name)
+
+		// Assert the content of the data frame
+		frame := res.Frames[0]
+		require.NotNil(t, frame.Fields)
+		require.Equal(t, 3, len(frame.Fields))
+		assert.Equal(t, 2, frame.Fields[0].Len())
+		labels := GetFrameLabels(frame)
+		assert.Contains(t, labels, "Timestamp")
+		assert.Contains(t, labels, "version-1.0")
+		assert.Contains(t, labels, "version-1.1")
+	})
 }

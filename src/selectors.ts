@@ -112,6 +112,38 @@ export const Components = {
         placeholder: '10',
       },
     },
+    Metrics: {
+      Field: {
+        label: 'Field',
+        tooltip: 'metrics field',
+        placeholder: 'Required. Select one or more fields to see the metric',
+      },
+      Query: {
+        label: 'Query',
+        tooltip: 'Sentry query to filter the results',
+        placeholder: 'Enter a Sentry query (run with Shift+Enter)',
+      },
+      GroupBy: {
+        label: 'Group By',
+        tooltip: 'group by',
+        placeholder: 'Optional. Select the option to group the results',
+      },
+      Sort: {
+        label: 'Sort By',
+        tooltip: 'Sort results',
+        placeholder: 'Optional',
+      },
+      Order: {
+        label: 'Order',
+        tooltip: 'Sort order',
+        placeholder: 'Optional',
+      },
+      Limit: {
+        label: 'Limit',
+        tooltip: 'Number of results (10 max)',
+        placeholder: '5',
+      },
+    },
     StatsV2: {
       Field: {
         label: 'Field',
