@@ -4,7 +4,7 @@
     // temporary debug configuration, we'll update this to use the usual plugin-sdk method soon
     // ! RUN `mage -v build:debug` AND RESTART GRAFANA BEFORE STARTING THE DEBUGGER !
     {
-      "name": "Connect to docker",
+      "name": "Debug via attach",
       "type": "go",
       "request": "attach",
       "mode": "local",
