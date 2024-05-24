@@ -8,7 +8,7 @@
       "type": "go",
       "request": "attach",
       "mode": "local",
-      "debugAdapter": "dlv-dap",
+      "debugAdapter": "dlv-dap"
     }
   ]
 }
