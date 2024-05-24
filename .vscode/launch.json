@@ -9,7 +9,6 @@
       "request": "attach",
       "mode": "local",
       "debugAdapter": "dlv-dap",
-      "substitutePath": []
     }
   ]
 }
