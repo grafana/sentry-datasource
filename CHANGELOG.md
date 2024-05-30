@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.8.0 (2024-05-30)
+
+- Add support for Metrics queries (with thanks again to @oblador) ([#254](https://github.com/grafana/sentry-datasource/pull/254))
+- Dependency updates
+
 ## 1.7.0 (2024-05-07)
 
 - Add support for Events Stats queries (with thanks to @oblador) ([#225](https://github.com/grafana/sentry-datasource/pull/225))
