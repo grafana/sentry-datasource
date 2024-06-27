@@ -39,7 +39,6 @@ func (gei *GetEventsStatsInput) ToQuery() string {
 	if gei.Limit < 1 || gei.Limit > 10 {
 		gei.Limit = 10
 	}
-	fmt.Println(gei.From)
 	params := url.Values{}
 	params.Set("query", gei.Query)
 	params.Set("start", gei.From.Format("2006-01-02T15:04:05Z07:00"))
