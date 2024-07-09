@@ -23,11 +23,13 @@ To install the Sentry data source plugin in your Grafana instance, refer to [Ins
 To configure the Sentry data source plugin within Grafana, get an internal integration token from Sentry:
 
 1. Go to `https://sentry.io`.
-2. Navigate to **Organization Settings**, and then to **Developer Settings**.
-3. Select **New Internal Integration**.
-4. Use a valid name such as _Grafana_.
-5. Go to **PERMISSIONS**, provide **Read** permissions to the required resources such as "Project", "Issue and Event", and "Organization".
-6. Copy the token, and then use this token when configuring the data source within Grafana.
+2. Navigate to **Organization Settings**
+3. Under **Developer Settings** select **Custom Integrations**.
+4. Click **Create New Integration** and then select **Internal Integration**
+5. Use a valid name such as _Grafana_.
+6. Go to **PERMISSIONS**, provide **Read** permissions to the required resources such as "Project", "Issue and Event", and "Organization".
+7. Click **Save Changes** then scroll down to **TOKENS** and click **+ New Token**
+8. Copy the token for the **Sentry Auth Token** field when configuring the data source within Grafana.
 
 > Note: In Sentry, The Admin, Manager, or Owner role is required to get an internal integration token
 

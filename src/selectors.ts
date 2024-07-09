@@ -16,7 +16,7 @@ export const Components = {
         label: 'Sentry Org',
         placeholder: 'Sentry org slug',
         ariaLabel: `Enter your Sentry Organization slug here`,
-        tooltip: `Sentry Org slug. Typically this will be in the url https://sentry.io/organizations/{organization_slug}/`,
+        tooltip: `Sentry Org slug. Typically this will be the last segment of the URL: https://sentry.io/organizations/{organization_slug}/ - only the slug should be entered here`,
       },
       AuthToken: {
         label: 'Sentry Auth Token',
@@ -83,6 +83,65 @@ export const Components = {
         label: 'Limit',
         tooltip: 'Number of results (100 max)',
         placeholder: '100',
+      },
+    },
+    EventsStats: {
+      Query: {
+        label: 'Query',
+        tooltip: 'Sentry query to filter the results',
+        placeholder: 'Enter a Sentry query (run with Shift+Enter)',
+      },
+      YAxis: {
+        label: 'Y-axis',
+        tooltip: 'Choose what to plot in the y-axis. Required',
+        placeholder: 'Required. Enter one or more fields to see the events (enter key to add)',
+      },
+      Groups: {
+        label: 'Group',
+        tooltip: 'Group your results by field or tag',
+        placeholder: 'Optional. Enter one or more fields to group values (enter key to add)',
+      },
+      Sort: {
+        label: 'Sort By',
+        tooltip: 'Sort results',
+        placeholder: 'Optional',
+      },
+      Limit: {
+        label: 'Limit',
+        tooltip: 'Number of results (10 max)',
+        placeholder: '10',
+      },
+    },
+    Metrics: {
+      Field: {
+        label: 'Field',
+        tooltip: 'metrics field',
+        placeholder: 'Required. Select one or more fields to see the metric',
+      },
+      Query: {
+        label: 'Query',
+        tooltip: 'Sentry query to filter the results',
+        placeholder: 'Enter a Sentry query (run with Shift+Enter)',
+      },
+      GroupBy: {
+        label: 'Group By',
+        tooltip: 'group by',
+        placeholder: 'Optional. Select the option to group the results',
+      },
+      Sort: {
+        label: 'Sort By',
+        tooltip: 'Sort results',
+        placeholder: 'Optional',
+      },
+      Order: {
+        label: 'Order',
+        tooltip: 'Sort order',
+        placeholder: 'Optional',
+      },
+      Limit: {
+        label: 'Limit',
+        tooltip: 'Number of results (10 max)',
+        placeholder: '5',
       },
     },
     StatsV2: {

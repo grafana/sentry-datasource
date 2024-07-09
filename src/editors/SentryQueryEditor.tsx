@@ -10,6 +10,8 @@ import type { QueryEditorProps } from '@grafana/data';
 import type { SentryConfig, SentryQuery } from './../types';
 import './../styles/editor.scss';
 import { EditorRows } from '@grafana/experimental';
+import { EventsStatsEditor } from 'components/query-editor/EventsStatsEditor';
+import { MetricsEditor } from 'components/query-editor/MetricsEditor';
 
 type SentryQueryEditorProps = {} & QueryEditorProps<SentryDataSource, SentryQuery, SentryConfig>;
 
@@ -29,7 +31,13 @@ export const SentryQueryEditor = (props: SentryQueryEditorProps) => {
       {query.queryType === 'statsV2' ? (
         <StatsV2Editor query={query} onChange={onChange} onRunQuery={onRunQuery} />
       ) : null}
-      {query.queryType === 'events' ? <EventsEditor query={query} onChange={onChange} onRunQuery={onRunQuery} /> : null}      
+      {query.queryType === 'events' ? <EventsEditor query={query} onChange={onChange} onRunQuery={onRunQuery} /> : null}
+      {query.queryType === 'eventsStats' ? (
+        <EventsStatsEditor query={query} onChange={onChange} onRunQuery={onRunQuery} />
+      ) : null}
+      {query.queryType === 'metrics' ? (
+        <MetricsEditor query={query} onChange={onChange} onRunQuery={onRunQuery} />
+      ) : null}
     </EditorRows>
   );
 };
