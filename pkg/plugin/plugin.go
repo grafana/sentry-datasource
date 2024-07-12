@@ -4,48 +4,40 @@ import (
 	"context"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	"github.com/grafana/grafana-plugin-sdk-go/backend/datasource"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
 	"github.com/grafana/sentry-datasource/pkg/sentry"
 )
 
-type SentryPlugin struct {
-	sentryClient sentry.SentryClient
-}
-
 type SentryDatasource struct {
-	IM instancemgmt.InstanceManager
+	backend.CallResourceHandler
+	client sentry.SentryClient
 }
 
-func (ds *SentryDatasource) getDatasourceInstance(ctx context.Context, pluginCtx backend.PluginContext) (*SentryPlugin, error) {
-	s, err := ds.IM.Get(ctx, pluginCtx)
-	if err != nil {
-		return nil, err
-	}
-	return s.(*SentryPlugin), nil
-}
+var (
+	_ backend.QueryDataHandler      = (*SentryDatasource)(nil)
+	_ backend.CheckHealthHandler    = (*SentryDatasource)(nil)
+	_ instancemgmt.InstanceDisposer = (*SentryDatasource)(nil)
+)
 
-func NewDatasource() datasource.ServeOpts {
-	im := datasource.NewInstanceManager(getInstance)
-	host := &SentryDatasource{
-		IM: im,
-	}
-	return datasource.ServeOpts{
-		CheckHealthHandler:  host,
-		QueryDataHandler:    host,
-		CallResourceHandler: httpadapter.New(host.getResourceRouter()),
+// NewDatasourceInstance creates an instance of the SentryDatasource. It is a helper
+// function that is mostly used for testing.
+func NewDatasourceInstance(sc *sentry.SentryClient) *SentryDatasource {
+	return &SentryDatasource{
+		client: *sc,
 	}
 }
 
-func getInstance(ctx context.Context, s backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
+// NewDatasource creates an instance factory for the SentryDatasource. It is consumed by
+// the `datasource.Manage` function to create a new instance of the datasource.
+func NewDatasource(ctx context.Context, s backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
 	settings, err := GetSettings(s)
 	if err != nil {
 		return nil, err
 	}
 
-	// we need this options to load the secure proxy configuration
+	// we need these options to load the secure proxy configuration
 	opt, err := s.HTTPClientOptions(ctx)
 	if err != nil {
 		return nil, err
@@ -60,7 +52,14 @@ func getInstance(ctx context.Context, s backend.DataSourceInstanceSettings) (ins
 	if err != nil {
 		return nil, err
 	}
-	return &SentryPlugin{
-		sentryClient: *sc,
-	}, nil
+
+	ds := NewDatasourceInstance(sc)
+
+	// these are used to proxy requests to Sentry
+	ds.CallResourceHandler = httpadapter.New(ds.getResourceRouter())
+
+	return ds, nil
+}
+
+func (ds *SentryDatasource) Dispose() {
 }

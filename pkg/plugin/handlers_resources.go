@@ -5,17 +5,16 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
 	"github.com/grafana/sentry-datasource/pkg/sentry"
 )
 
-func (host *SentryDatasource) getResourceRouter() *mux.Router {
+func (ds *SentryDatasource) getResourceRouter() *mux.Router {
 	router := mux.NewRouter()
-	router.HandleFunc("/api/0/organizations", host.withDatasourceHandler(GetOrganizationsHandler)).Methods("GET")
-	router.HandleFunc("/api/0/organizations/{organization_slug}/projects", host.withDatasourceHandler(GetProjectsHandler)).Methods("GET")
-	router.HandleFunc("/api/0/organizations/{organization_slug}/teams", host.withDatasourceHandler(GetOrganizationTeamsHandler)).Methods("GET")
-	router.HandleFunc("/api/0/teams/{organization_slug}/{team_slug}/projects", host.withDatasourceHandler(GetTeamsProjectsHandler)).Methods("GET")
-	router.NotFoundHandler = http.HandlerFunc(host.withDatasourceHandler(DefaultResourceHandler))
+	router.HandleFunc("/api/0/organizations", ds.withDatasourceHandler(GetOrganizationsHandler)).Methods("GET")
+	router.HandleFunc("/api/0/organizations/{organization_slug}/projects", ds.withDatasourceHandler(GetProjectsHandler)).Methods("GET")
+	router.HandleFunc("/api/0/organizations/{organization_slug}/teams", ds.withDatasourceHandler(GetOrganizationTeamsHandler)).Methods("GET")
+	router.HandleFunc("/api/0/teams/{organization_slug}/{team_slug}/projects", ds.withDatasourceHandler(GetTeamsProjectsHandler)).Methods("GET")
+	router.NotFoundHandler = http.HandlerFunc(ds.withDatasourceHandler(DefaultResourceHandler))
 	return router
 }
 
@@ -73,16 +72,9 @@ func DefaultResourceHandler(client *sentry.SentryClient) http.HandlerFunc {
 	}
 }
 
-func (host *SentryDatasource) withDatasourceHandler(getHandler func(d *sentry.SentryClient) http.HandlerFunc) func(rw http.ResponseWriter, r *http.Request) {
+func (ds *SentryDatasource) withDatasourceHandler(getHandler func(d *sentry.SentryClient) http.HandlerFunc) func(rw http.ResponseWriter, r *http.Request) {
 	return func(rw http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
-		pluginContext := httpadapter.PluginConfigFromContext(ctx)
-		datasource, err := host.getDatasourceInstance(ctx, pluginContext)
-		if err != nil {
-			http.Error(rw, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		h := getHandler(&datasource.sentryClient)
+		h := getHandler(&ds.client)
 		h.ServeHTTP(rw, r)
 	}
 }
