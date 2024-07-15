@@ -21,6 +21,7 @@ export const TypeSelector = (props: {
         options={options}
         onChange={(e) => props.onChange(e.value as VariableQueryType)}
         width={25}
+        data-testid='data-testid query-type-dropdown'
       />
     </Field>
   );
