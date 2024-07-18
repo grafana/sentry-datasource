@@ -46,15 +46,12 @@ func GetQuery(query backend.DataQuery) (SentryQuery, error) {
 
 func (ds *SentryDatasource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
 	response := backend.NewQueryDataResponse()
-	dsi, err := ds.getDatasourceInstance(ctx, req.PluginContext)
-	if err != nil {
-		response.Responses["error"] = backend.DataResponse{Error: err}
-		return response, nil
-	}
+
 	for _, q := range req.Queries {
-		res := QueryData(ctx, req.PluginContext, q, dsi.sentryClient)
+		res := QueryData(ctx, req.PluginContext, q, ds.client)
 		response.Responses[q.RefID] = res
 	}
+
 	return response, nil
 }
 
