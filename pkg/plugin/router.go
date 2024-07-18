@@ -18,6 +18,13 @@ func (ds *SentryDatasource) getResourceRouter() *mux.Router {
 	return router
 }
 
+func (ds *SentryDatasource) withDatasourceHandler(getHandler func(d *sentry.SentryClient) http.HandlerFunc) func(rw http.ResponseWriter, r *http.Request) {
+	return func(rw http.ResponseWriter, r *http.Request) {
+		h := getHandler(&ds.client)
+		h.ServeHTTP(rw, r)
+	}
+}
+
 func GetOrganizationsHandler(client *sentry.SentryClient) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		orgs, err := client.GetOrganizations()
@@ -69,13 +76,6 @@ func GetOrganizationTeamsHandler(client *sentry.SentryClient) http.HandlerFunc {
 func DefaultResourceHandler(client *sentry.SentryClient) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		http.Error(rw, "not a valid resource call", http.StatusNotImplemented)
-	}
-}
-
-func (ds *SentryDatasource) withDatasourceHandler(getHandler func(d *sentry.SentryClient) http.HandlerFunc) func(rw http.ResponseWriter, r *http.Request) {
-	return func(rw http.ResponseWriter, r *http.Request) {
-		h := getHandler(&ds.client)
-		h.ServeHTTP(rw, r)
 	}
 }
 
