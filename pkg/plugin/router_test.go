@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/grafana/sentry-datasource/pkg/plugin"
+	"github.com/grafana/sentry-datasource/pkg/util"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -22,7 +23,7 @@ func TestGetOrganizationsHandler(t *testing.T) {
 	t.Run("should return valid list of organizations", func(t *testing.T) {
 		fakeOrgs := `[{"dateCreated":"0001-01-01T00:00:00Z","id":"","isEarlyAdopter":false,"name":"","require2FA":false,"slug":"","status":{"id":"","name":""},"avatar":{"avatarType":""}},{"dateCreated":"0001-01-01T00:00:00Z","id":"","isEarlyAdopter":false,"name":"","require2FA":false,"slug":"","status":{"id":"","name":""},"avatar":{"avatarType":""}},{"dateCreated":"0001-01-01T00:00:00Z","id":"","isEarlyAdopter":false,"name":"","require2FA":false,"slug":"","status":{"id":"","name":""},"avatar":{"avatarType":""}}]`
 		req, _ := http.NewRequest("GET", "/api/0/organizations", nil)
-		client := NewFakeClient(fakeDoer{Body: fakeOrgs})
+		client := util.NewFakeClient(util.FakeDoer{Body: fakeOrgs})
 		handler := plugin.GetOrganizationsHandler(client)
 		rr := httptest.NewRecorder()
 		router := getFakeRouter(map[string]func(http.ResponseWriter, *http.Request){"/api/0/organizations": handler})
@@ -36,7 +37,7 @@ func TestGetOrganizationTeamsHandler(t *testing.T) {
 	fakeTeams := "[{\"avatar\":{\"avatarType\":\"\",\"avatarUuid\":null},\"dateCreated\":\"0001-01-01T00:00:00Z\",\"hasAccess\":false,\"id\":\"\",\"isMember\":false,\"isPending\":false,\"memberCount\":0,\"name\":\"\",\"projects\":null,\"slug\":\"\"},{\"avatar\":{\"avatarType\":\"\",\"avatarUuid\":null},\"dateCreated\":\"0001-01-01T00:00:00Z\",\"hasAccess\":false,\"id\":\"\",\"isMember\":false,\"isPending\":false,\"memberCount\":0,\"name\":\"\",\"projects\":null,\"slug\":\"\"},{\"avatar\":{\"avatarType\":\"\",\"avatarUuid\":null},\"dateCreated\":\"0001-01-01T00:00:00Z\",\"hasAccess\":false,\"id\":\"\",\"isMember\":false,\"isPending\":false,\"memberCount\":0,\"name\":\"\",\"projects\":null,\"slug\":\"\"}]"
 	t.Run("valid org slug should return results", func(t *testing.T) {
 		req, _ := http.NewRequest("GET", "/api/0/organizations/foo/teams", nil)
-		client := NewFakeClient(fakeDoer{Body: fakeTeams})
+		client := util.NewFakeClient(util.FakeDoer{Body: fakeTeams})
 		handler := plugin.GetOrganizationTeamsHandler(client)
 		rr := httptest.NewRecorder()
 		router := getFakeRouter(map[string]func(http.ResponseWriter, *http.Request){"/api/0/organizations/{organization_slug}/teams": handler})
@@ -49,7 +50,7 @@ func TestGetProjectsHandler(t *testing.T) {
 	fakeProjects := "[{\"dateCreated\":\"0001-01-01T00:00:00Z\",\"hasAccess\":false,\"id\":\"\",\"isBookmarked\":false,\"isMember\":false,\"environments\":null,\"name\":\"\",\"slug\":\"\",\"team\":{\"id\":\"\",\"name\":\"\",\"slug\":\"\"},\"teams\":null},{\"dateCreated\":\"0001-01-01T00:00:00Z\",\"hasAccess\":false,\"id\":\"\",\"isBookmarked\":false,\"isMember\":false,\"environments\":null,\"name\":\"\",\"slug\":\"\",\"team\":{\"id\":\"\",\"name\":\"\",\"slug\":\"\"},\"teams\":null},{\"dateCreated\":\"0001-01-01T00:00:00Z\",\"hasAccess\":false,\"id\":\"\",\"isBookmarked\":false,\"isMember\":false,\"environments\":null,\"name\":\"\",\"slug\":\"\",\"team\":{\"id\":\"\",\"name\":\"\",\"slug\":\"\"},\"teams\":null}]"
 	t.Run("valid org slug should return results", func(t *testing.T) {
 		req, _ := http.NewRequest("GET", "/api/0/organizations/foo/projects", nil)
-		client := NewFakeClient(fakeDoer{Body: fakeProjects})
+		client := util.NewFakeClient(util.FakeDoer{Body: fakeProjects})
 		handler := plugin.GetProjectsHandler(client)
 		rr := httptest.NewRecorder()
 		router := getFakeRouter(map[string]func(http.ResponseWriter, *http.Request){"/api/0/organizations/{organization_slug}/projects": handler})
@@ -61,7 +62,7 @@ func TestGetProjectsHandler(t *testing.T) {
 func TestDefaultResourceHandler(t *testing.T) {
 	t.Run("unknown or invalid route should throw error", func(t *testing.T) {
 		req, _ := http.NewRequest("GET", "/", nil)
-		client := NewFakeClient(fakeDoer{Body: ""})
+		client := util.NewFakeClient(util.FakeDoer{Body: ""})
 		handler := plugin.DefaultResourceHandler(client)
 		rr := httptest.NewRecorder()
 		router := getFakeRouter(map[string]func(http.ResponseWriter, *http.Request){"/": handler})

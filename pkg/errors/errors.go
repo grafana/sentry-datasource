@@ -1,6 +1,11 @@
-package plugin
+package errors
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/grafana/grafana-plugin-sdk-go/data"
+)
 
 var (
 	ErrorQueryDataNotImplemented         = errors.New("query data not implemented")
@@ -13,3 +18,17 @@ var (
 	ErrorInvalidOrganizationSlug         = errors.New("invalid or empty organization slug")
 	ErrorUnknownQueryType                = errors.New("unknown query type")
 )
+
+// GetErrorResponse returns a DataResponse with an error frame.
+func GetErrorResponse(response backend.DataResponse, executedQueryString string, err error) backend.DataResponse {
+	if err != nil {
+		response.Error = err
+		frame := data.NewFrame("Error")
+		frame.Meta = &data.FrameMeta{
+			ExecutedQueryString: executedQueryString,
+		}
+		response.Frames = append(response.Frames, frame)
+		return response
+	}
+	return response
+}

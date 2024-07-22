@@ -1,4 +1,4 @@
-package plugin
+package framer
 
 import (
 	"fmt"
@@ -9,9 +9,41 @@ import (
 	"github.com/grafana/sentry-datasource/pkg/sentry"
 )
 
-type SentryEventsStatsSet struct {
-	Name string
-	Data []interface{}
+func ConvertMetricsResponseToFrame(frameName string, metrics sentry.MetricsResponse) (*data.Frame, error) {
+	if len(metrics.Intervals) == 0 {
+		return data.NewFrameOfFieldTypes(frameName, 0), nil
+	}
+	frame := data.NewFrameOfFieldTypes(frameName, len(metrics.Intervals))
+	field := data.NewField("Timestamp", nil, metrics.Intervals)
+	frame.Fields = append(frame.Fields, field)
+	for _, group := range metrics.Groups {
+		for valueName, series := range group.Series {
+			array, isArray := series.([]interface{})
+			if !isArray {
+				return nil, fmt.Errorf("expected array, got %T", series)
+			}
+			field := data.NewFieldFromFieldType(data.FieldTypeNullableFloat64, len(array))
+			field.Name = valueName
+			for _, by := range group.By {
+				float, ok := by.(float64)
+				if ok {
+					field.Name = strconv.FormatFloat(float, 'f', 0, 64)
+				} else {
+					field.Name = by.(string)
+				}
+			}
+			for index, item := range array {
+				value, ok := item.(float64)
+				if ok {
+					field.Set(index, &value)
+				} else if item != nil {
+					return nil, fmt.Errorf("expected float64 or null, got %T", item)
+				}
+			}
+			frame.Fields = append(frame.Fields, field)
+		}
+	}
+	return frame, nil
 }
 
 func ConvertStatsV2ResponseToFrame(frameName string, stats sentry.StatsV2Response) (*data.Frame, error) {
@@ -125,76 +157,6 @@ func ConvertEventsStatsResponseToFrame(frameName string, eventsStats sentry.Sent
 			return nil, error
 		}
 		frame.Fields = append(frame.Fields, field)
-	}
-	return frame, nil
-}
-
-func ExtractDataSets(namePrefix string, rawData map[string]interface{}) ([]SentryEventsStatsSet, error) {
-	var sets []SentryEventsStatsSet
-	for key, dataSetOrGroup := range rawData {
-		if key == "data" {
-			set, isArray := dataSetOrGroup.([]interface{})
-			if !isArray {
-				return nil, fmt.Errorf("expected array, got %T", dataSetOrGroup)
-			}
-			return append(sets, SentryEventsStatsSet{
-				Name: namePrefix,
-				Data: set,
-			}), nil
-		}
-		if key == "order" {
-			continue
-		}
-		child, isObject := dataSetOrGroup.(map[string]interface{})
-		if !isObject {
-			continue
-		}
-		name := key
-		if len(namePrefix) != 0 && len(key) != 0 {
-			name = fmt.Sprintf("%s: %s", namePrefix, key)
-		}
-		nestedSets, error := ExtractDataSets(name, child)
-		if error != nil {
-			return nil, error
-		}
-		sets = append(sets, nestedSets...)
-	}
-	return sets, nil
-}
-
-func ConvertMetricsResponseToFrame(frameName string, metrics sentry.MetricsResponse) (*data.Frame, error) {
-	if len(metrics.Intervals) == 0 {
-		return data.NewFrameOfFieldTypes(frameName, 0), nil
-	}
-	frame := data.NewFrameOfFieldTypes(frameName, len(metrics.Intervals))
-	field := data.NewField("Timestamp", nil, metrics.Intervals)
-	frame.Fields = append(frame.Fields, field)
-	for _, group := range metrics.Groups {
-		for valueName, series := range group.Series {
-			array, isArray := series.([]interface{})
-			if !isArray {
-				return nil, fmt.Errorf("expected array, got %T", series)
-			}
-			field := data.NewFieldFromFieldType(data.FieldTypeNullableFloat64, len(array))
-			field.Name = valueName
-			for _, by := range group.By {
-				float, ok := by.(float64)
-				if ok {
-					field.Name = strconv.FormatFloat(float, 'f', 0, 64)
-				} else {
-					field.Name = by.(string)
-				}
-			}
-			for index, item := range array {
-				value, ok := item.(float64)
-				if ok {
-					field.Set(index, &value)
-				} else if item != nil {
-					return nil, fmt.Errorf("expected float64 or null, got %T", item)
-				}
-			}
-			frame.Fields = append(frame.Fields, field)
-		}
 	}
 	return frame, nil
 }
