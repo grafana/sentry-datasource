@@ -9,7 +9,8 @@
     "pkg/mocker/testdata",
     "pkg/**/*_test.go",
     "mage_output_file.go",
-    "src/**/*.{test,spec}.{ts,tsx}"
+    "src/**/*.{test,spec}.{ts,tsx}",
+    "CHANGELOG.md"
   ],
   "words": [
     "DataSource",
