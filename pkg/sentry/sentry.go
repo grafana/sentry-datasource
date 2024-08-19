@@ -7,7 +7,9 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/build"
+	"github.com/grafana/grafana-plugin-sdk-go/experimental/errorsource"
 	"github.com/peterhellberg/link"
 )
 
@@ -68,10 +70,10 @@ func (sc *SentryClient) FetchWithPagination(path string, out interface{}) (strin
 		var errResponse SentryErrorResponse
 		if err := json.NewDecoder(res.Body).Decode(&errResponse); err != nil {
 			errorMessage := strings.TrimSpace(fmt.Sprintf("%s %s", res.Status, err.Error()))
-			return "", errors.New(errorMessage)
+			return "", errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(res.StatusCode), errors.New(errorMessage), false)
 		}
 		errorMessage := strings.TrimSpace(fmt.Sprintf("%s %s", res.Status, errResponse.Detail))
-		return "", errors.New(errorMessage)
+		return "", errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(res.StatusCode), errors.New(errorMessage), false)
 	}
 	return nextURL, nil
 }
@@ -94,10 +96,10 @@ func (sc *SentryClient) Fetch(path string, out interface{}) error {
 		var errResponse SentryErrorResponse
 		if err := json.NewDecoder(res.Body).Decode(&errResponse); err != nil {
 			errorMessage := strings.TrimSpace(fmt.Sprintf("%s %s", res.Status, err.Error()))
-			return errors.New(errorMessage)
+			return errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(res.StatusCode), errors.New(errorMessage), false)
 		}
 		errorMessage := strings.TrimSpace(fmt.Sprintf("%s %s", res.Status, errResponse.Detail))
-		return errors.New(errorMessage)
+		return errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(res.StatusCode), errors.New(errorMessage), false)
 	}
 	return err
 }
