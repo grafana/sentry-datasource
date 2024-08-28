@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/grafana/grafana-plugin-sdk-go/experimental/errorsource"
 	. "github.com/grafana/sentry-datasource/pkg/errors"
 	"github.com/grafana/sentry-datasource/pkg/plugin"
 	"github.com/grafana/sentry-datasource/pkg/util"
@@ -28,7 +29,7 @@ func Test_QueryData(t *testing.T) {
 			"queryType" : "issues"
 		}`)}}})
 		assert.NotNil(t, res.Responses["A"].Error)
-		assert.Equal(t, errors.New("400 Unknown error"), res.Responses["A"].Error)
+		assert.Equal(t, errorsource.SourceError(backend.ErrorSourceDownstream, errors.New("400 Unknown error"), false), res.Responses["A"].Error)
 	})
 
 	t.Run("invalid response with valid status code should capture error", func(t *testing.T) {
@@ -50,7 +51,7 @@ func Test_QueryData(t *testing.T) {
 			"queryType" : "issues"
 		}`)}}})
 		assert.NotNil(t, res.Responses["A"].Error)
-		assert.Equal(t, errors.New("400 Unknown error simulated error"), res.Responses["A"].Error)
+		assert.Equal(t, errorsource.SourceError(backend.ErrorSourceDownstream, errors.New("400 Unknown error simulated error"), false), res.Responses["A"].Error)
 	})
 }
 

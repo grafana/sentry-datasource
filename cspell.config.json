@@ -21,6 +21,7 @@
     "httpadapter",
     "httpclient",
     "instancemgmt",
+    "errorsource",
     "mhdw",
     "nolint",
     "oblador",
