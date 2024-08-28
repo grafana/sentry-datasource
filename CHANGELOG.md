@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.8.2 (2024-08-28)
+
+- Add `errorsource` support ([#313](https://github.com/grafana/sentry-datasource/pull/313))
+- Dependency updates
+  
 ## 1.8.1 (2024-08-09)
 
 - Fix timerange bug with Event Stats query ([#279](https://github.com/grafana/sentry-datasource/pull/279))
