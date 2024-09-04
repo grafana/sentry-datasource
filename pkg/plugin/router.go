@@ -68,7 +68,7 @@ func GetOrganizationTeamsHandler(client *sentry.SentryClient) http.HandlerFunc {
 			http.Error(rw, "invalid orgSlug", http.StatusBadRequest)
 			return
 		}
-		teams, err := client.ListOrganizationTeams(orgSlug)
+		teams, err := client.ListOrganizationTeams(orgSlug, true)
 		writeResponse(teams, err, rw)
 	}
 }
