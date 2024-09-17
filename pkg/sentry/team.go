@@ -21,8 +21,24 @@ type SentryTeam struct {
 	Slug        string        `json:"slug"`
 }
 
-func (sc *SentryClient) ListOrganizationTeams(organizationSlug string) ([]SentryTeam, error) {
-	out := []SentryTeam{}
-	err := sc.Fetch(fmt.Sprintf("/api/0/organizations/%s/teams/", organizationSlug), &out)
-	return out, err
+func (sc *SentryClient) ListOrganizationTeams(organizationSlug string, withPagination bool) ([]SentryTeam, error) {
+	teams := []SentryTeam{}
+	url := fmt.Sprintf("/api/0/organizations/%s/teams/", organizationSlug)
+
+	if withPagination {
+		for url != "" {
+			batch := []SentryTeam{}
+			nextURL, err := sc.FetchWithPagination(url, &batch)
+			if err != nil {
+				return nil, err
+			}
+
+			teams = append(teams, batch...)
+			url = nextURL
+		}
+		return teams, nil
+	} else {
+		err := sc.Fetch(url, &teams)
+		return teams, err
+	}
 }
