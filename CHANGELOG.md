@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.3 (2024-09-26)
+
+- Dependency updates
+  
 ## 1.8.2 (2024-08-28)
 
 - Add `errorsource` support ([#313](https://github.com/grafana/sentry-datasource/pull/313))
