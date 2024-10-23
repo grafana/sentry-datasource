@@ -116,6 +116,7 @@ func createResponse(backendQuery backend.DataQuery, client sentry.SentryClient) 
 		return handlers.HandleStatsV2(client, query, backendQuery, response)
 	default:
 		response.Error = errors.ErrorUnknownQueryType
+		response.ErrorSource = backend.ErrorSourceDownstream
 	}
 
 	return response

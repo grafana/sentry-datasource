@@ -148,7 +148,7 @@ func HandleStatsV2(client sentry.SentryClient, query query.SentryQuery, backendQ
 	})
 	if err != nil {
 		// errorsource set by Sentry client
-		return errors.GetErrorResponse(response, executedQueryString, err)
+		return errors.GetErrorResponse(response, executedQueryString, errorsource.DownstreamError(err, false))
 	}
 	frame, err := framer.ConvertStatsV2ResponseToFrame(framer.GetFrameName("Stats", backendQuery.RefID), stats)
 	if err != nil {
