@@ -1,0 +1,27 @@
+on:
+  workflow_dispatch:
+  release:
+    types: [published, created]
+
+jobs:
+  send-slack-notification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate token
+        uses: tibdex/github-app-token@v1
+        id: generate-token
+        continue-on-error: true
+        with:
+          app_id: ${{ secrets.PARTNER_DATASOURCES_APP_ID }}
+          private_key: ${{ secrets.PARTNER_DATASOURCES_APP_PEM }}
+
+      - name: Send notification
+        uses: grafana/plugins-actions/.github/workflows/plugin-release-slack-notification.yml@main
+        with:
+          channelId: ${{ vars.PARTNER_DATASOURCES_PUBLIC_CHANNEL_ID }}
+          repoId: sentry-datasource
+          commitSha: ${{ github.sha }}
+        secrets:
+          slackBotToken: ${{ secrets.PARTNER_DATASOURCES_SLACK_APP_TOKEN }}
+          slackBotSigningSecret: ${{ secrets.PARTNER_DATASOURCES_SLACK_APP_SIGNING_SECRET }}
+          githubToken: ${{ steps.generate-token.outputs.token }}
