@@ -6,10 +6,12 @@ on:
 
 jobs:
   generate-token:
-    uses: actions/create-github-app-token@v1
-    with:
-      app_id: ${{ secrets.PARTNER_DATASOURCES_APP_ID }}
-      private_key: ${{ secrets.PARTNER_DATASOURCES_APP_PEM }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.PARTNER_DATASOURCES_APP_ID }}
+          private-key: ${{ secrets.PARTNER_DATASOURCES_APP_PEM }}
 
   send-slack-notification:
     needs: generate-token
