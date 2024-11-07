@@ -6,7 +6,7 @@ toolchain go1.22.5
 
 require (
 	github.com/gorilla/mux v1.8.1
-	github.com/grafana/grafana-plugin-sdk-go v0.259.1
+	github.com/grafana/grafana-plugin-sdk-go v0.259.2
 	github.com/peterhellberg/link v1.2.0
 	github.com/stretchr/testify v1.9.0
 )
