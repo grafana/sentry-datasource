@@ -82,5 +82,9 @@
   "resolutions": {
     "rxjs": "6.3.3"
   },
-  "packageManager": "yarn@1.22.19"
+  "packageManager": "yarn@1.22.22",
+  "volta": {
+    "node": "20.18.1",
+    "yarn": "1.22.22"
+  }
 }
