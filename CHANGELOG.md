@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.5 (2024-11-28)
+
+- Dependency updates
+  
 ## 1.8.4 (2024-11-07)
 
 - Dependency updates
