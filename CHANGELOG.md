@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.8.5 (2024-11-28)
+
+- Dependency updates
+  
+## 1.8.4 (2024-11-07)
+
+- Dependency updates
+  
+## 1.8.3 (2024-09-26)
+
+- Dependency updates
+  
+## 1.8.2 (2024-08-28)
+
+- Add `errorsource` support ([#313](https://github.com/grafana/sentry-datasource/pull/313))
+- Dependency updates
+  
+## 1.8.1 (2024-08-09)
+
+- Fix timerange bug with Event Stats query ([#279](https://github.com/grafana/sentry-datasource/pull/279))
+- Fix Event data link in ID field (with thanks @Pexers) ([#286](https://github.com/grafana/sentry-datasource/pull/286))
+- Dependency updates
+
 ## 1.8.0 (2024-05-30)
 
 - Add support for Metrics queries (with thanks again to @oblador) ([#254](https://github.com/grafana/sentry-datasource/pull/254))

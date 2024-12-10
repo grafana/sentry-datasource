@@ -1,97 +1,77 @@
-package plugin_test
+package handlers_test
 
 import (
 	"context"
-	"errors"
 	"testing"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	"github.com/grafana/grafana-plugin-sdk-go/data"
+	"github.com/grafana/sentry-datasource/pkg/framer"
 	"github.com/grafana/sentry-datasource/pkg/plugin"
+	"github.com/grafana/sentry-datasource/pkg/util"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func GetFrameLabels(frame *data.Frame) []string {
-	labels := make([]string, len(frame.Fields))
-	for i := range frame.Fields {
-		labels[i] = frame.Fields[i].Name
-	}
-	return labels
+func TestSentryDatasource_Issues(t *testing.T) {
+	t.Run("valid org slug should not throw error", func(t *testing.T) {
+		sc := util.NewFakeClient(util.FakeDoer{Body: "[{},{},{}]"})
+		ds := plugin.NewDatasourceInstance(sc)
+		ctx := context.TODO()
+
+		res, _ := ds.QueryData(ctx, &backend.QueryDataRequest{Queries: []backend.DataQuery{{RefID: "A", JSON: []byte(`{
+			"queryType" : "issues"
+		}`)}}})
+
+		assert.Nil(t, res.Responses["A"].Error)
+		require.Equal(t, 1, len(res.Responses["A"].Frames))
+		assert.Equal(t, "Issues (A)", res.Responses["A"].Frames[0].Name)
+		require.Equal(t, 32, len(res.Responses["A"].Frames[0].Fields))
+		require.Equal(t, 3, res.Responses["A"].Frames[0].Fields[0].Len())
+	})
 }
 
-func TestSentryDatasource_QueryData(t *testing.T) {
-	t.Run("invalid query should throw error", func(t *testing.T) {
-		sc := NewFakeClient(fakeDoer{})
-		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{JSON: []byte(`{}`)}, *sc)
-		assert.Equal(t, plugin.ErrorUnknownQueryType, res.Error)
-	})
-	t.Run("invalid response should capture error", func(t *testing.T) {
-		sc := NewFakeClient(fakeDoer{Body: "{}", ExpectedStatusCode: 400, ExpectedStatus: "400 Unknown error"})
-		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{JSON: []byte(`{
-			"queryType" : "issues"
-		}`)}, *sc)
-		assert.NotNil(t, res.Error)
-		assert.Equal(t, errors.New("400 Unknown error"), res.Error)
-	})
-	t.Run("invalid response with valid status code should capture error", func(t *testing.T) {
-		sc := NewFakeClient(fakeDoer{Body: "{}"})
-		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{JSON: []byte(`{
-			"queryType" : "issues"
-		}`)}, *sc)
-		require.NotNil(t, res.Error)
-		assert.Equal(t, "json: cannot unmarshal object into Go value of type []sentry.SentryIssue", res.Error.Error())
-	})
-	t.Run("invalid response should capture error detail if available", func(t *testing.T) {
-		sc := NewFakeClient(fakeDoer{Body: `{ "detail" : "simulated error" }`, ExpectedStatusCode: 400, ExpectedStatus: "400 Unknown error"})
-		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{JSON: []byte(`{
-			"queryType" : "issues"
-		}`)}, *sc)
-		assert.NotNil(t, res.Error)
-		assert.Equal(t, errors.New("400 Unknown error simulated error"), res.Error)
-	})
-	t.Run("valid org slug should not throw error", func(t *testing.T) {
-		sc := NewFakeClient(fakeDoer{Body: "[{},{},{}]"})
-		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(`{
-			"queryType" : "issues"
-		}`)}, *sc)
-		assert.Nil(t, res.Error)
-		require.Equal(t, 1, len(res.Frames))
-		assert.Equal(t, "Issues (A)", res.Frames[0].Name)
-		require.Equal(t, 32, len(res.Frames[0].Fields))
-		require.Equal(t, 3, res.Frames[0].Fields[0].Len())
-	})
+func TestSentryDatasource_StatsV2(t *testing.T) {
 	t.Run("stats query without field should throw error", func(t *testing.T) {
-		sc := NewFakeClient(fakeDoer{Body: "{}"})
-		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(`{
+		sc := util.NewFakeClient(util.FakeDoer{Body: "{}"})
+		ds := plugin.NewDatasourceInstance(sc)
+		ctx := context.TODO()
+		res, _ := ds.QueryData(ctx, &backend.QueryDataRequest{Queries: []backend.DataQuery{{RefID: "A", JSON: []byte(`{
 			"queryType" : "statsV2"
-		}`)}, *sc)
-		assert.NotNil(t, res.Error)
-		assert.Equal(t, `at least one "field" is required`, res.Error.Error())
+		}`)}}})
+		assert.NotNil(t, res.Responses["A"].Error)
+		assert.Equal(t, `at least one "field" is required`, res.Responses["A"].Error.Error())
 	})
+
 	t.Run("stats query without category should throw error", func(t *testing.T) {
-		sc := NewFakeClient(fakeDoer{Body: "{}"})
-		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(`{
+		sc := util.NewFakeClient(util.FakeDoer{Body: "{}"})
+		ds := plugin.NewDatasourceInstance(sc)
+		ctx := context.TODO()
+		res, _ := ds.QueryData(ctx, &backend.QueryDataRequest{Queries: []backend.DataQuery{{RefID: "A", JSON: []byte(`{
 			"queryType" : "statsV2", 
 			"statsFields" : ["foo"]
-		}`)}, *sc)
-		assert.NotNil(t, res.Error)
-		assert.Equal(t, `at least one "category" is required`, res.Error.Error())
+		}`)}}})
+		assert.NotNil(t, res.Responses["A"].Error)
+		assert.Equal(t, `at least one "category" is required`, res.Responses["A"].Error.Error())
 	})
+
 	t.Run("stats query with field and category should not throw error", func(t *testing.T) {
-		sc := NewFakeClient(fakeDoer{Body: "{}"})
-		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(`{
+		sc := util.NewFakeClient(util.FakeDoer{Body: "{}"})
+		ds := plugin.NewDatasourceInstance(sc)
+		ctx := context.TODO()
+		res, _ := ds.QueryData(ctx, &backend.QueryDataRequest{Queries: []backend.DataQuery{{RefID: "A", JSON: []byte(`{
 			"queryType" : "statsV2", 
 			"statsFields" : ["foo"],
 			"statsCategory" : ["foo"]
-		}`)}, *sc)
-		assert.Nil(t, res.Error)
-		require.Equal(t, 1, len(res.Frames))
-		assert.Equal(t, "Stats (A)", res.Frames[0].Name)
-		require.Equal(t, 0, len(res.Frames[0].Fields))
+		}`)}}})
+		assert.Nil(t, res.Responses["A"].Error)
+		require.Equal(t, 1, len(res.Responses["A"].Frames))
+		assert.Equal(t, "Stats (A)", res.Responses["A"].Frames[0].Name)
+		require.Equal(t, 0, len(res.Responses["A"].Frames[0].Fields))
 	})
+
 	t.Run("valid stats query should produce correct result", func(t *testing.T) {
-		sc := NewFakeClient(fakeDoer{Body: `{
+		sc := util.NewFakeClient(util.FakeDoer{Body: `{
 			"start":"2021-07-15T15:00:00Z",
 			"end":"2021-10-13T18:00:00Z",
 			"intervals": ["2021-07-15T15:00:00Z","2021-07-15T18:00:00Z"],
@@ -99,23 +79,25 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 				{ "by": {}, "series": { "sum(quantity)" : [ 11, 22 ]} }
 			]
 		}`})
-		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(`{
+		ds := plugin.NewDatasourceInstance(sc)
+		ctx := context.TODO()
+		res, _ := ds.QueryData(ctx, &backend.QueryDataRequest{Queries: []backend.DataQuery{{RefID: "A", JSON: []byte(`{
 			"queryType" : "statsV2", 
 			"statsFields" : ["foo"],
 			"statsCategory" : ["foo"]
-		}`)}, *sc)
-		assert.Nil(t, res.Error)
-		require.Equal(t, 1, len(res.Frames))
-		assert.Equal(t, "Stats (A)", res.Frames[0].Name)
-		require.Equal(t, 2, len(res.Frames[0].Fields))
-		require.Equal(t, 2, res.Frames[0].Fields[0].Len())
-		require.Equal(t, "Timestamp", res.Frames[0].Fields[0].Name)
-		require.Equal(t, "Sum (Quantity)", res.Frames[0].Fields[1].Name)
-		require.Equal(t, "", res.Frames[0].Fields[1].Labels.String())
-
+		}`)}}})
+		assert.Nil(t, res.Responses["A"].Error)
+		require.Equal(t, 1, len(res.Responses["A"].Frames))
+		assert.Equal(t, "Stats (A)", res.Responses["A"].Frames[0].Name)
+		require.Equal(t, 2, len(res.Responses["A"].Frames[0].Fields))
+		require.Equal(t, 2, res.Responses["A"].Frames[0].Fields[0].Len())
+		require.Equal(t, "Timestamp", res.Responses["A"].Frames[0].Fields[0].Name)
+		require.Equal(t, "Sum (Quantity)", res.Responses["A"].Frames[0].Fields[1].Name)
+		require.Equal(t, "", res.Responses["A"].Frames[0].Fields[1].Labels.String())
 	})
+
 	t.Run("valid stats query with valid group by should produce correct result", func(t *testing.T) {
-		sc := NewFakeClient(fakeDoer{Body: `{
+		sc := util.NewFakeClient(util.FakeDoer{Body: `{
 			"start":"2021-07-15T15:00:00Z",
 			"end":"2021-10-13T18:00:00Z",
 			"intervals": ["2021-07-15T15:00:00Z","2021-07-15T18:00:00Z"],
@@ -124,28 +106,33 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 				{ "by": { "reason":"bar", "category": "foo2" }, "series": { "sum(quantity)" : [ 11, 22 ], "sum(times_seen)" : [ 11, 22 ]} }
 			]
 		}`})
-		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(`{
+		ds := plugin.NewDatasourceInstance(sc)
+		ctx := context.TODO()
+		res, _ := ds.QueryData(ctx, &backend.QueryDataRequest{Queries: []backend.DataQuery{{RefID: "A", JSON: []byte(`{
 			"queryType" : "statsV2", 
 			"statsFields" : ["foo"],
 			"statsCategory" : ["foo"]
-		}`)}, *sc)
-		assert.Nil(t, res.Error)
-		require.Equal(t, 1, len(res.Frames))
-		assert.Equal(t, "Stats (A)", res.Frames[0].Name)
-		require.Equal(t, 5, len(res.Frames[0].Fields))
-		require.Equal(t, 2, res.Frames[0].Fields[0].Len())
-		require.Equal(t, "Timestamp", res.Frames[0].Fields[0].Name)
-		require.Equal(t, "Sum (Quantity)", res.Frames[0].Fields[1].Name)
-		require.Equal(t, "Sum (Times Seen)", res.Frames[0].Fields[2].Name)
-		require.Equal(t, "Sum (Quantity)", res.Frames[0].Fields[3].Name)
-		require.Equal(t, "Sum (Times Seen)", res.Frames[0].Fields[4].Name)
-		require.Equal(t, "Category=foo1, Reason=foo", res.Frames[0].Fields[1].Labels.String())
-		require.Equal(t, "Category=foo1, Reason=foo", res.Frames[0].Fields[2].Labels.String())
-		require.Equal(t, "Category=foo2, Reason=bar", res.Frames[0].Fields[3].Labels.String())
-		require.Equal(t, "Category=foo2, Reason=bar", res.Frames[0].Fields[4].Labels.String())
+		}`)}}})
+		assert.Nil(t, res.Responses["A"].Error)
+		require.Equal(t, 1, len(res.Responses["A"].Frames))
+		assert.Equal(t, "Stats (A)", res.Responses["A"].Frames[0].Name)
+		require.Equal(t, 5, len(res.Responses["A"].Frames[0].Fields))
+		require.Equal(t, 2, res.Responses["A"].Frames[0].Fields[0].Len())
+		require.Equal(t, "Timestamp", res.Responses["A"].Frames[0].Fields[0].Name)
+		require.Equal(t, "Sum (Quantity)", res.Responses["A"].Frames[0].Fields[1].Name)
+		require.Equal(t, "Sum (Times Seen)", res.Responses["A"].Frames[0].Fields[2].Name)
+		require.Equal(t, "Sum (Quantity)", res.Responses["A"].Frames[0].Fields[3].Name)
+		require.Equal(t, "Sum (Times Seen)", res.Responses["A"].Frames[0].Fields[4].Name)
+		require.Equal(t, "Category=foo1, Reason=foo", res.Responses["A"].Frames[0].Fields[1].Labels.String())
+		require.Equal(t, "Category=foo1, Reason=foo", res.Responses["A"].Frames[0].Fields[2].Labels.String())
+		require.Equal(t, "Category=foo2, Reason=bar", res.Responses["A"].Frames[0].Fields[3].Labels.String())
+		require.Equal(t, "Category=foo2, Reason=bar", res.Responses["A"].Frames[0].Fields[4].Labels.String())
 	})
+}
+
+func TestSentryDatasource_Events(t *testing.T) {
 	t.Run("valid events query should produce correct result", func(t *testing.T) {
-		sc := NewFakeClient(fakeDoer{Body: `{
+		sc := util.NewFakeClient(util.FakeDoer{Body: `{
 			"data": [
 				{
 					"id": "event_id_1",
@@ -175,6 +162,7 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 				}
 			}
 		  }`})
+
 		query := `{
 			"queryType" : "events",
 			"projectIds" : ["project_id"],
@@ -183,23 +171,28 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 			"eventsSort" : "event_sort",
 			"eventsLimit" : 10
 		}`
-		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(query)}, *sc)
+
+		ds := plugin.NewDatasourceInstance(sc)
+		ctx := context.TODO()
+
+		res, _ := ds.QueryData(ctx, &backend.QueryDataRequest{Queries: []backend.DataQuery{{RefID: "A", JSON: []byte(query)}}})
 
 		// Assert that there are no errors and the data frame is correctly formed
-		assert.Nil(t, res.Error)
-		require.Equal(t, 1, len(res.Frames))
-		assert.Equal(t, "Events (A)", res.Frames[0].Name)
+		assert.Nil(t, res.Responses["A"].Error)
+		require.Equal(t, 1, len(res.Responses["A"].Frames))
+		assert.Equal(t, "Events (A)", res.Responses["A"].Frames[0].Name)
 
 		// Assert the content of the data frame
-		frame := res.Frames[0]
+		frame := res.Responses["A"].Frames[0]
 		require.NotNil(t, frame.Fields)
 		require.Equal(t, 11, len(frame.Fields))
 		assert.Equal(t, 3, frame.Fields[0].Len())
 		require.Equal(t, "ID", frame.Fields[0].Name)
 		require.Equal(t, "Title", frame.Fields[1].Name)
 	})
+
 	t.Run("valid events stats query should produce correct result", func(t *testing.T) {
-		sc := NewFakeClient(fakeDoer{Body: `{
+		sc := util.NewFakeClient(util.FakeDoer{Body: `{
 			"": {
 				"data": [
 					[1, [{ "count": 123.0 }]],
@@ -210,6 +203,7 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 				"meta": {}
 			}
 		}`})
+
 		query := `{
 			"queryType" : "eventsStats",
 			"projectIds" : ["project_id"],
@@ -220,23 +214,30 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 			"eventsStatsSort" : "event_sort",
 			"eventsStatsLimit" : 10
 		}`
-		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(query)}, *sc)
+
+		ds := plugin.NewDatasourceInstance(sc)
+		ctx := context.TODO()
+
+		res, _ := ds.QueryData(ctx, &backend.QueryDataRequest{Queries: []backend.DataQuery{{RefID: "A", JSON: []byte(query)}}})
 
 		// Assert that there are no errors and the data frame is correctly formed
-		assert.Nil(t, res.Error)
-		require.Equal(t, 1, len(res.Frames))
-		assert.Equal(t, "EventsStats (A)", res.Frames[0].Name)
+		assert.Nil(t, res.Responses["A"].Error)
+		require.Equal(t, 1, len(res.Responses["A"].Frames))
+		assert.Equal(t, "EventsStats (A)", res.Responses["A"].Frames[0].Name)
 
 		// Assert the content of the data frame
-		frame := res.Frames[0]
+		frame := res.Responses["A"].Frames[0]
 		require.NotNil(t, frame.Fields)
 		require.Equal(t, 2, len(frame.Fields))
 		assert.Equal(t, 2, frame.Fields[0].Len())
 		require.Equal(t, "Timestamp", frame.Fields[0].Name)
 		require.Equal(t, "", frame.Fields[1].Name)
 	})
+}
+
+func TestSentryDatasource_EventsStats(t *testing.T) {
 	t.Run("valid grouped events stats query should produce correct result", func(t *testing.T) {
-		sc := NewFakeClient(fakeDoer{Body: `{
+		sc := util.NewFakeClient(util.FakeDoer{Body: `{
 			"Group A": {
 				"data": [
 					[1, [{ "count": 123.0 }]],
@@ -256,6 +257,7 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 				"meta": {}
 			}
 		}`})
+
 		query := `{
 			"queryType" : "eventsStats",
 			"projectIds" : ["project_id"],
@@ -266,25 +268,30 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 			"eventsStatsSort" : "event_sort",
 			"eventsStatsLimit" : 10
 		}`
-		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(query)}, *sc)
+
+		ds := plugin.NewDatasourceInstance(sc)
+		ctx := context.TODO()
+
+		res, _ := ds.QueryData(ctx, &backend.QueryDataRequest{Queries: []backend.DataQuery{{RefID: "A", JSON: []byte(query)}}})
 
 		// Assert that there are no errors and the data frame is correctly formed
-		assert.Nil(t, res.Error)
-		require.Equal(t, 1, len(res.Frames))
-		assert.Equal(t, "EventsStats (A)", res.Frames[0].Name)
+		assert.Nil(t, res.Responses["A"].Error)
+		require.Equal(t, 1, len(res.Responses["A"].Frames))
+		assert.Equal(t, "EventsStats (A)", res.Responses["A"].Frames[0].Name)
 
 		// Assert the content of the data frame
-		frame := res.Frames[0]
+		frame := res.Responses["A"].Frames[0]
 		require.NotNil(t, frame.Fields)
 		require.Equal(t, 3, len(frame.Fields))
 		assert.Equal(t, 2, frame.Fields[0].Len())
-		labels := GetFrameLabels(frame)
+		labels := framer.GetFrameLabels(frame)
 		assert.Contains(t, labels, "Timestamp")
 		assert.Contains(t, labels, "Group A")
 		assert.Contains(t, labels, "Group B")
 	})
+
 	t.Run("valid multiple yAxis events stats query should produce correct result", func(t *testing.T) {
-		sc := NewFakeClient(fakeDoer{Body: `{
+		sc := util.NewFakeClient(util.FakeDoer{Body: `{
 			"Group A": {
 				"event_yaxis_a": {
 					"data": [
@@ -328,6 +335,7 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 				"order": 1
 			}
 		}`})
+
 		query := `{
 			"queryType" : "eventsStats",
 			"projectIds" : ["project_id"],
@@ -338,27 +346,32 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 			"eventsStatsSort" : "event_sort",
 			"eventsStatsLimit" : 10
 		}`
-		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(query)}, *sc)
+
+		ds := plugin.NewDatasourceInstance(sc)
+		ctx := context.TODO()
+
+		res, _ := ds.QueryData(ctx, &backend.QueryDataRequest{Queries: []backend.DataQuery{{RefID: "A", JSON: []byte(query)}}})
 
 		// Assert that there are no errors and the data frame is correctly formed
-		assert.Nil(t, res.Error)
-		require.Equal(t, 1, len(res.Frames))
-		assert.Equal(t, "EventsStats (A)", res.Frames[0].Name)
+		assert.Nil(t, res.Responses["A"].Error)
+		require.Equal(t, 1, len(res.Responses["A"].Frames))
+		assert.Equal(t, "EventsStats (A)", res.Responses["A"].Frames[0].Name)
 
 		// Assert the content of the data frame
-		frame := res.Frames[0]
+		frame := res.Responses["A"].Frames[0]
 		require.NotNil(t, frame.Fields)
 		require.Equal(t, 5, len(frame.Fields))
 		assert.Equal(t, 2, frame.Fields[0].Len())
-		labels := GetFrameLabels(frame)
+		labels := framer.GetFrameLabels(frame)
 		assert.Contains(t, labels, "Timestamp")
 		assert.Contains(t, labels, "Group A: event_yaxis_a")
 		assert.Contains(t, labels, "Group A: event_yaxis_b")
 		assert.Contains(t, labels, "Group B: event_yaxis_a")
 		assert.Contains(t, labels, "Group B: event_yaxis_b")
 	})
+
 	t.Run("events stats with null values should be handled gracefully", func(t *testing.T) {
-		sc := NewFakeClient(fakeDoer{Body: `{
+		sc := util.NewFakeClient(util.FakeDoer{Body: `{
 			"data": [
 				[1, [{ "count": null }]],
 				[2, [{ "count": 234.0 }]]
@@ -377,6 +390,7 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 				"dataset": "discover"
 			}
 		}`})
+
 		query := `{
 			"queryType" : "eventsStats",
 			"projectIds" : ["project_id"],
@@ -387,13 +401,17 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 			"eventsStatsSort" : "event_sort",
 			"eventsStatsLimit" : 10
 		}`
-		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(query)}, *sc)
+
+		ds := plugin.NewDatasourceInstance(sc)
+		ctx := context.TODO()
+
+		res, _ := ds.QueryData(ctx, &backend.QueryDataRequest{Queries: []backend.DataQuery{{RefID: "A", JSON: []byte(query)}}})
 
 		// Assert that there are no errors and the data frame is correctly formed
-		assert.Nil(t, res.Error)
+		assert.Nil(t, res.Responses["A"].Error)
 
 		// Assert the content of the data frame
-		frame := res.Frames[0]
+		frame := res.Responses["A"].Frames[0]
 		firstValue, _ := frame.Fields[1].NullableFloatAt(0)
 		secondValue, _ := frame.Fields[1].NullableFloatAt(1)
 		require.Nil(t, firstValue)
@@ -401,7 +419,7 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 	})
 
 	t.Run("stats query with incorrect interval by should throw error", func(t *testing.T) {
-		sc := NewFakeClient(fakeDoer{Body: `{
+		sc := util.NewFakeClient(util.FakeDoer{Body: `{
 			"start":"2021-07-15T15:00:00Z",
 			"end":"2021-10-13T15:59:00Z",
 			"intervals": ["2021-07-15T15:00:00Z","2021-07-15T15:30:00Z"],
@@ -409,17 +427,22 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 				{ "by": {}, "series": { "sum(quantity)" : [ 11, 22 ]} }
 			]
 		}`})
-		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(`{
+
+		ds := plugin.NewDatasourceInstance(sc)
+		ctx := context.TODO()
+
+		res, _ := ds.QueryData(ctx, &backend.QueryDataRequest{Queries: []backend.DataQuery{{RefID: "A", JSON: []byte(`{
 			"queryType" : "statsV2",
 			"statsFields" : ["sum(quantity)"],
 			"statsCategory" : ["error"],
 			"statsInterval": "30mins"
-		}`)}, *sc)
-		assert.NotNil(t, res.Error)
-		assert.Equal(t, `"interval" should be in the format [number][unit] where unit is one of m/h/d/w`, res.Error.Error())
+		}`)}}})
+
+		assert.NotNil(t, res.Responses["A"].Error)
+		assert.Equal(t, `"interval" should be in the format [number][unit] where unit is one of m/h/d/w`, res.Responses["A"].Error.Error())
 	})
 	t.Run("valid stats query with valid interval by should produce correct result", func(t *testing.T) {
-		sc := NewFakeClient(fakeDoer{Body: `{
+		sc := util.NewFakeClient(util.FakeDoer{Body: `{
 			"start":"2021-07-15T15:00:00Z",
 			"end":"2021-10-13T15:59:00Z",
 			"intervals": ["2021-07-15T15:00:00Z","2021-07-15T15:30:00Z"],
@@ -427,23 +450,31 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 				{ "by": {}, "series": { "sum(quantity)" : [ 11, 22 ]} }
 			]
 		}`})
-		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(`{
+
+		ds := plugin.NewDatasourceInstance(sc)
+		ctx := context.TODO()
+
+		res, _ := ds.QueryData(ctx, &backend.QueryDataRequest{Queries: []backend.DataQuery{{RefID: "A", JSON: []byte(`{
 			"queryType" : "statsV2",
 			"statsFields" : ["sum(quantity)"],
 			"statsCategory" : ["error"],
 			"statsInterval": "30m"
-		}`)}, *sc)
-		assert.Nil(t, res.Error)
-		require.Equal(t, 1, len(res.Frames))
-		assert.Equal(t, "Stats (A)", res.Frames[0].Name)
-		require.Equal(t, 2, len(res.Frames[0].Fields))
-		require.Equal(t, 2, res.Frames[0].Fields[0].Len())
-		require.Equal(t, "Timestamp", res.Frames[0].Fields[0].Name)
-		require.Equal(t, "Sum (Quantity)", res.Frames[0].Fields[1].Name)
-		require.Equal(t, "", res.Frames[0].Fields[1].Labels.String())
+		}`)}}})
+
+		assert.Nil(t, res.Responses["A"].Error)
+		require.Equal(t, 1, len(res.Responses["A"].Frames))
+		assert.Equal(t, "Stats (A)", res.Responses["A"].Frames[0].Name)
+		require.Equal(t, 2, len(res.Responses["A"].Frames[0].Fields))
+		require.Equal(t, 2, res.Responses["A"].Frames[0].Fields[0].Len())
+		require.Equal(t, "Timestamp", res.Responses["A"].Frames[0].Fields[0].Name)
+		require.Equal(t, "Sum (Quantity)", res.Responses["A"].Frames[0].Fields[1].Name)
+		require.Equal(t, "", res.Responses["A"].Frames[0].Fields[1].Labels.String())
 	})
+}
+
+func TestSentryDatasource_Metrics(t *testing.T) {
 	t.Run("valid metrics query should produce correct result", func(t *testing.T) {
-		sc := NewFakeClient(fakeDoer{Body: `{
+		sc := util.NewFakeClient(util.FakeDoer{Body: `{
 			"start": "2021-07-15T15:00:00Z",
 			"end": "2021-10-13T15:59:00Z",
 			"intervals": ["2021-07-15T15:00:00Z", "2021-07-15T15:30:00Z"],
@@ -451,6 +482,7 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 			"meta": [],
 			"query": ""
 		}`})
+
 		query := `{
 			"queryType" : "metrics",
 			"projectIds" : ["project_id"],
@@ -458,39 +490,45 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 			"metricsQuery" : "metrics_query",
 			"metricsField" : "metrics_field"
 		}`
-		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(query)}, *sc)
+
+		ds := plugin.NewDatasourceInstance(sc)
+		ctx := context.TODO()
+
+		res, _ := ds.QueryData(ctx, &backend.QueryDataRequest{Queries: []backend.DataQuery{{RefID: "A", JSON: []byte(query)}}})
 
 		// Assert that there are no errors and the data frame is correctly formed
-		assert.Nil(t, res.Error)
-		require.Equal(t, 1, len(res.Frames))
-		assert.Equal(t, "Metrics (A)", res.Frames[0].Name)
+		assert.Nil(t, res.Responses["A"].Error)
+		require.Equal(t, 1, len(res.Responses["A"].Frames))
+		assert.Equal(t, "Metrics (A)", res.Responses["A"].Frames[0].Name)
 
 		// Assert the content of the data frame
-		frame := res.Frames[0]
+		frame := res.Responses["A"].Frames[0]
 		require.NotNil(t, frame.Fields)
 		require.Equal(t, 2, len(frame.Fields))
 		assert.Equal(t, 2, frame.Fields[0].Len())
 		require.Equal(t, "Timestamp", frame.Fields[0].Name)
 		require.Equal(t, "session.crash_rate", frame.Fields[1].Name)
 	})
+
 	t.Run("grouped metrics query should handle null values", func(t *testing.T) {
-		sc := NewFakeClient(fakeDoer{Body: `{
+		sc := util.NewFakeClient(util.FakeDoer{Body: `{
 			"start": "2021-07-15T15:00:00Z",
 			"end": "2021-10-13T15:59:00Z",
 			"intervals": ["2021-07-15T15:00:00Z", "2021-07-15T15:30:00Z"],
 			"groups":[
-				{ 
-					"by": { "release": "version-1.0" }, 
+				{
+					"by": { "release": "version-1.0" },
 					"series": { "count_unique(sentry.sessions.user)" : [ 0.0002941324772677614, 0.0002764405454278872 ] }
 				},
-				{ 
-					"by": { "release": "version-1.1" }, 
+				{
+					"by": { "release": "version-1.1" },
 					"series": { "count_unique(sentry.sessions.user)" : [ null, 0.0002764405454278872 ] }
 				}
 			],
 			"meta": [],
 			"query": "metrics_query"
 		}`})
+
 		query := `{
 			"queryType" : "metrics",
 			"projectIds" : ["project_id"],
@@ -502,19 +540,23 @@ func TestSentryDatasource_QueryData(t *testing.T) {
 			"metricsOrder" : "metrics_order",
 			"metricsLimit" : 5
 		}`
-		res := plugin.QueryData(context.Background(), backend.PluginContext{}, backend.DataQuery{RefID: "A", JSON: []byte(query)}, *sc)
+
+		ds := plugin.NewDatasourceInstance(sc)
+		ctx := context.TODO()
+
+		res, _ := ds.QueryData(ctx, &backend.QueryDataRequest{Queries: []backend.DataQuery{{RefID: "A", JSON: []byte(query)}}})
 
 		// Assert that there are no errors and the data frame is correctly formed
-		assert.Nil(t, res.Error)
-		require.Equal(t, 1, len(res.Frames))
-		assert.Equal(t, "Metrics (A)", res.Frames[0].Name)
+		assert.Nil(t, res.Responses["A"].Error)
+		require.Equal(t, 1, len(res.Responses["A"].Frames))
+		assert.Equal(t, "Metrics (A)", res.Responses["A"].Frames[0].Name)
 
 		// Assert the content of the data frame
-		frame := res.Frames[0]
+		frame := res.Responses["A"].Frames[0]
 		require.NotNil(t, frame.Fields)
 		require.Equal(t, 3, len(frame.Fields))
 		assert.Equal(t, 2, frame.Fields[0].Len())
-		labels := GetFrameLabels(frame)
+		labels := framer.GetFrameLabels(frame)
 		assert.Contains(t, labels, "Timestamp")
 		assert.Contains(t, labels, "version-1.0")
 		assert.Contains(t, labels, "version-1.1")

@@ -1,7 +1,6 @@
-package plugin
+package util
 
 const (
-	PluginID                     string = "grafana-sentry-datasource"
 	SuccessfulHealthCheckMessage string = "plugin health check successful"
 	DefaultSentryURL             string = "https://sentry.io"
 )

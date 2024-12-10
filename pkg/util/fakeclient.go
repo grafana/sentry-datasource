@@ -1,4 +1,4 @@
-package plugin_test
+package util
 
 import (
 	"bytes"
@@ -14,7 +14,7 @@ const fakeSentryOrg string = "foo"
 const fakeSentryAuthToken string = "fake-token"
 const fakeResponseBody string = "{}"
 
-type fakeDoer struct {
+type FakeDoer struct {
 	Body               string
 	AuthToken          string
 	ExpectedError      error
@@ -22,7 +22,7 @@ type fakeDoer struct {
 	ExpectedStatus     string
 }
 
-func (fd *fakeDoer) Do(req *http.Request) (*http.Response, error) {
+func (fd *FakeDoer) Do(req *http.Request) (*http.Response, error) {
 	res := &http.Response{
 		StatusCode: http.StatusOK,
 		Status:     "200 OK",
@@ -51,7 +51,7 @@ func (fd *fakeDoer) Do(req *http.Request) (*http.Response, error) {
 	return nil, errors.New("fake client not implemented")
 }
 
-func NewFakeClient(props fakeDoer) *sentry.SentryClient {
+func NewFakeClient(props FakeDoer) *sentry.SentryClient {
 	sc, _ := sentry.NewSentryClient(fakeSentryUrl, fakeSentryOrg, fakeSentryAuthToken, &props)
 	return sc
 }
