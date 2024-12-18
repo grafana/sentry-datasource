@@ -14,6 +14,7 @@ type SentryIssue struct {
 	Count       string    `json:"count"`
 	UserCount   int64     `json:"userCount"`
 	Status      string    `json:"status"`
+	Substatus   string    `json:"substatus"`
 	Level       string    `json:"level"`
 	Type        string    `json:"type"`
 	Platform    string    `json:"platform"`
