@@ -15,6 +15,10 @@ export const EventsEditor = ({ query, onChange, onRunQuery }: EventsEditorProps)
   const onEventsQueryChange = (eventsQuery: string) => {
     onChange({ ...query, eventsQuery });
   };
+  const onEventsExtraFieldsChange = (eventsExtraFields: string[]) => {
+    onChange({ ...query, eventsExtraFields });
+    onRunQuery();
+  };
   const onEventsSortChange = (eventsSort: SentryEventSort) => {
     onChange({ ...query, eventsSort: eventsSort });
     onRunQuery();
@@ -36,6 +40,28 @@ export const EventsEditor = ({ query, onChange, onRunQuery }: EventsEditorProps)
             onRunQuery={onRunQuery}
             placeholder={selectors.components.QueryEditor.Events.Query.placeholder}
             portalOrigin="Sentry"
+          />
+        </EditorField>
+      </EditorRow>
+      <EditorRow>
+        <EditorField
+          tooltip={selectors.components.QueryEditor.Events.ExtraFields.tooltip}
+          label={selectors.components.QueryEditor.Events.ExtraFields.label}
+          width={'100%'}
+        >
+          <Select
+            isMulti={true}
+            options={query.eventsExtraFields?.map(field => ({ label: field, value: field })) || []}
+            value={query.eventsExtraFields?.map(field => ({ label: field, value: field })) || []}
+            onChange={(values) => onEventsExtraFieldsChange(
+              (values || []).map((v: { value: string }) => v.value)
+                .filter((v: unknown): v is string => v !== undefined)
+            )}
+            allowCustomValue={true}
+            placeholder={selectors.components.QueryEditor.Events.ExtraFields.placeholder}
+            width={'auto'}
+            maxVisibleValues={20}
+            showAllSelectedWhenOpen={true}
           />
         </EditorField>
       </EditorRow>
