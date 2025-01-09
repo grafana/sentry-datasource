@@ -69,9 +69,9 @@ export const Components = {
       },
     },
     Events: {
-      ExtraFields: {
-        label: 'ExtraFields',
-        tooltip: 'Sentry extra field names to fetch',
+      Fields: {
+        label: 'Fields',
+        tooltip: 'Sentry field names to fetch',
         placeholder: 'Enter a Sentry field name',
       },
       Query: {

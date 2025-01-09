@@ -65,7 +65,7 @@ export type SentryEventsQuery = {
   projectIds: string[];
   environments: string[];
   eventsQuery: string;
-  eventsExtraFields?: string[];
+  eventsFields?: string[];
   eventsSort?: SentryEventSort;
   eventsLimit?: number;
 } & SentryQueryBase<'events'>;
