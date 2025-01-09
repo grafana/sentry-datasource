@@ -11,30 +11,12 @@ type GetEventsInput struct {
 	OrganizationSlug string
 	ProjectIds       []string
 	Environments     []string
-	ExtraFields      []string
+	Fields           []string
 	Query            string
 	From             time.Time
 	To               time.Time
 	Sort             string
 	Limit            int64
-}
-
-// getRequiredFields returns the list of fields that are required to be fetched
-// from the sentry API. This is used to build the query string.
-func getRequiredFields() []string {
-	return []string{
-		"id",
-		"title",
-		"project",
-		"project.id",
-		"release",
-		"count()",
-		"epm()",
-		"last_seen()",
-		"level",
-		"event.type",
-		"platform",
-	}
 }
 
 func (gei *GetEventsInput) ToQuery() string {
@@ -50,10 +32,7 @@ func (gei *GetEventsInput) ToQuery() string {
 		params.Set("sort", gei.Sort)
 	}
 	params.Set("per_page", strconv.FormatInt(gei.Limit, 10))
-	for _, field := range getRequiredFields() {
-		params.Add("field", field)
-	}
-	for _, field := range gei.ExtraFields {
+	for _, field := range gei.Fields {
 		params.Add("field", field)
 	}
 	for _, projectId := range gei.ProjectIds {

@@ -11,12 +11,42 @@ interface EventsEditorProps {
   onRunQuery: () => void;
 }
 
+// A list of fields that are to be fetched from the sentry API. 
+// This is used to build the default query string.
+const DEFAULT_FIELDS = [
+  'id',
+  'title',
+  'project',
+  'project.id',
+  'release',
+  'count()',
+  'epm()',
+  'last_seen()',
+  'level',
+  'event.type',
+  'platform'
+];
+
+const fieldOptions = DEFAULT_FIELDS.map(field => ({
+  label: field,
+  value: field
+}));
+
 export const EventsEditor = ({ query, onChange, onRunQuery }: EventsEditorProps) => {
+  const [customOptions, setCustomOptions] = React.useState<Array<{ label: string, value: string }>>([]);
+  if (!query.eventsFields) {
+    onChange({
+      ...query,
+      eventsFields: DEFAULT_FIELDS
+    });
+    onRunQuery();
+  }
+
   const onEventsQueryChange = (eventsQuery: string) => {
     onChange({ ...query, eventsQuery });
   };
-  const onEventsExtraFieldsChange = (eventsExtraFields: string[]) => {
-    onChange({ ...query, eventsExtraFields });
+  const onEventsFieldsChange = (eventsFields: string[]) => {
+    onChange({ ...query, eventsFields: eventsFields });
     onRunQuery();
   };
   const onEventsSortChange = (eventsSort: SentryEventSort) => {
@@ -45,20 +75,28 @@ export const EventsEditor = ({ query, onChange, onRunQuery }: EventsEditorProps)
       </EditorRow>
       <EditorRow>
         <EditorField
-          tooltip={selectors.components.QueryEditor.Events.ExtraFields.tooltip}
-          label={selectors.components.QueryEditor.Events.ExtraFields.label}
+          tooltip={selectors.components.QueryEditor.Events.Fields.tooltip}
+          label={selectors.components.QueryEditor.Events.Fields.label}
           width={'100%'}
         >
           <Select
             isMulti={true}
-            options={query.eventsExtraFields?.map(field => ({ label: field, value: field })) || []}
-            value={query.eventsExtraFields?.map(field => ({ label: field, value: field })) || []}
-            onChange={(values) => onEventsExtraFieldsChange(
+            options={[...fieldOptions, ...customOptions]}
+            value={query.eventsFields?.map(field => ({ label: field, value: field })) || []}
+            onChange={(values) => onEventsFieldsChange(
               (values || []).map((v: { value: string }) => v.value)
-                .filter((v: unknown): v is string => v !== undefined)
+                .filter(Boolean)
             )}
             allowCustomValue={true}
-            placeholder={selectors.components.QueryEditor.Events.ExtraFields.placeholder}
+            onCreateOption={(v) => {
+              const customValue = { label: v, value: v };
+              setCustomOptions([...customOptions, customValue]);
+              onEventsFieldsChange([
+                ...(query.eventsFields || []),
+                v
+              ]);
+            }}
+            placeholder={selectors.components.QueryEditor.Events.Fields.placeholder}
             width={'auto'}
             maxVisibleValues={20}
             showAllSelectedWhenOpen={true}
