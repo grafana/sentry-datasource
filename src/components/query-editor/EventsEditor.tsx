@@ -52,6 +52,7 @@ export const EventsEditor = ({ query, onChange, onRunQuery }: EventsEditorProps)
               onChange={(e) => onEventsSortChange(e?.value!)}
               className="inline-element"
               placeholder={selectors.components.QueryEditor.Events.Sort.placeholder}
+              allowCustomValue={true}
               isClearable={true}
             />
           </EditorField>
