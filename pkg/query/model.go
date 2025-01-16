@@ -8,6 +8,7 @@ type SentryQuery struct {
 	IssuesSort        string   `json:"issuesSort,omitempty"`
 	IssuesLimit       int64    `json:"issuesLimit,omitempty"`
 	EventsQuery       string   `json:"eventsQuery,omitempty"`
+	EventsFields      []string `json:"eventsFields,omitempty"`
 	EventsSort        string   `json:"eventsSort,omitempty"`
 	EventsLimit       int64    `json:"eventsLimit,omitempty"`
 	EventsStatsQuery  string   `json:"eventsStatsQuery,omitempty"`

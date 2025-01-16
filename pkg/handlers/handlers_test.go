@@ -168,6 +168,7 @@ func TestSentryDatasource_Events(t *testing.T) {
 			"projectIds" : ["project_id"],
 			"environments" : ["dev"],
 			"eventsQuery" : "event_query",
+			"eventsFields" : ["id","title","message","project.name","release"],
 			"eventsSort" : "event_sort",
 			"eventsLimit" : 10
 		}`
@@ -185,10 +186,11 @@ func TestSentryDatasource_Events(t *testing.T) {
 		// Assert the content of the data frame
 		frame := res.Responses["A"].Frames[0]
 		require.NotNil(t, frame.Fields)
-		require.Equal(t, 11, len(frame.Fields))
+		require.Equal(t, 4, len(frame.Fields))
 		assert.Equal(t, 3, frame.Fields[0].Len())
-		require.Equal(t, "ID", frame.Fields[0].Name)
-		require.Equal(t, "Title", frame.Fields[1].Name)
+		require.Equal(t, "id", frame.Fields[0].Name)
+		require.Equal(t, "message", frame.Fields[1].Name)
+		require.Contains(t, frame.Meta.ExecutedQueryString, "release")
 	})
 
 	t.Run("valid events stats query should produce correct result", func(t *testing.T) {
