@@ -26,7 +26,7 @@ func TestSentryDatasource_Issues(t *testing.T) {
 		assert.Nil(t, res.Responses["A"].Error)
 		require.Equal(t, 1, len(res.Responses["A"].Frames))
 		assert.Equal(t, "Issues (A)", res.Responses["A"].Frames[0].Name)
-		require.Equal(t, 32, len(res.Responses["A"].Frames[0].Fields))
+		require.Equal(t, 33, len(res.Responses["A"].Frames[0].Fields))
 		require.Equal(t, 3, res.Responses["A"].Frames[0].Fields[0].Len())
 	})
 }
