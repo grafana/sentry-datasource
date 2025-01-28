@@ -27,7 +27,7 @@
     "@emotion/css": "11.11.2",
     "@grafana/data": "10.4.2",
     "@grafana/experimental": "^1.7.10",
-    "@playwright/test": "^1.42.1",
+    "@playwright/test": "^1.50.0",
     "@grafana/runtime": "10.4.2",
     "@grafana/schema": "10.4.2",
     "@grafana/ui": "10.4.2",
