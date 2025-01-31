@@ -80,7 +80,7 @@
     "webpack-livereload-plugin": "^3.0.2"
   },
   "resolutions": {
-    "rxjs": "6.3.3",
+    "rxjs": "7.8.1",
     "jackspeak": "2.1.1"
   },
   "packageManager": "yarn@1.22.19"
