@@ -1,22 +1,29 @@
 # Changelog
 
+## 1.9.0 (2025-02-19)
+
+- Make substatus data available ([#393](https://github.com/grafana/sentry-datasource/pull/393))
+- Allow sorting Events by a custom field ([#403](https://github.com/grafana/sentry-datasource/pull/403))
+- Migrate from `@grafana/experimental` to `@grafana/plugin-ui` ([#415](https://github.com/grafana/sentry-datasource/pull/415))
+- Dependency updates
+
 ## 1.8.5 (2024-11-28)
 
 - Dependency updates
-  
+
 ## 1.8.4 (2024-11-07)
 
 - Dependency updates
-  
+
 ## 1.8.3 (2024-09-26)
 
 - Dependency updates
-  
+
 ## 1.8.2 (2024-08-28)
 
 - Add `errorsource` support ([#313](https://github.com/grafana/sentry-datasource/pull/313))
 - Dependency updates
-  
+
 ## 1.8.1 (2024-08-09)
 
 - Fix timerange bug with Event Stats query ([#279](https://github.com/grafana/sentry-datasource/pull/279))
@@ -37,7 +44,7 @@
 ## 1.6.0 (2024-03-22)
 
 - Dependency updates
-  
+
 ## 1.5.0 (2023-12-11)
 
 - Add interval to statsV2
