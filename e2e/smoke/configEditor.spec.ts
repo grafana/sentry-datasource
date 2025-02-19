@@ -2,7 +2,7 @@ import { expect, test } from '@grafana/plugin-e2e';
 import { Components } from '../../src/selectors';
 
 test.describe('Create Sentry datasource - smoke', () => {
-  test('renders the config editor', async ({ createDataSourceConfigPage, page, readProvisionedDataSource }) => {
+  test('renders the config editor', async ({ createDataSourceConfigPage, page }) => {
     const configPage = await createDataSourceConfigPage({
       type: 'grafana-sentry-datasource',
     });

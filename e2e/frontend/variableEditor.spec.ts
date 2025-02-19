@@ -6,7 +6,7 @@ import { SentryConfig, SentrySecureConfig } from '../../src/types';
 test.describe('Sentry variables', () => {
   test('add and edit variables', async ({ variableEditPage, page, readProvisionedDataSource }) => {
     const datasource = await readProvisionedDataSource<SentryConfig, SentrySecureConfig>({
-      fileName: 'adx.yaml',
+      fileName: 'sentry.yaml',
     });
     await variableEditPage.datasource.set(datasource.name);
     await page.keyboard.press('Enter');

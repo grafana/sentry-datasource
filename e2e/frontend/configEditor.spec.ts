@@ -37,8 +37,8 @@ test.describe('Test config editor', () => {
     gotoDataSourceConfigPage,
   }) => {
     const datasource = await readProvisionedDataSource<SentryConfig, SentrySecureConfig>({
-      fileName: 'adx.yaml',
-      name: 'Azure Data Explorer',
+      fileName: 'sentry.yaml',
+      name: 'Sentry',
     });
     const configPage = await gotoDataSourceConfigPage(datasource.uid);
     configPage.mockHealthCheckResponse({ status: 200 });
