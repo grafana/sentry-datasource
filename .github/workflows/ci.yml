@@ -135,21 +135,11 @@ jobs:
           unzip ${{ needs.build.outputs.archive }}
           mv ${{ needs.build.outputs.plugin-id }} dist
 
-      - name: Get secrets
-        id: get-secrets
-        uses: grafana/shared-workflows/actions/get-vault-secrets@main
-        with:
-          repo_secrets: |
-            TENANT_ID=e2e:tenantId
-            CLIENT_ID=e2e:clientId
-            CLIENT_SECRET=e2e:clientSecret
-            CLUSTER_URL=e2e:clusterUrl
-
       - name: Start Grafana
         shell: bash
         run: |
           docker compose pull
-          TENANT_ID=${{ env.TENANT_ID}} CLIENT_ID=${{ env.CLIENT_ID}} CLIENT_SECRET=${{ env.CLIENT_SECRET}} CLUSTER_URL=${{ env.CLUSTER_URL}} docker compose up --detach --wait --wait-timeout 60
+          docker compose up --detach --wait --wait-timeout 60
         env:
           GRAFANA_IMAGE: ${{ matrix.GRAFANA_IMAGE.NAME }}
           GRAFANA_VERSION: ${{ matrix.GRAFANA_IMAGE.VERSION }}
