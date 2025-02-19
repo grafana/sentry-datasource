@@ -158,7 +158,8 @@ export const Components = {
       Interval: {
         label: 'Interval',
         tooltip: 'interval',
-        placeholder: 'Optional. Enter the interval to group the results (expected format `[number][unit]` where unit is `m` for minutes, `h` for hours, `d` for days, or `w` for weeks)',
+        placeholder:
+          'Optional. Enter the interval to group the results (expected format `[number][unit]` where unit is `m` for minutes, `h` for hours, `d` for days, or `w` for weeks)',
       },
       Category: {
         label: 'Category Filter',
@@ -186,6 +187,7 @@ export const Components = {
       label: 'Query Type',
       tooltip: 'Choose query type to get the relevant filters and results',
       id: 'data-testid variable-query-editor-query-type-select',
+      selectorTestId: 'data-testid query-type-dropdown',
     },
     Organization: {
       label: 'Organization',
