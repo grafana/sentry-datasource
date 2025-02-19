@@ -139,7 +139,7 @@ jobs:
         shell: bash
         run: |
           docker compose pull
-          docker compose up --detach --wait --wait-timeout 60
+          ORG_SLUG=org-slug AUTH_TOKEN=token  docker compose up --detach --wait --wait-timeout 60
         env:
           GRAFANA_IMAGE: ${{ matrix.GRAFANA_IMAGE.NAME }}
           GRAFANA_VERSION: ${{ matrix.GRAFANA_IMAGE.VERSION }}
