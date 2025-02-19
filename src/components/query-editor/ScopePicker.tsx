@@ -7,7 +7,7 @@ import { replaceProjectIDs } from './../../app/replace';
 import { selectors } from './../../selectors';
 import type { QueryEditorProps, SelectableValue } from '@grafana/data';
 import type { SentryConfig, SentryProject, SentryQuery } from './../../types';
-import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/experimental';
+import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/plugin-ui';
 
 type ScopePickerProps = { hideEnvironments?: boolean } & Pick<
   QueryEditorProps<SentryDataSource, SentryQuery, SentryConfig>,

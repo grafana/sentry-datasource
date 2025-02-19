@@ -5,7 +5,7 @@ import { selectors } from './../../selectors';
 import { QueryTypeOptions } from '../../constants';
 import type { QueryEditorProps } from '@grafana/data';
 import type { SentryConfig, SentryQuery, QueryType } from './../../types';
-import { EditorField, EditorRow } from '@grafana/experimental';
+import { EditorField, EditorRow } from '@grafana/plugin-ui';
 
 type QueryTypePickerProps = Pick<
   QueryEditorProps<SentryDataSource, SentryQuery, SentryConfig>,

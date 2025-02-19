@@ -10,7 +10,10 @@
     "pkg/**/*_test.go",
     "mage_output_file.go",
     "src/**/*.{test,spec}.{ts,tsx}",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "e2e",
+    "playwright-report",
+    "package.json"
   ],
   "words": [
     "DataSource",

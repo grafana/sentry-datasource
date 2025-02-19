@@ -2,7 +2,7 @@ import React from 'react';
 import { Input, QueryField, TagsInput } from '@grafana/ui';
 import { selectors } from '../../selectors';
 import type { SentryEventsStatsQuery } from '../../types';
-import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/experimental';
+import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/plugin-ui';
 
 interface EventsStatsEditorProps {
   query: SentryEventsStatsQuery;

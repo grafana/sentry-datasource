@@ -9,7 +9,7 @@ import { StatsV2Editor } from './../components/query-editor/StatsV2Editor';
 import type { QueryEditorProps } from '@grafana/data';
 import type { SentryConfig, SentryQuery } from './../types';
 import './../styles/editor.scss';
-import { EditorRows } from '@grafana/experimental';
+import { EditorRows } from '@grafana/plugin-ui';
 import { EventsStatsEditor } from 'components/query-editor/EventsStatsEditor';
 import { MetricsEditor } from 'components/query-editor/MetricsEditor';
 
