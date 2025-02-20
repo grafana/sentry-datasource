@@ -3,7 +3,7 @@ import { Input, QueryField, Select } from '@grafana/ui';
 import { selectors } from '../../selectors';
 import { SentryEventSortOptions } from '../../constants';
 import type { SentryEventSort, SentryEventsQuery } from '../../types';
-import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/experimental';
+import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/plugin-ui';
 
 interface EventsEditorProps {
   query: SentryEventsQuery;

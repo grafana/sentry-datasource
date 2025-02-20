@@ -3,7 +3,7 @@ import { Field, Input, Button } from '@grafana/ui';
 import { Components } from './../selectors';
 import { DEFAULT_SENTRY_URL } from './../constants';
 
-import { DataSourceDescription, ConfigSection } from '@grafana/experimental';
+import { DataSourceDescription, ConfigSection } from '@grafana/plugin-ui';
 import type { DataSourcePluginOptionsEditorProps } from '@grafana/data';
 
 import type { SentryConfig, SentrySecureConfig } from './../types';

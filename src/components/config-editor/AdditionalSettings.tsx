@@ -1,6 +1,6 @@
 import React from 'react';
 import { config } from '@grafana/runtime';
-import { ConfigSection } from '@grafana/experimental';
+import { ConfigSection } from '@grafana/plugin-ui';
 import { Field, Switch } from '@grafana/ui';
 
 import { Components } from '../../selectors';

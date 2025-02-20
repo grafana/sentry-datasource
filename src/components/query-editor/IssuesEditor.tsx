@@ -3,7 +3,7 @@ import { Input, QueryField, Select } from '@grafana/ui';
 import { selectors } from '../../selectors';
 import { SentryIssueSortOptions } from '../../constants';
 import type { SentryIssueSort, SentryIssuesQuery } from '../../types';
-import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/experimental';
+import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/plugin-ui';
 
 interface IssuesEditorProps {
   query: SentryIssuesQuery;

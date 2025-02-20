@@ -8,7 +8,7 @@ import type {
   SentryMetricsQuerySort,
   SentryMetricsQueryOrder,
 } from '../../types';
-import { EditorField, EditorRow } from '@grafana/experimental';
+import { EditorField, EditorRow } from '@grafana/plugin-ui';
 import {
   SentryMetricsQueryFieldOptions,
   SentryMetricsQueryGroupByOptions,

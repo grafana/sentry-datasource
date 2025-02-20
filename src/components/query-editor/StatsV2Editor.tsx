@@ -8,7 +8,7 @@ import {
   SentryStatsV2QueryOutcomeOptions,
 } from '../../constants';
 import type { SentryStatsV2Query } from '../../types';
-import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/experimental';
+import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/plugin-ui';
 
 interface StatsV2EditorProps {
   query: SentryStatsV2Query;
@@ -90,12 +90,7 @@ export const StatsV2Editor = ({ query, onChange, onRunQuery }: StatsV2EditorProp
             <Input
               value={query.statsInterval || ''}
               placeholder={StatsV2Selectors.Interval.placeholder}
-              onChange={(e) =>
-                onPropChange(
-                  'statsInterval',
-                  e.currentTarget.value || ''
-                )
-              }
+              onChange={(e) => onPropChange('statsInterval', e.currentTarget.value || '')}
             />
           </EditorField>
         </EditorFieldGroup>
