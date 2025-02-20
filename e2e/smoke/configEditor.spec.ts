@@ -7,8 +7,8 @@ test.describe('Create Sentry datasource - smoke', () => {
       type: 'grafana-sentry-datasource',
     });
 
-    await expect(page.getByTestId(Components.ConfigEditor.SentrySettings.URL.placeholder)).toBeVisible();
-    await expect(page.getByTestId(Components.ConfigEditor.SentrySettings.OrgSlug.placeholder)).toBeVisible();
-    await expect(page.getByTestId(Components.ConfigEditor.SentrySettings.AuthToken.placeholder)).toBeVisible();
+    await expect(page.getByPlaceholder(Components.ConfigEditor.SentrySettings.URL.placeholder)).toBeVisible();
+    await expect(page.getByPlaceholder(Components.ConfigEditor.SentrySettings.OrgSlug.placeholder)).toBeVisible();
+    await expect(page.getByPlaceholder(Components.ConfigEditor.SentrySettings.AuthToken.placeholder)).toBeVisible();
   });
 });

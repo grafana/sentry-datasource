@@ -5,7 +5,7 @@ import type { PluginOptions } from '@grafana/plugin-e2e';
 const pluginE2eAuth = `${dirname(require.resolve('@grafana/plugin-e2e'))}/auth`;
 
 export default defineConfig<PluginOptions>({
-  testDir: './e2e/frontend',
+  testDir: './e2e',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -23,7 +23,7 @@ export default defineConfig<PluginOptions>({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
-    video: 'on'
+    video: 'on',
   },
 
   /* Configure projects for major browsers */
@@ -42,6 +42,6 @@ export default defineConfig<PluginOptions>({
         storageState: 'playwright/.auth/admin.json',
       },
       dependencies: ['auth'],
-    }
+    },
   ],
 });
