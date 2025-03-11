@@ -86,7 +86,7 @@
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-jsdoc": "^50.6.4",
     "eslint-plugin-react": "^7.33.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
     "imports-loader": "^5.0.0",
     "semver": "^7.6.3",
     "terser-webpack-plugin": "^5.3.11",
