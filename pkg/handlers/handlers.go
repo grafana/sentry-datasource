@@ -15,9 +15,13 @@ func HandleIssues(client sentry.SentryClient, query query.SentryQuery, backendQu
 	if client.OrgSlug == "" {
 		return errors.GetErrorResponse(response, "", errorsource.DownstreamError(errors.ErrorInvalidOrganizationSlug, false))
 	}
+	projectId := ""
+	if len(query.ProjectIds) > 0 {
+		projectId = query.ProjectIds[0]
+	}
 	issues, executedQueryString, err := client.GetIssues(sentry.GetIssuesInput{
 		OrganizationSlug: client.OrgSlug,
-		ProjectIds:       query.ProjectIds,
+		ProjectId:        projectId,
 		Environments:     query.Environments,
 		Query:            query.IssuesQuery,
 		Sort:             query.IssuesSort,
@@ -43,9 +47,13 @@ func HandleEvents(client sentry.SentryClient, query query.SentryQuery, backendQu
 	if client.OrgSlug == "" {
 		return errors.GetErrorResponse(response, "", errorsource.DownstreamError(errors.ErrorInvalidOrganizationSlug, false))
 	}
+	projectId := ""
+	if len(query.ProjectIds) > 0 {
+		projectId = query.ProjectIds[0]
+	}
 	events, executedQueryString, err := client.GetEvents(sentry.GetEventsInput{
 		OrganizationSlug: client.OrgSlug,
-		ProjectIds:       query.ProjectIds,
+		ProjectId:        projectId,
 		Environments:     query.Environments,
 		Query:            query.EventsQuery,
 		Fields:           query.EventsFields,
