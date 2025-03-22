@@ -61,7 +61,7 @@ type SentryIssue struct {
 
 type GetIssuesInput struct {
 	OrganizationSlug string
-	ProjectIds       []string
+	ProjectId        string
 	Environments     []string
 	Query            string
 	From             time.Time
@@ -71,7 +71,7 @@ type GetIssuesInput struct {
 }
 
 func (gii *GetIssuesInput) ToQuery() string {
-	urlPath := fmt.Sprintf("/api/0/organizations/%s/issues/?", gii.OrganizationSlug)
+	urlPath := fmt.Sprintf("/api/0/projects/%s/%s/issues/?", gii.OrganizationSlug, gii.ProjectId)
 	if gii.Limit < 1 || gii.Limit > 10000 {
 		gii.Limit = 10000
 	}
@@ -83,9 +83,6 @@ func (gii *GetIssuesInput) ToQuery() string {
 		params.Set("sort", gii.Sort)
 	}
 	params.Set("limit", strconv.FormatInt(gii.Limit, 10))
-	for _, projectId := range gii.ProjectIds {
-		params.Add("project", projectId)
-	}
 	for _, environment := range gii.Environments {
 		params.Add("environment", environment)
 	}
