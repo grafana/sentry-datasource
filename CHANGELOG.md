@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.9.1 (2025-04-02)
+
+- Create plugin update, bump minimum supported Grafana version to 10.4.0 ([#452](https://github.com/grafana/sentry-datasource/pull/452))
+- Update config to support fork tests ([#438](https://github.com/grafana/sentry-datasource/pull/438))
+- Dependency updates
+
 ## 1.9.0 (2025-02-19)
 
 - Make substatus data available ([#393](https://github.com/grafana/sentry-datasource/pull/393))
