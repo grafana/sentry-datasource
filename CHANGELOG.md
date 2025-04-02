@@ -1,7 +1,8 @@
 # Changelog
 
-## 1.9.1 (2025-04-02)
+## 2.0.0 (2025-04-02)
 
+- Allow choosing fields to fetch for sentry events ([#400](https://github.com/grafana/sentry-datasource/pull/400))
 - Create plugin update, bump minimum supported Grafana version to 10.4.0 ([#452](https://github.com/grafana/sentry-datasource/pull/452))
 - Update config to support fork tests ([#438](https://github.com/grafana/sentry-datasource/pull/438))
 - Dependency updates
