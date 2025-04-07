@@ -1,4 +1,4 @@
-import type { DataSourceJsonData, DataQuery } from '@grafana/data';
+import type { DataQuery, DataSourceJsonData } from '@grafana/data';
 
 //#region Sentry Objects
 export type SentryOrganization = {
@@ -68,6 +68,7 @@ export type SentryEventsQuery = {
   eventsQuery: string;
   eventsFields?: string[];
   eventsSort?: SentryEventSort;
+  eventsSortDirection?: SentrySortDirection;
   eventsLimit?: number;
 } & SentryQueryBase<'events'>;
 export type SentryEventsStatsQuery = {
