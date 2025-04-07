@@ -3,11 +3,9 @@ import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/plugin-ui';
 import { Input, QueryField, Select } from '@grafana/ui';
 import { SentryDataSource } from 'datasource';
 import React from 'react';
-import { SentryEventSortDirectionOptions, SentryEventSortOptions } from '../../constants';
-import { selectors } from '../../selectors';
 import { SentryEventSortOptions } from '../../constants';
+import { selectors } from '../../selectors';
 import type { SentryEventSort, SentryEventsQuery } from '../../types';
-import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/plugin-ui';
 
 interface EventsEditorProps {
   query: SentryEventsQuery;

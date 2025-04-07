@@ -8,6 +8,7 @@
   "private": true,
   "scripts": {
     "build": "webpack -c ./.config/webpack/webpack.config.ts --env production",
+    "build:backend": "mage -v build:linux",
     "dev": "webpack -w -c ./.config/webpack/webpack.config.ts --env development",
     "dev_mock": "docker-compose -f docker-compose-mock.yml up",
     "e2e:playwright": "yarn playwright test",
