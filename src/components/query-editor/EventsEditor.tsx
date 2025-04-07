@@ -1,9 +1,7 @@
 import React from 'react';
 import { Input, QueryField, Select } from '@grafana/ui';
 import { selectors } from '../../selectors';
-import { SentryEventSortOptions } from '../../constants';
-import type { SentryEventSort, SentryEventsQuery } from '../../types';
-import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/plugin-ui';
+import type { SentryEventSort, SentryEventsQuery, SentrySortDirection } from '../../types';
 
 interface EventsEditorProps {
   query: SentryEventsQuery;
@@ -51,6 +49,10 @@ export const EventsEditor = ({ query, onChange, onRunQuery }: EventsEditorProps)
   };
   const onEventsSortChange = (eventsSort: SentryEventSort) => {
     onChange({ ...query, eventsSort: eventsSort });
+    onRunQuery();
+  };
+  const onEventsSortDirectionChange = (eventsSortDirection: SentrySortDirection) => {
+    onChange({ ...query, eventsSortDirection: eventsSortDirection });
     onRunQuery();
   };
   const onEventsLimitChange = (eventsLimit?: number) => {
