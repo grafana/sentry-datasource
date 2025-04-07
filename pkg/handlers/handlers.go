@@ -43,13 +43,17 @@ func HandleEvents(client sentry.SentryClient, query query.SentryQuery, backendQu
 	if client.OrgSlug == "" {
 		return errors.GetErrorResponse(response, "", errorsource.DownstreamError(errors.ErrorInvalidOrganizationSlug, false))
 	}
+	sort := query.EventsSort
+	if query.EventsSortDirection == "desc" {
+		sort = "-" + query.EventsSort
+	}
 	events, executedQueryString, err := client.GetEvents(sentry.GetEventsInput{
 		OrganizationSlug: client.OrgSlug,
 		ProjectIds:       query.ProjectIds,
 		Environments:     query.Environments,
 		Query:            query.EventsQuery,
 		Fields:           query.EventsFields,
-		Sort:             query.EventsSort,
+		Sort:             sort,
 		Limit:            query.EventsLimit,
 		From:             backendQuery.TimeRange.From,
 		To:               backendQuery.TimeRange.To,

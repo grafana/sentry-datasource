@@ -121,6 +121,20 @@ export const EventsEditor = ({ query, onChange, onRunQuery }: EventsEditorProps)
             />
           </EditorField>
           <EditorField
+            tooltip={''}
+            label={'Sort Direction'}
+          >
+            <Select
+              options={SentryEventSortDirectionOptions}
+              value={query.eventsSortDirection || 'desc'}
+              width={15}
+              onChange={(e) => onEventsSortDirectionChange(e?.value!)}
+              className="inline-element"
+              allowCustomValue={false}
+              isClearable={false}
+            />
+          </EditorField>
+          <EditorField
             tooltip={selectors.components.QueryEditor.Events.Limit.tooltip}
             label={selectors.components.QueryEditor.Events.Limit.label}
           >

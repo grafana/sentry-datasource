@@ -38,6 +38,7 @@ export type SentryTeam = {
 };
 export type SentryIssueSort = 'inbox' | 'new' | 'date' | 'priority' | 'freq' | 'user';
 export type SentryEventSort = 'last_seen()' | 'count()' | 'epm()' | 'failure_rate()' | 'level';
+export type SentrySortDirection = 'asc' | 'desc';
 //#endregion
 
 //#region Config
