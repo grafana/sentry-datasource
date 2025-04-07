@@ -44,7 +44,7 @@ func HandleEvents(client sentry.SentryClient, query query.SentryQuery, backendQu
 		return errors.GetErrorResponse(response, "", errorsource.DownstreamError(errors.ErrorInvalidOrganizationSlug, false))
 	}
 	sort := query.EventsSort
-	if query.EventsSortDirection == "desc" {
+	if query.EventsSort != "" && query.EventsSortDirection == "desc" {
 		sort = "-" + query.EventsSort
 	}
 	events, executedQueryString, err := client.GetEvents(sentry.GetEventsInput{

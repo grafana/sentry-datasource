@@ -1,5 +1,7 @@
-import React from 'react';
+import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/plugin-ui';
 import { Input, QueryField, Select } from '@grafana/ui';
+import React from 'react';
+import { SentryEventSortDirectionOptions, SentryEventSortOptions } from '../../constants';
 import { selectors } from '../../selectors';
 import type { SentryEventSort, SentryEventsQuery, SentrySortDirection } from '../../types';
 
@@ -47,7 +49,7 @@ export const EventsEditor = ({ query, onChange, onRunQuery }: EventsEditorProps)
     onChange({ ...query, eventsFields: eventsFields });
     onRunQuery();
   };
-  const onEventsSortChange = (eventsSort: SentryEventSort) => {
+  const onEventsSortChange = (eventsSort: SentryEventSort | undefined) => {
     onChange({ ...query, eventsSort: eventsSort });
     onRunQuery();
   };
@@ -122,20 +124,22 @@ export const EventsEditor = ({ query, onChange, onRunQuery }: EventsEditorProps)
               isClearable={true}
             />
           </EditorField>
-          <EditorField
-            tooltip={''}
-            label={'Sort Direction'}
-          >
-            <Select
-              options={SentryEventSortDirectionOptions}
-              value={query.eventsSortDirection || 'desc'}
-              width={15}
-              onChange={(e) => onEventsSortDirectionChange(e?.value!)}
-              className="inline-element"
-              allowCustomValue={false}
-              isClearable={false}
-            />
-          </EditorField>
+          {query.eventsSort && (
+            <EditorField
+              tooltip={''}
+              label={'Sort Direction'}
+            >
+              <Select
+                options={SentryEventSortDirectionOptions}
+                value={query.eventsSortDirection || 'desc'}
+                width={18}
+                onChange={(e) => onEventsSortDirectionChange(e?.value!)}
+                className="inline-element"
+                allowCustomValue={false}
+                isClearable={false}
+              />
+            </EditorField>
+          )}
           <EditorField
             tooltip={selectors.components.QueryEditor.Events.Limit.tooltip}
             label={selectors.components.QueryEditor.Events.Limit.label}
