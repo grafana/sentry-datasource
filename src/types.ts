@@ -1,4 +1,4 @@
-import type { DataSourceJsonData, DataQuery } from '@grafana/data';
+import type { DataQuery, DataSourceJsonData } from '@grafana/data';
 
 //#region Sentry Objects
 export type SentryOrganization = {
@@ -36,8 +36,14 @@ export type SentryTeam = {
   slug: string;
   status?: string;
 };
+export type SentryTag = {
+  key: string;
+  name: string;
+  totalValues: number;
+}
 export type SentryIssueSort = 'inbox' | 'new' | 'date' | 'priority' | 'freq' | 'user';
 export type SentryEventSort = 'last_seen()' | 'count()' | 'epm()' | 'failure_rate()' | 'level';
+export type SentrySortDirection = 'asc' | 'desc';
 //#endregion
 
 //#region Config
@@ -67,6 +73,7 @@ export type SentryEventsQuery = {
   eventsQuery: string;
   eventsFields?: string[];
   eventsSort?: SentryEventSort;
+  eventsSortDirection?: SentrySortDirection;
   eventsLimit?: number;
 } & SentryQueryBase<'events'>;
 export type SentryEventsStatsQuery = {

@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import type { QueryEditorProps, SelectableValue } from '@grafana/data';
+import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/plugin-ui';
 import { getTemplateSrv } from '@grafana/runtime';
 import { MultiSelect } from '@grafana/ui';
-import { SentryDataSource } from './../../datasource';
-import { getEnvironmentNamesFromProject } from './../../app/utils';
+import React, { useEffect, useState } from 'react';
 import { replaceProjectIDs } from './../../app/replace';
+import { getEnvironmentNamesFromProject } from './../../app/utils';
+import { SentryDataSource } from './../../datasource';
 import { selectors } from './../../selectors';
-import type { QueryEditorProps, SelectableValue } from '@grafana/data';
 import type { SentryConfig, SentryProject, SentryQuery } from './../../types';
-import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/plugin-ui';
 
 type ScopePickerProps = { hideEnvironments?: boolean } & Pick<
   QueryEditorProps<SentryDataSource, SentryQuery, SentryConfig>,
