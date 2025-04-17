@@ -3,9 +3,9 @@ import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/plugin-ui';
 import { Input, QueryField, Select } from '@grafana/ui';
 import { SentryDataSource } from 'datasource';
 import React from 'react';
-import { SentryEventSortOptions } from '../../constants';
+import { SentryEventSortOptions, SentryEventSortDirectionOptions } from '../../constants';
 import { selectors } from '../../selectors';
-import type { SentryEventSort, SentryEventsQuery } from '../../types';
+import type { SentryEventSort, SentryEventsQuery, SentrySortDirection } from '../../types';
 
 interface EventsEditorProps {
   query: SentryEventsQuery;
@@ -14,7 +14,7 @@ interface EventsEditorProps {
   datasource: SentryDataSource;
 }
 
-// A list of fields that are to be fetched from the sentry API. 
+// A list of fields that are to be fetched from the sentry API.
 // This is used to build the default query string.
 const DEFAULT_FIELDS = [
   'id',
@@ -27,15 +27,15 @@ const DEFAULT_FIELDS = [
   'last_seen()',
   'level',
   'event.type',
-  'platform'
+  'platform',
 ];
 
 type Option = SelectableValue<string>;
 
-const fieldOptions: Option[] = DEFAULT_FIELDS.map(field => ({
-  icon:'text-fields',
+const fieldOptions: Option[] = DEFAULT_FIELDS.map((field) => ({
+  icon: 'text-fields',
   label: field,
-  value: field
+  value: field,
 }));
 
 export const EventsEditor = ({ query, onChange, onRunQuery, datasource }: EventsEditorProps) => {
@@ -44,14 +44,16 @@ export const EventsEditor = ({ query, onChange, onRunQuery, datasource }: Events
 
   React.useEffect(() => {
     datasource.getTags().then((tags) => {
-      setTagsOptions(tags.map(tag => ({ tag: 'tag', icon:'tag-alt', label: `tags[${tag.key}]`, value: `tags[${tag.key}]` })));
+      setTagsOptions(
+        tags.map((tag) => ({ tag: 'tag', icon: 'tag-alt', label: `tags[${tag.key}]`, value: `tags[${tag.key}]` }))
+      );
     });
   }, [datasource]);
 
   if (!query.eventsFields) {
     onChange({
       ...query,
-      eventsFields: DEFAULT_FIELDS
+      eventsFields: DEFAULT_FIELDS,
     });
     onRunQuery();
   }
@@ -63,8 +65,12 @@ export const EventsEditor = ({ query, onChange, onRunQuery, datasource }: Events
     onChange({ ...query, eventsFields: eventsFields });
     onRunQuery();
   };
-  const onEventsSortChange = (eventsSort: SentryEventSort) => {
+  const onEventsSortChange = (eventsSort: SentryEventSort | undefined) => {
     onChange({ ...query, eventsSort: eventsSort });
+    onRunQuery();
+  };
+  const onEventsSortDirectionChange = (eventsSortDirection: SentrySortDirection) => {
+    onChange({ ...query, eventsSortDirection: eventsSortDirection });
     onRunQuery();
   };
   const onEventsLimitChange = (eventsLimit?: number) => {
@@ -96,19 +102,15 @@ export const EventsEditor = ({ query, onChange, onRunQuery, datasource }: Events
           <Select
             isMulti={true}
             options={[...fieldOptions, ...customOptions, ...tagsOptions]}
-            value={query.eventsFields?.map(field => ({ label: field, value: field })) || []}
-            onChange={(values) => onEventsFieldsChange(
-              (values || []).map((v: { value: string }) => v.value)
-                .filter(Boolean)
-            )}
+            value={query.eventsFields?.map((field) => ({ label: field, value: field })) || []}
+            onChange={(values) =>
+              onEventsFieldsChange((values || []).map((v: { value: string }) => v.value).filter(Boolean))
+            }
             allowCustomValue={true}
             onCreateOption={(v) => {
               const customValue = { label: v, value: v, icon: 'pen' };
               setCustomOptions([...customOptions, customValue]);
-              onEventsFieldsChange([
-                ...(query.eventsFields || []),
-                v
-              ]);
+              onEventsFieldsChange([...(query.eventsFields || []), v]);
             }}
             placeholder={selectors.components.QueryEditor.Events.Fields.placeholder}
             width={'auto'}
@@ -134,6 +136,19 @@ export const EventsEditor = ({ query, onChange, onRunQuery, datasource }: Events
               isClearable={true}
             />
           </EditorField>
+          {query.eventsSort && (
+            <EditorField tooltip={''} label={'Sort Direction'}>
+              <Select
+                options={SentryEventSortDirectionOptions}
+                value={query.eventsSortDirection || 'desc'}
+                width={18}
+                onChange={(e) => onEventsSortDirectionChange(e?.value!)}
+                className="inline-element"
+                allowCustomValue={false}
+                isClearable={false}
+              />
+            </EditorField>
+          )}
           <EditorField
             tooltip={selectors.components.QueryEditor.Events.Limit.tooltip}
             label={selectors.components.QueryEditor.Events.Limit.label}
