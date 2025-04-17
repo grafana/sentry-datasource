@@ -1,16 +1,17 @@
 import type { SelectableValue } from '@grafana/data';
 import type {
   QueryType,
-  SentryIssueSort,
   SentryEventSort,
-  SentryStatsV2QueryField,
-  SentryStatsV2QueryGroupBy,
-  SentryStatsV2QueryCategory,
-  SentryStatsV2QueryOutcome,
+  SentryIssueSort,
   SentryMetricsQueryField,
   SentryMetricsQueryGroupBy,
   SentryMetricsQueryOrder,
   SentryMetricsQuerySort,
+  SentrySortDirection,
+  SentryStatsV2QueryCategory,
+  SentryStatsV2QueryField,
+  SentryStatsV2QueryGroupBy,
+  SentryStatsV2QueryOutcome,
 } from './types';
 
 export const QueryTypeOptions: Array<SelectableValue<QueryType>> = [
@@ -34,6 +35,10 @@ export const SentryEventSortOptions: Array<SelectableValue<SentryEventSort>> = [
   { value: 'epm()', label: 'Events per minute' },
   { value: 'failure_rate()', label: 'Failure rate' },
   { value: 'level', label: 'Level' },
+];
+export const SentryEventSortDirectionOptions: Array<SelectableValue<SentrySortDirection>> = [
+  { value: 'asc', label: 'Ascending' },
+  { value: 'desc', label: 'Descending' },
 ];
 export const SentryMetricsQueryFieldOptions: Array<SelectableValue<SentryMetricsQueryField>> = [
   { value: 'session.anr_rate', label: 'session.anr_rate' },
