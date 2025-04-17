@@ -1,18 +1,19 @@
-import { Observable } from 'rxjs';
+import type { DataQueryRequest, DataQueryResponse, DataSourceInstanceSettings, MetricFindValue, ScopedVars } from '@grafana/data';
 import { DataSourceWithBackend, getTemplateSrv } from '@grafana/runtime';
+import { Observable } from 'rxjs';
 import { applyTemplateVariables, applyTemplateVariablesToVariableQuery } from './app/replace';
 import { getEnvironmentNamesFromProject } from './app/utils';
-import type { DataSourceInstanceSettings, MetricFindValue, DataQueryRequest, DataQueryResponse, ScopedVars } from '@grafana/data';
 import type {
+  GetResourceCallGetTeamsProjectsPath,
+  GetResourceCallListOrgTeamsPath,
+  GetResourceCallProjectsPath,
   SentryConfig,
-  SentryQuery,
-  SentryVariableQuery,
   SentryOrganization,
   SentryProject,
+  SentryQuery,
+  SentryTag,
   SentryTeam,
-  GetResourceCallProjectsPath,
-  GetResourceCallListOrgTeamsPath,
-  GetResourceCallGetTeamsProjectsPath,
+  SentryVariableQuery,
 } from './types';
 export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryConfig> {
   constructor(private instanceSettings: DataSourceInstanceSettings<SentryConfig>) {
@@ -89,6 +90,11 @@ export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryC
         resolve([]);
       }
     });
+  }
+
+  getTags(orgSlug: string = this.getOrgSlug()): Promise<SentryTag[]> {
+    const replacedOrgSlug: string = getTemplateSrv().replace(orgSlug);
+    return this.getResource<SentryTag[]>(`api/0/organizations/${replacedOrgSlug}/tags`);
   }
 
   getOrganizations(): Promise<SentryOrganization[]> {
