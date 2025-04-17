@@ -1,17 +1,17 @@
-import React from 'react';
-import { SentryDataSource } from './../datasource';
-import { Error } from '../components/Error';
-import { QueryTypePicker } from './../components/query-editor/QueryTypePicker';
-import { ScopePicker } from './../components/query-editor/ScopePicker';
-import { IssuesEditor } from './../components/query-editor/IssuesEditor';
-import { EventsEditor } from './../components/query-editor/EventsEditor';
-import { StatsV2Editor } from './../components/query-editor/StatsV2Editor';
 import type { QueryEditorProps } from '@grafana/data';
-import type { SentryConfig, SentryQuery } from './../types';
-import './../styles/editor.scss';
 import { EditorRows } from '@grafana/plugin-ui';
 import { EventsStatsEditor } from 'components/query-editor/EventsStatsEditor';
 import { MetricsEditor } from 'components/query-editor/MetricsEditor';
+import React from 'react';
+import { Error } from '../components/Error';
+import { EventsEditor } from './../components/query-editor/EventsEditor';
+import { IssuesEditor } from './../components/query-editor/IssuesEditor';
+import { QueryTypePicker } from './../components/query-editor/QueryTypePicker';
+import { ScopePicker } from './../components/query-editor/ScopePicker';
+import { StatsV2Editor } from './../components/query-editor/StatsV2Editor';
+import { SentryDataSource } from './../datasource';
+import './../styles/editor.scss';
+import type { SentryConfig, SentryQuery } from './../types';
 
 type SentryQueryEditorProps = {} & QueryEditorProps<SentryDataSource, SentryQuery, SentryConfig>;
 
@@ -31,7 +31,7 @@ export const SentryQueryEditor = (props: SentryQueryEditorProps) => {
       {query.queryType === 'statsV2' ? (
         <StatsV2Editor query={query} onChange={onChange} onRunQuery={onRunQuery} />
       ) : null}
-      {query.queryType === 'events' ? <EventsEditor query={query} onChange={onChange} onRunQuery={onRunQuery} /> : null}
+      {query.queryType === 'events' ? <EventsEditor query={query} onChange={onChange} onRunQuery={onRunQuery} datasource={datasource} /> : null}
       {query.queryType === 'eventsStats' ? (
         <EventsStatsEditor query={query} onChange={onChange} onRunQuery={onRunQuery} />
       ) : null}

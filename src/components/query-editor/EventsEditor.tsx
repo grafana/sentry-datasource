@@ -1,14 +1,17 @@
-import React from 'react';
-import { Input, QueryField, Select } from '@grafana/ui';
-import { selectors } from '../../selectors';
-import { SentryEventSortOptions } from '../../constants';
-import type { SentryEventSort, SentryEventsQuery } from '../../types';
+import { SelectableValue } from '@grafana/data';
 import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/plugin-ui';
+import { Input, QueryField, Select } from '@grafana/ui';
+import { SentryDataSource } from 'datasource';
+import React from 'react';
+import { SentryEventSortOptions } from '../../constants';
+import { selectors } from '../../selectors';
+import type { SentryEventSort, SentryEventsQuery } from '../../types';
 
 interface EventsEditorProps {
   query: SentryEventsQuery;
   onChange: (value: SentryEventsQuery) => void;
   onRunQuery: () => void;
+  datasource: SentryDataSource;
 }
 
 // A list of fields that are to be fetched from the sentry API. 
@@ -27,13 +30,24 @@ const DEFAULT_FIELDS = [
   'platform'
 ];
 
-const fieldOptions = DEFAULT_FIELDS.map(field => ({
+type Option = SelectableValue<string>;
+
+const fieldOptions: Option[] = DEFAULT_FIELDS.map(field => ({
+  icon:'text-fields',
   label: field,
   value: field
 }));
 
-export const EventsEditor = ({ query, onChange, onRunQuery }: EventsEditorProps) => {
-  const [customOptions, setCustomOptions] = React.useState<Array<{ label: string, value: string }>>([]);
+export const EventsEditor = ({ query, onChange, onRunQuery, datasource }: EventsEditorProps) => {
+  const [customOptions, setCustomOptions] = React.useState<Option[]>([]);
+  const [tagsOptions, setTagsOptions] = React.useState<Option[]>([]);
+
+  React.useEffect(() => {
+    datasource.getTags().then((tags) => {
+      setTagsOptions(tags.map(tag => ({ tag: 'tag', icon:'tag-alt', label: `tags[${tag.key}]`, value: `tags[${tag.key}]` })));
+    });
+  }, [datasource]);
+
   if (!query.eventsFields) {
     onChange({
       ...query,
@@ -81,7 +95,7 @@ export const EventsEditor = ({ query, onChange, onRunQuery }: EventsEditorProps)
         >
           <Select
             isMulti={true}
-            options={[...fieldOptions, ...customOptions]}
+            options={[...fieldOptions, ...customOptions, ...tagsOptions]}
             value={query.eventsFields?.map(field => ({ label: field, value: field })) || []}
             onChange={(values) => onEventsFieldsChange(
               (values || []).map((v: { value: string }) => v.value)
@@ -89,7 +103,7 @@ export const EventsEditor = ({ query, onChange, onRunQuery }: EventsEditorProps)
             )}
             allowCustomValue={true}
             onCreateOption={(v) => {
-              const customValue = { label: v, value: v };
+              const customValue = { label: v, value: v, icon: 'pen' };
               setCustomOptions([...customOptions, customValue]);
               onEventsFieldsChange([
                 ...(query.eventsFields || []),

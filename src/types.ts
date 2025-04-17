@@ -36,6 +36,11 @@ export type SentryTeam = {
   slug: string;
   status?: string;
 };
+export type SentryTag = {
+  key: string;
+  name: string;
+  totalValues: number;
+}
 export type SentryIssueSort = 'inbox' | 'new' | 'date' | 'priority' | 'freq' | 'user';
 export type SentryEventSort = 'last_seen()' | 'count()' | 'epm()' | 'failure_rate()' | 'level';
 //#endregion
