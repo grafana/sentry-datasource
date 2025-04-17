@@ -1260,10 +1260,10 @@
     tslib "2.8.1"
     typescript "5.7.3"
 
-"@grafana/e2e-selectors@^12.0.0-234029":
-  version "12.0.0-234204"
-  resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-12.0.0-234204.tgz#7f6f1c204f34e076f83b111467ee4005a6480f08"
-  integrity sha512-6kZDxPCXvHTab7UZqTC80mLKcKP9t88SBci+4BcTAuuvavlC6NRbT44+WPGfzHUsghEXy1rFLwQgg3iwVLynVQ==
+"@grafana/e2e-selectors@^12.0.0-235294":
+  version "12.0.0-238747"
+  resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-12.0.0-238747.tgz#6578dbc6b99f6febc69f161c26f3bc66b16e2d54"
+  integrity sha512-Dn6mtT8JYVlisqvry18QZsFIjWNO0Bte4kQmnihRbbH3UuJqVKxWO9zOR2ucQjQ2SiQYZzwgMV/lR77md7ZDow==
   dependencies:
     "@grafana/tsconfig" "^2.0.0"
     semver "^7.7.0"
@@ -1292,27 +1292,27 @@
     ua-parser-js "^1.0.32"
     web-vitals "^4.0.1"
 
-"@grafana/plugin-e2e@^1.19.2":
-  version "1.19.2"
-  resolved "https://registry.yarnpkg.com/@grafana/plugin-e2e/-/plugin-e2e-1.19.2.tgz#655928fe552ecffb26d87431071a3dc891d79330"
-  integrity sha512-2mFcUqmr8MGJXI03K1d2nz/KswB2lmIfd/bOHq8559UJX+jk0th3ypnWUF70KuNtZBElQyiiLlDmP/o8VuHK0A==
+"@grafana/plugin-e2e@^1.19.6":
+  version "1.19.6"
+  resolved "https://registry.yarnpkg.com/@grafana/plugin-e2e/-/plugin-e2e-1.19.6.tgz#281f1bfd604f45ff119ea05f6542ef2cb3298cdb"
+  integrity sha512-azGCDbV+BCThGUJskZAxjtlu7LBMVi+Avymgyf6Qv6egPohO3zcO99Cgd+X8+BvcOyKQu+zem18Yh+VGlJZqQw==
   dependencies:
-    "@grafana/e2e-selectors" "^12.0.0-234029"
+    "@grafana/e2e-selectors" "^12.0.0-235294"
     semver "^7.5.4"
     uuid "^11.0.2"
     yaml "^2.3.4"
 
-"@grafana/plugin-ui@^0.10.4":
-  version "0.10.4"
-  resolved "https://registry.yarnpkg.com/@grafana/plugin-ui/-/plugin-ui-0.10.4.tgz#2db8663f3a93f78cccc82d6eda49952c6459cf62"
-  integrity sha512-ZHCA4cqM5r4mxtjiBxq31byru5/b+GnfP3edWK9aTgmU/0qbdgu5wNSrBvKg4qgtvrzp6PNt2t5R3geibJjUbA==
+"@grafana/plugin-ui@^0.10.5":
+  version "0.10.5"
+  resolved "https://registry.yarnpkg.com/@grafana/plugin-ui/-/plugin-ui-0.10.5.tgz#8a0ac1c723f5aa6351a133e6cebfaae1b1627511"
+  integrity sha512-UNkfg1jSFbxNrgS35PNOfZ4NpexnLZa0e+nwiuXGugZ3Ie5+mcpHBeALmyI2LawYsU2AYdG9hm0wRMrW83z46A==
   dependencies:
     "@emotion/css" "^11.11.2"
     "@hello-pangea/dnd" "^17.0.0"
     "@react-awesome-query-builder/ui" "^6.6.4"
     "@types/prismjs" "^1.26.4"
     lodash "^4.17.21"
-    prismjs "^1.29.0"
+    prismjs "^1.30.0"
     react-calendar "^4.8.0"
     react-popper-tooltip "^4.4.2"
     react-use "^17.3.1"
@@ -7785,10 +7785,15 @@ pretty-format@^29.0.0, pretty-format@^29.7.0:
     ansi-styles "^5.0.0"
     react-is "^18.0.0"
 
-prismjs@1.29.0, prismjs@^1.29.0:
+prismjs@1.29.0:
   version "1.29.0"
   resolved "https://registry.yarnpkg.com/prismjs/-/prismjs-1.29.0.tgz#f113555a8fa9b57c35e637bba27509dcf802dd12"
   integrity sha512-Kx/1w86q/epKcmte75LNrEoT+lX8pBpavuAbvJWRXar7Hz8jrtF+e3vY751p0R8H9HdArwaCTNDDzHg/ScJK1Q==
+
+prismjs@^1.30.0:
+  version "1.30.0"
+  resolved "https://registry.yarnpkg.com/prismjs/-/prismjs-1.30.0.tgz#d9709969d9d4e16403f6f348c63553b19f0975a9"
+  integrity sha512-DEvV2ZF2r2/63V+tK8hQvrR2ZGn10srHbXviTlcv7Kpzw8jWiNTqbVgjO3IY8RxrrOUF8VPMQQFysYYYv0YZxw==
 
 prompts@^2.0.1:
   version "2.4.2"
@@ -10043,12 +10048,7 @@ yaml@^1.10.0:
   resolved "https://registry.yarnpkg.com/yaml/-/yaml-1.10.2.tgz#2301c5ffbf12b467de8da2333a459e29e7920e4b"
   integrity sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==
 
-yaml@^2.3.4:
-  version "2.7.0"
-  resolved "https://registry.yarnpkg.com/yaml/-/yaml-2.7.0.tgz#aef9bb617a64c937a9a748803786ad8d3ffe1e98"
-  integrity sha512-+hSoy/QHluxmC9kCIJyL/uyFmLmc+e5CFR5Wa+bpIhIj85LVb9ZH2nVnqrHoSvKogwODv0ClqZkmiSSaIH5LTA==
-
-yaml@^2.7.1:
+yaml@^2.3.4, yaml@^2.7.1:
   version "2.7.1"
   resolved "https://registry.yarnpkg.com/yaml/-/yaml-2.7.1.tgz#44a247d1b88523855679ac7fa7cda6ed7e135cf6"
   integrity sha512-10ULxpnOCQXxJvBgxsn9ptjq6uviG/htZKk9veJGhlqn3w/DxQ631zFF+nlQXLwmImeS5amR2dl2U8sg6U9jsQ==
