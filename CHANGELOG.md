@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.1.0 (2025-04-17)
+
+- Support sorting direction in the events query builder ([#478](https://github.com/grafana/sentry-datasource/pull/478))
+- Support tags auto-completion in the events query builder ([#477](https://github.com/grafana/sentry-datasource/pull/477))
+- Dependency updates
+
 ## 2.0.0 (2025-04-02)
 
 - Allow choosing fields to fetch for sentry events ([#400](https://github.com/grafana/sentry-datasource/pull/400))
