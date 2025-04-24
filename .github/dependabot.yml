@@ -24,6 +24,7 @@ updates:
     # Ignore most dependencies that are maintained via the create-plugin tool
     # See https://github.com/grafana/plugin-tools/blob/main/packages/create-plugin/templates/common/package.json
     ignore:
+      - dependency-name: "@playwright/test"
       - dependency-name: "@babel/core"
       - dependency-name: "@emotion/css"
       - dependency-name: "@grafana/eslint-config"
