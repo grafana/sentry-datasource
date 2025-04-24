@@ -8,7 +8,7 @@ jobs:
   generate-token:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/create-github-app-token@v1
+      - uses: actions/create-github-app-token@v2
         with:
           app-id: ${{ secrets.PARTNER_DATASOURCES_APP_ID }}
           private-key: ${{ secrets.PARTNER_DATASOURCES_APP_PEM }}
