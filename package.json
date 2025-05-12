@@ -88,7 +88,7 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "imports-loader": "^5.0.0",
-    "semver": "^7.6.3",
+    "semver": "^7.7.2",
     "terser-webpack-plugin": "^5.3.14",
     "webpack-subresource-integrity": "^5.1.0",
     "webpack-virtual-modules": "^0.6.2"
