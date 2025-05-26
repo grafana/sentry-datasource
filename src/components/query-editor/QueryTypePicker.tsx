@@ -1,11 +1,11 @@
-import React from 'react';
+import type { QueryEditorProps } from '@grafana/data';
+import { EditorField, EditorRow } from '@grafana/plugin-ui';
 import { Select } from '@grafana/ui';
+import React from 'react';
+import { QueryTypeOptions } from '../../constants';
 import { SentryDataSource } from './../../datasource';
 import { selectors } from './../../selectors';
-import { QueryTypeOptions } from '../../constants';
-import type { QueryEditorProps } from '@grafana/data';
-import type { SentryConfig, SentryQuery, QueryType } from './../../types';
-import { EditorField, EditorRow } from '@grafana/plugin-ui';
+import type { QueryType, SentryConfig, SentryQuery } from './../../types';
 
 type QueryTypePickerProps = Pick<
   QueryEditorProps<SentryDataSource, SentryQuery, SentryConfig>,
