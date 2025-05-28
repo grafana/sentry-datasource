@@ -27,7 +27,7 @@ func Mock(req *http.Request) (*http.Response, error) {
 			Body:       io.NopCloser(bytes.NewBufferString(`{ "detail": "Invalid token" }`)),
 		}, nil
 	}
-	var body io.ReadCloser = io.NopCloser(bytes.NewBufferString("{}"))
+	var body = io.NopCloser(bytes.NewBufferString("{}"))
 	switch req.URL.Path {
 	default:
 		file := filepath.Join(basePath(), "./testdata/projects.json")
