@@ -37,6 +37,12 @@ type SentryErrorResponse struct {
 	Detail string `json:"detail"`
 }
 
+func closeHttpResponseBody(res *http.Response) {
+	if err := res.Body.Close(); err != nil {
+		backend.Logger.Warn("Error closing http response", "error", err.Error())
+	}
+}
+
 func (sc *SentryClient) FetchWithPagination(path string, out interface{}) (string, error) {
 	fullURL := path
 	if !strings.HasPrefix(path, sc.BaseURL) {
@@ -50,7 +56,7 @@ func (sc *SentryClient) FetchWithPagination(path string, out interface{}) (strin
 	if err != nil {
 		return "", err
 	}
-	defer res.Body.Close()
+	defer closeHttpResponseBody(res)
 
 	nextURL := ""
 	header := res.Header
@@ -87,7 +93,8 @@ func (sc *SentryClient) Fetch(path string, out interface{}) error {
 	if err != nil {
 		return err
 	}
-	defer res.Body.Close()
+	defer closeHttpResponseBody(res)
+
 	if res.StatusCode == http.StatusOK {
 		if err := json.NewDecoder(res.Body).Decode(&out); err != nil {
 			return err
