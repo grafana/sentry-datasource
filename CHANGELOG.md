@@ -1,5 +1,10 @@
 # Changelog
 
+
+## 2.1.1 (2025-05-29)
+
+- Dependency updates
+
 ## 2.1.0 (2025-04-17)
 
 - Support sorting direction in the events query builder ([#478](https://github.com/grafana/sentry-datasource/pull/478))
