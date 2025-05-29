@@ -7,6 +7,7 @@ import type {
   GetResourceCallGetTeamsProjectsPath,
   GetResourceCallListOrgTeamsPath,
   GetResourceCallProjectsPath,
+  SentryAttribute,
   SentryConfig,
   SentryOrganization,
   SentryProject,
@@ -95,6 +96,11 @@ export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryC
   getTags(orgSlug: string = this.getOrgSlug()): Promise<SentryTag[]> {
     const replacedOrgSlug: string = getTemplateSrv().replace(orgSlug);
     return this.getResource<SentryTag[]>(`api/0/organizations/${replacedOrgSlug}/tags`);
+  }
+
+  getAttributes(orgSlug: string = this.getOrgSlug()): Promise<SentryAttribute[]> {
+    const replacedOrgSlug: string = getTemplateSrv().replace(orgSlug);
+    return this.getResource<SentryTag[]>(`api/0/organizations/${replacedOrgSlug}/trace-items/attributes/`);
   }
 
   getOrganizations(): Promise<SentryOrganization[]> {

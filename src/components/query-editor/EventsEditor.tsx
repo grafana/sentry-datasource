@@ -2,21 +2,22 @@ import { SelectableValue } from '@grafana/data';
 import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/plugin-ui';
 import { Input, QueryField, Select } from '@grafana/ui';
 import { SentryDataSource } from 'datasource';
-import React from 'react';
-import { SentryEventSortOptions, SentryEventSortDirectionOptions } from '../../constants';
+import { sortBy } from 'lodash';
+import React, { useEffect } from 'react';
+import { SentryEventSortDirectionOptions, SentryEventSortOptions } from '../../constants';
 import { selectors } from '../../selectors';
-import type { SentryEventSort, SentryEventsQuery, SentrySortDirection } from '../../types';
+import type { SentryEventSort, SentryEventsQuery, SentrySortDirection, SentrySpansQuery } from '../../types';
 
 interface EventsEditorProps {
-  query: SentryEventsQuery;
-  onChange: (value: SentryEventsQuery) => void;
+  query: SentryEventsQuery | SentrySpansQuery;
+  onChange: (value: SentryEventsQuery | SentrySpansQuery) => void;
   onRunQuery: () => void;
   datasource: SentryDataSource;
 }
 
 // A list of fields that are to be fetched from the sentry API.
 // This is used to build the default query string.
-const DEFAULT_FIELDS = [
+const EVENTS_DEFAULT_FIELDS = [
   'id',
   'title',
   'project',
@@ -29,31 +30,44 @@ const DEFAULT_FIELDS = [
   'event.type',
   'platform',
 ];
+const SPANS_DEFAULT_FIELDS = [
+  'id',
+  "span.op",
+  "span.description",
+  'count()',
+];
 
 type Option = SelectableValue<string>;
 
-const fieldOptions: Option[] = DEFAULT_FIELDS.map((field) => ({
-  icon: 'text-fields',
-  label: field,
-  value: field,
-}));
+
+const toOptions = (fields: string[]): Option[] => fields.map((field) => ({ icon: 'text-fields', label: field, value: field }));
 
 export const EventsEditor = ({ query, onChange, onRunQuery, datasource }: EventsEditorProps) => {
-  const [customOptions, setCustomOptions] = React.useState<Option[]>([]);
-  const [tagsOptions, setTagsOptions] = React.useState<Option[]>([]);
+  const suggestFields = async () => datasource.getTags().then((tags) => tags.map((tag) => ({ icon: 'tag-alt', label: `tags[${tag.key}]`, value: `tags[${tag.key}]` })));
+  return <EventsLikeEditor query={query} onChange={onChange} onRunQuery={onRunQuery} datasource={datasource} defaultFields={EVENTS_DEFAULT_FIELDS} suggestFields={suggestFields} />;
+};
 
-  React.useEffect(() => {
-    datasource.getTags().then((tags) => {
-      setTagsOptions(
-        tags.map((tag) => ({ tag: 'tag', icon: 'tag-alt', label: `tags[${tag.key}]`, value: `tags[${tag.key}]` }))
-      );
+export const SpansEditor = ({ query, onChange, onRunQuery, datasource }: EventsEditorProps) => {
+  const suggestFields = async () => datasource.getAttributes().then((attr) => attr.map((attr) => ({ icon: 'tag-alt', label: attr.key, value: attr.key })));
+  return <EventsLikeEditor query={query} onChange={onChange} onRunQuery={onRunQuery} datasource={datasource} defaultFields={SPANS_DEFAULT_FIELDS} suggestFields={suggestFields}/>;
+};
+
+const EventsLikeEditor = ({ query, onChange, onRunQuery, defaultFields, suggestFields }: EventsEditorProps & {defaultFields: string[], suggestFields: () => Promise<Option[]> }) => {
+  const [customOptions, setCustomOptions] = React.useState<Option[]>([]);
+  const [fieldOptions, setFieldOptions] = React.useState<Option[]>([]);
+  useEffect(() => {
+    suggestFields().then((fields)=> {
+      setFieldOptions(sortBy([
+        ...toOptions(defaultFields),
+        ...fields,
+      ], 'label'))
     });
-  }, [datasource]);
+  }, [defaultFields, suggestFields]);
 
   if (!query.eventsFields) {
     onChange({
       ...query,
-      eventsFields: DEFAULT_FIELDS,
+      eventsFields: defaultFields,
     });
     onRunQuery();
   }
@@ -101,7 +115,7 @@ export const EventsEditor = ({ query, onChange, onRunQuery, datasource }: Events
         >
           <Select
             isMulti={true}
-            options={[...fieldOptions, ...customOptions, ...tagsOptions]}
+            options={[...fieldOptions, ...customOptions]}
             value={query.eventsFields?.map((field) => ({ label: field, value: field })) || []}
             onChange={(values) =>
               onEventsFieldsChange((values || []).map((v: { value: string }) => v.value).filter(Boolean))
