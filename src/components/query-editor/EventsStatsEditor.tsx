@@ -1,12 +1,12 @@
-import React from 'react';
-import { Input, QueryField, TagsInput } from '@grafana/ui';
-import { selectors } from '../../selectors';
-import type { SentryEventsStatsQuery } from '../../types';
 import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/plugin-ui';
+import { Input, QueryField, TagsInput } from '@grafana/ui';
+import React from 'react';
+import { selectors } from '../../selectors';
+import type { SentryEventsStatsQuery, SentrySpansStatsQuery } from '../../types';
 
 interface EventsStatsEditorProps {
-  query: SentryEventsStatsQuery;
-  onChange: (value: SentryEventsStatsQuery) => void;
+  query: SentryEventsStatsQuery | SentrySpansStatsQuery;
+  onChange: (value: SentryEventsStatsQuery | SentrySpansStatsQuery) => void;
   onRunQuery: () => void;
 }
 

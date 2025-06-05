@@ -4,7 +4,7 @@ import { EventsStatsEditor } from 'components/query-editor/EventsStatsEditor';
 import { MetricsEditor } from 'components/query-editor/MetricsEditor';
 import React from 'react';
 import { Error } from '../components/Error';
-import { EventsEditor } from './../components/query-editor/EventsEditor';
+import { EventsEditor, SpansEditor } from './../components/query-editor/EventsEditor';
 import { IssuesEditor } from './../components/query-editor/IssuesEditor';
 import { QueryTypePicker } from './../components/query-editor/QueryTypePicker';
 import { ScopePicker } from './../components/query-editor/ScopePicker';
@@ -33,6 +33,10 @@ export const SentryQueryEditor = (props: SentryQueryEditorProps) => {
       ) : null}
       {query.queryType === 'events' ? <EventsEditor query={query} onChange={onChange} onRunQuery={onRunQuery} datasource={datasource} /> : null}
       {query.queryType === 'eventsStats' ? (
+        <EventsStatsEditor query={query} onChange={onChange} onRunQuery={onRunQuery} />
+      ) : null}
+      {query.queryType === 'spans' ? <SpansEditor query={query} onChange={onChange} onRunQuery={onRunQuery} datasource={datasource} /> : null}
+      {query.queryType === 'spansStats' ? (
         <EventsStatsEditor query={query} onChange={onChange} onRunQuery={onRunQuery} />
       ) : null}
       {query.queryType === 'metrics' ? (
