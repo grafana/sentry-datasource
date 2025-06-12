@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.1.2 (2025-06-11)
+
+- Dependency updates
 
 ## 2.1.1 (2025-05-29)
 
