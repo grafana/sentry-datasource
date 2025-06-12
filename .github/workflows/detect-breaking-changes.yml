@@ -14,7 +14,7 @@ jobs:
       - name: Install dependencies
         run: yarn install
       - name: Build plugin
-        run: yarn build
+        run: yarn build:client
       - name: Compatibility check
         uses: grafana/plugin-actions/is-compatible@f567fc6454619e6c8dbc2f91692197457c10a02b
         with:
