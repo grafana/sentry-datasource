@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.0 (2025-06-24)
+
+- Add support for spans (#517)
+
 ## 2.1.2 (2025-06-11)
 
 - Dependency updates
