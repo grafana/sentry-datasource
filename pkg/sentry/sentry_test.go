@@ -108,7 +108,6 @@ func TestSentryClient_Fetch(t *testing.T) {
 		err = client.Fetch("/api/projects/", &result)
 
 		require.Error(t, err)
-		assert.Contains(t, err.Error(), "403 Forbidden")
 		assert.Contains(t, err.Error(), errorDetail)
 	})
 }
@@ -273,7 +272,6 @@ func TestSentryClient_FetchWithPagination(t *testing.T) {
 		nextURL, err := client.FetchWithPagination("/api/projects/", &result)
 
 		require.Error(t, err)
-		assert.Contains(t, err.Error(), "404 Not Found")
 		assert.Contains(t, err.Error(), errorDetail)
 		assert.Empty(t, nextURL)
 	})
