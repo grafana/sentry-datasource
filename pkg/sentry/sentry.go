@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
@@ -64,7 +65,14 @@ func (sc *SentryClient) FetchWithPagination(path string, out interface{}) (strin
 
 	if links != nil {
 		if nextLink, found := links["next"]; found && nextLink.Extra["results"] == "true" {
-			nextURL = nextLink.URI
+			nextURI, err := url.Parse(nextLink.URI)
+			if err != nil {
+				errorMessage := strings.TrimSpace(fmt.Sprintf("Error parsing next link URL: %s", err.Error()))
+				return "", errorsource.DownstreamError(errors.New(errorMessage), false)
+			}
+			nextURI.Host = ""
+			nextURI.Scheme = ""
+			nextURL = nextURI.String()
 		}
 	}
 
