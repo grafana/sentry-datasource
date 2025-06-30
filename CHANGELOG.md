@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.1 (2025-06-30)
+
+- Fix parsing of next links in paginated requests (#538)
+- Dependency updates
+
 ## 2.2.0 (2025-06-24)
 
 - Add support for spans (#517)
