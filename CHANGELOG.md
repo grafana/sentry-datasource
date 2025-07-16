@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.2 (2025-07-16)
+
+- Deploy to Grafana Cloud only from publish workflow (#550)
+- Remove dependabot-reviewer workflow (#554)
+- Dependency updates
+
 ## 2.2.1 (2025-06-30)
 
 - Fix parsing of next links in paginated requests (#538)
