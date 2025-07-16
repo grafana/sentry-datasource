@@ -1,5 +1,5 @@
-name: Plugins - CD
-run-name: Deploy ${{ inputs.branch }} to ${{ inputs.environment }} by @${{ github.actor }}
+name: Deploy to Grafana Cloud
+run-name: Deploy ${{ inputs.branch }} to Grafana Cloud ${{ inputs.environment }} by @${{ github.actor }}
 
 on:
   workflow_dispatch:
@@ -34,8 +34,7 @@ jobs:
       branch: ${{ github.event.inputs.branch }}
       environment: ${{ github.event.inputs.environment }}
       docs-only: ${{ fromJSON(github.event.inputs.docs-only) }}
-      scopes: universal
+      scopes: grafana_cloud
       go-version: '1.24'
       golangci-lint-version: '2.1.6'
       run-playwright: false
-
