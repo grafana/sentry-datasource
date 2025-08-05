@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.3 (2025-08-05)
+
+- Dependency updates
+
 ## 2.2.2 (2025-07-16)
 
 - Deploy to Grafana Cloud only from publish workflow (#550)
