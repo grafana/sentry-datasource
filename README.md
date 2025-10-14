@@ -78,7 +78,7 @@ To get the list of Sentry issues, select **Sentry Issues** as the query type. Is
 | Query Type   | Choose **Issues** as query type.                                  |
 | Projects     | (optional) Select one or more projects to filter the results.     |
 | Environments | (optional) Select one or more environments to filter the results. |
-| Query        | (optional) Enter your sentry query to get the relevant results.   |
+| Query        | (optional) Enter your Sentry query to get the relevant results. If you wish to filter by fields on the `issues` query type, you should use the format `FIELD_NAME:FIELD_VALUE`. |
 | Sort By      | (optional) Select the order of results you want to display.       |
 | Limit        | (optional) Limit the number of results displayed.                 |
 
