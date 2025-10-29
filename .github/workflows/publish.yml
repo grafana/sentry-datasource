@@ -7,7 +7,7 @@ on:
         description: Branch to publish from. Can be used to deploy PRs to dev
         default: main
       environment:
-        description: Environment to publish to. Cloud will publish to (dev, ops, prod) but only to Grafana Cloud. On Prem will only publish to Prod with Universal Scope
+        description: Environment to publish to all waves (dev + ops + prod). Cloud will publish scoped only to Grafana Cloud, On Prem will publish with Universal scope
         required: true
         type: choice
         options: [cloud, on-prem]
