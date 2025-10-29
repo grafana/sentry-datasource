@@ -22,9 +22,6 @@ jobs:
       fail-fast: false
       matrix:
         environment: [dev, ops, prod]
-        exclude:
-          - environment: ${{ !inputs.environment == 'cloud' && 'dev' }}
-          - environment: ${{ !inputs.environment == 'cloud' && 'ops' }}
     name: CD
     uses: grafana/plugin-ci-workflows/.github/workflows/cd.yml@main # zizmor: ignore[unpinned-uses]
     permissions:
