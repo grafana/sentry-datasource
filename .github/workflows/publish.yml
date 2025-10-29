@@ -1,6 +1,5 @@
 name: Deploy to Grafana Cloud
 run-name: Deploy ${{ inputs.branch }} to Grafana Cloud ${{ inputs.environment }} by @${{ github.actor }}
-
 on:
   workflow_dispatch:
     inputs:
@@ -8,22 +7,24 @@ on:
         description: Branch to publish from. Can be used to deploy PRs to dev
         default: main
       environment:
-        description: Environment to publish to
+        description: Environment to publish to. Cloud will publish to (dev, ops, prod) but only to Grafana Cloud. On Prem will only publish to Prod with Universal Scope
         required: true
         type: choice
-        options:
-          - 'dev'
-          - 'ops'
-          - 'prod'
+        options: [cloud, on-prem]
       docs-only:
         description: Only publish docs, do not publish the plugin
         default: false
         type: boolean
-
 permissions: {}
-
 jobs:
   cd:
+    strategy:
+      fail-fast: false
+      matrix:
+        environment: [dev, ops, prod]
+        exclude:
+          - environment: ${{ !inputs.environment == 'cloud' && 'dev' }}
+          - environment: ${{ !inputs.environment == 'cloud' && 'ops' }}
     name: CD
     uses: grafana/plugin-ci-workflows/.github/workflows/cd.yml@main # zizmor: ignore[unpinned-uses]
     permissions:
@@ -32,10 +33,10 @@ jobs:
       attestations: write
     with:
       branch: ${{ github.event.inputs.branch }}
-      environment: ${{ github.event.inputs.environment }}
+      environment: ${{ matrix.environment }}
       docs-only: ${{ fromJSON(github.event.inputs.docs-only) }}
-      scopes: grafana_cloud
+      scopes: ${{ inputs.environment == 'cloud' && 'grafana_cloud' || inputs.environment == 'on-prem' && 'universal' }}
       go-version: '1.24'
-      golangci-lint-version: '2.1.6'
+      golangci-lint-version: 2.1.6
       run-playwright: false
       github-draft-release: false
