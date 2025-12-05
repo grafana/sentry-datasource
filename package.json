@@ -36,7 +36,7 @@
     "lodash": "^4.17.21",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "rxjs": "7.8.1",
+    "rxjs": "7.8.2",
     "tslib": "2.6.2"
   },
   "devDependencies": {
@@ -55,7 +55,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/glob": "^8.0.0",
     "@types/jest": "^29.5.12",
-    "@types/lodash": "^4.17.0",
+    "@types/lodash": "^4.17.15",
     "@types/node": "^20.8.7",
     "@types/react-router-dom": "^5.2.0",
     "copy-webpack-plugin": "^12.0.2",
@@ -96,7 +96,7 @@
     "webpack-virtual-modules": "^0.6.2"
   },
   "resolutions": {
-    "rxjs": "7.8.1",
+    "rxjs": "7.8.2",
     "jackspeak": "2.1.1"
   },
   "packageManager": "yarn@1.22.19"
