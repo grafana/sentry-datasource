@@ -55,6 +55,7 @@ export interface SentryConfig extends DataSourceJsonData {
   url: string;
   orgSlug: string;
   enableSecureSocksProxy?: boolean;
+  tlsSkipVerify?: boolean;
 }
 export interface SentrySecureConfig {
   authToken: string;
