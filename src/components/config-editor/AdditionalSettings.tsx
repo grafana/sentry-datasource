@@ -14,26 +14,41 @@ interface AdditionalSettingsProps {
 }
 
 export function AdditionalSettings({ jsonData, onOptionChange }: AdditionalSettingsProps) {
-  return config.secureSocksDSProxyEnabled && isVersionGtOrEq(config.buildInfo.version, '10.0.0') ? (
+  const shouldShowSection = config.secureSocksDSProxyEnabled && isVersionGtOrEq(config.buildInfo.version, '10.0.0');
+  const isInitiallyOpen = jsonData.enableSecureSocksProxy || jsonData.tlsSkipVerify;
+
+  return (
     <>
       <Divider />
       <ConfigSection
         title="Additional settings"
-        description="Additional settings are optional settings that can be configured for more control over your data source. This includes enabling the secure socks proxy."
+        description="Additional settings are optional settings that can be configured for more control over your data source."
         isCollapsible
-        isInitiallyOpen={jsonData.enableSecureSocksProxy}
+        isInitiallyOpen={isInitiallyOpen}
       >
+        {shouldShowSection && (
+          <Field
+            label={Components.ConfigEditor.SecureSocksProxy.label}
+            description={Components.ConfigEditor.SecureSocksProxy.tooltip}
+          >
+            <Switch
+              className="gf-form"
+              value={jsonData.enableSecureSocksProxy || false}
+              onChange={(e) => onOptionChange('enableSecureSocksProxy', e.currentTarget.checked)}
+            />
+          </Field>
+        )}
         <Field
-          label={Components.ConfigEditor.SecureSocksProxy.label}
-          description={Components.ConfigEditor.SecureSocksProxy.tooltip}
+          label={Components.ConfigEditor.TLSSkipVerify.label}
+          description={Components.ConfigEditor.TLSSkipVerify.tooltip}
         >
           <Switch
             className="gf-form"
-            value={jsonData.enableSecureSocksProxy || false}
-            onChange={(e) => onOptionChange('enableSecureSocksProxy', e.currentTarget.checked)}
+            value={jsonData.tlsSkipVerify || false}
+            onChange={(e) => onOptionChange('tlsSkipVerify', e.currentTarget.checked)}
           />
         </Field>
       </ConfigSection>
     </>
-  ) : null;
+  );
 }
