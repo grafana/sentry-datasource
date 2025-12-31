@@ -56,7 +56,7 @@
     "@types/glob": "^8.0.0",
     "@types/jest": "^29.5.12",
     "@types/lodash": "^4.17.20",
-    "@types/node": "^20.8.7",
+    "@types/node": "^20.12.7",
     "@types/react-router-dom": "^5.2.0",
     "copy-webpack-plugin": "^12.0.2",
     "cspell": "^9.4.0",
