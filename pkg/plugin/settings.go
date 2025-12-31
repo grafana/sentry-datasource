@@ -9,9 +9,10 @@ import (
 )
 
 type SentryConfig struct {
-	URL       string `json:"url"`
-	OrgSlug   string `json:"orgSlug"`
-	authToken string `json:"-"`
+	URL           string `json:"url"`
+	OrgSlug       string `json:"orgSlug"`
+	TLSSkipVerify bool   `json:"tlsSkipVerify"`
+	authToken     string `json:"-"`
 }
 
 func (sc *SentryConfig) Validate() error {
