@@ -982,10 +982,10 @@
     tslib "2.8.1"
     typescript "5.7.3"
 
-"@grafana/e2e-selectors@^12.2.0-255920":
-  version "12.3.0"
-  resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-12.3.0.tgz#25f747395fd6dfdf7bfcb743095098ea79bbf1fc"
-  integrity sha512-b4Q4QVxV6SLfv4q2MGUwX2swNbDzTgHZB/PHe4/AmLBEU/BUrbeyQdRSUr5bj9NDNHqwSPC5ef1fmj7ZRBE+lw==
+"@grafana/e2e-selectors@12.3.1", "@grafana/e2e-selectors@^12.2.0-255920":
+  version "12.3.1"
+  resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-12.3.1.tgz#689f7bdd718bfa872ee7be8807869b4e3705c3d1"
+  integrity sha512-65riVBmMDMIqndLL/dQcmVP/Jujn5nkTs9IbE5+nTjEniqLopWXlkz1OGt7k/Q32PRVmzNKJbFvNqp4msGWK7Q==
   dependencies:
     semver "^7.7.0"
     tslib "2.8.1"
