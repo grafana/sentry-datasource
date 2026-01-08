@@ -53,6 +53,15 @@ func NewDatasource(ctx context.Context, s backend.DataSourceInstanceSettings) (i
 		return nil, err
 	}
 
+	// configure TLS skip verify if enabled
+	if settings.TLSSkipVerify {
+		if opt.TLS == nil {
+			opt.TLS = &httpclient.TLSOptions{}
+		}
+		opt.TLS.InsecureSkipVerify = true
+		backend.Logger.Warn("TLS certificate verification is disabled - this is insecure and should only be used with self-signed certificates")
+	}
+
 	hc, err := httpclient.New(opt)
 	if err != nil {
 		return nil, err

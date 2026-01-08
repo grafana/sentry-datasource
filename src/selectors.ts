@@ -32,6 +32,10 @@ export const Components = {
       label: 'Enable Secure Socks Proxy',
       tooltip: 'Enable proxying the datasource connection through the secure socks proxy to a different network.',
     },
+    TLSSkipVerify: {
+      label: 'Skip TLS Verify',
+      tooltip: 'Skip TLS certificate verification. Use this option for self-hosted Sentry instances with self-signed certificates.',
+    },
   },
   QueryEditor: {
     QueryType: {
