@@ -1023,10 +1023,10 @@
     uuid "^13.0.0"
     yaml "^2.3.4"
 
-"@grafana/plugin-ui@^0.10.7":
-  version "0.10.7"
-  resolved "https://registry.yarnpkg.com/@grafana/plugin-ui/-/plugin-ui-0.10.7.tgz#db0ed763a472d68cfda94055f52c095834465b5f"
-  integrity sha512-EUUCp2502h54S2I4D7Opwe+3TxtMMdkcnleG6V+T0txwFtsxNheDKD+S+8agjN0GiH2oMT4+gky6hBWWfkCJ0A==
+"@grafana/plugin-ui@^0.12.0":
+  version "0.12.1"
+  resolved "https://registry.yarnpkg.com/@grafana/plugin-ui/-/plugin-ui-0.12.1.tgz#68d4e3c076cda8ee820310dbc49b66662409c9ad"
+  integrity sha512-OIIySSay3iGBAhjK7tzTkpeBJIqNKR43FSS0yVveLWBRK5dxmYD911hz7oXrUr2qFvF0kVXZ/3M4BL7lgEQW9A==
   dependencies:
     "@emotion/css" "^11.11.2"
     "@hello-pangea/dnd" "^17.0.0"
