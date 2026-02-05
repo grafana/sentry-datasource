@@ -2,7 +2,7 @@ module github.com/grafana/sentry-datasource
 
 go 1.24.1
 
-toolchain go1.24.2
+toolchain go1.25.6
 
 require (
 	github.com/gorilla/mux v1.8.1
