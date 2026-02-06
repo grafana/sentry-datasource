@@ -1023,15 +1023,16 @@
     uuid "^13.0.0"
     yaml "^2.3.4"
 
-"@grafana/plugin-ui@^0.10.7":
-  version "0.10.7"
-  resolved "https://registry.yarnpkg.com/@grafana/plugin-ui/-/plugin-ui-0.10.7.tgz#db0ed763a472d68cfda94055f52c095834465b5f"
-  integrity sha512-EUUCp2502h54S2I4D7Opwe+3TxtMMdkcnleG6V+T0txwFtsxNheDKD+S+8agjN0GiH2oMT4+gky6hBWWfkCJ0A==
+"@grafana/plugin-ui@^0.13.0":
+  version "0.13.0"
+  resolved "https://registry.yarnpkg.com/@grafana/plugin-ui/-/plugin-ui-0.13.0.tgz#9f53bc93e78fdbe0426c56d9248c545ce77e078b"
+  integrity sha512-P2xT96FRmLljMCs4KWkLEDbSDlN8yhqOaJHc6RSUrSecHkMIkqzQxbcBvWP2MUa45Mv2dLwS9q4fDXEHA9IYfQ==
   dependencies:
     "@emotion/css" "^11.11.2"
     "@hello-pangea/dnd" "^17.0.0"
     "@react-awesome-query-builder/ui" "^6.6.4"
     "@types/prismjs" "^1.26.4"
+    chance "^1.1.7"
     lodash "^4.17.21"
     prismjs "^1.30.0"
     react-calendar "^4.8.0"
@@ -3391,6 +3392,11 @@ chalk@^5.2.0, chalk@^5.6.2:
   version "5.6.2"
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-5.6.2.tgz#b1238b6e23ea337af71c7f8a295db5af0c158aea"
   integrity sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA==
+
+chance@^1.1.7:
+  version "1.1.13"
+  resolved "https://registry.yarnpkg.com/chance/-/chance-1.1.13.tgz#d4ecfd20c5e6799aaf5c2270d7653b32385cd6e3"
+  integrity sha512-V6lQCljcLznE7tUYUM9EOAnnKXbctE6j/rdQkYOHIWbfGQbrzTsAXNW9CdU5XCo4ArXQCj/rb6HgxPlmGJcaUg==
 
 char-regex@^1.0.2:
   version "1.0.2"
