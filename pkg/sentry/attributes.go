@@ -12,7 +12,7 @@ func (sc *SentryClient) GetAttributes(organizationSlug string, withPagination bo
 	if organizationSlug == "" {
 		organizationSlug = sc.OrgSlug
 	}
-	urlPath := "/api/0/organizations/" + organizationSlug + "/trace-items/attributes/"
+	urlPath := "/api/0/organizations/" + organizationSlug + "/trace-items/attributes/?"
 	params := url.Values{}
 	params.Set("attributeType", "number")
 	params.Set("itemType", "spans")
