@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.4
+
+- Dependency updates
+- Add TLS certificate verification skip option (#642)
+- Fix 404 response when querying spans with attribute aggregation (#701)
+
 ## 2.2.3 (2025-08-05)
 
 - Dependency updates
