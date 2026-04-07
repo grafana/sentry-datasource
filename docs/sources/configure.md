@@ -68,9 +68,9 @@ The following table describes the available configuration settings.
 
 | Setting              | Description                                                                                                                                                                                   |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Sentry URL**       | The Sentry URL to connect to. If left blank, the default `https://sentry.io` is used. Set this to your self-hosted Sentry URL if you aren't using the hosted service.                        |
-| **Sentry Org**       | The Sentry organization slug. This is the last segment of your organization URL: `https://sentry.io/organizations/{organization_slug}/`. Enter only the slug, not the full URL.              |
-| **Sentry Auth Token** | The authentication token from Sentry. Create one from `https://sentry.io/settings/{organization_slug}/developer-settings/` using the steps in the previous section.                          |
+| **Sentry URL**       | (Required) The Sentry URL to connect to. Defaults to `https://sentry.io`. Set this to your self-hosted Sentry URL if you aren't using the hosted service.                                   |
+| **Sentry Org**       | (Required) The Sentry organization slug. This is the last segment of your organization URL: `https://sentry.io/organizations/{organization_slug}/`. Enter only the slug, not the full URL.   |
+| **Sentry Auth Token** | (Required) The authentication token from Sentry. Create one from `https://sentry.io/settings/{organization_slug}/developer-settings/` using the steps in the previous section.               |
 
 ### Additional settings
 
@@ -83,7 +83,7 @@ These optional settings provide more control over your data source connection.
 
 ## Verify the connection
 
-Click **Save & test** to verify the connection. A successful test displays the message: **plugin health check successful. N projects found.**, where _N_ is the number of projects accessible with the configured credentials.
+Click **Save & test** to verify the connection. A successful test displays the message: **plugin health check successful. N projects found.**, where _N_ is the number of projects accessible with the configured credentials. If the test fails, refer to [Troubleshoot Sentry data source issues](https://grafana.com/docs/plugins/grafana-sentry-datasource/latest/troubleshooting/) for common solutions.
 
 ## Provision the data source
 
@@ -113,3 +113,48 @@ The following table describes the provisioning keys.
 | `jsonData.tlsSkipVerify`          | Set to `true` to skip TLS certificate verification for self-hosted Sentry.                             |
 | `jsonData.enableSecureSocksProxy` | Set to `true` to proxy the connection through the secure socks proxy.                                  |
 | `secureJsonData.authToken`        | The Sentry authentication token.                                                                       |
+
+## Provision the data source with Terraform
+
+You can provision the Sentry data source using the [Grafana Terraform provider](https://registry.terraform.io/providers/grafana/grafana/latest/docs). Use the `grafana_data_source` resource to create and manage data source instances.
+
+### Basic Terraform provisioning
+
+```hcl
+resource "grafana_data_source" "sentry" {
+  type = "grafana-sentry-datasource"
+  name = "Sentry"
+
+  json_data_encoded = jsonencode({
+    url     = "https://sentry.io"
+    orgSlug = "<ORGANIZATION_SLUG>"
+  })
+
+  secure_json_data_encoded = jsonencode({
+    authToken = "<AUTH_TOKEN>"
+  })
+}
+```
+
+### Terraform provisioning for self-hosted Sentry
+
+The following example configures the data source for a self-hosted Sentry instance with TLS verification disabled:
+
+```hcl
+resource "grafana_data_source" "sentry" {
+  type = "grafana-sentry-datasource"
+  name = "Sentry (self-hosted)"
+
+  json_data_encoded = jsonencode({
+    url           = "https://sentry.example.com"
+    orgSlug       = "<ORGANIZATION_SLUG>"
+    tlsSkipVerify = true
+  })
+
+  secure_json_data_encoded = jsonencode({
+    authToken = "<AUTH_TOKEN>"
+  })
+}
+```
+
+For more information about the Grafana Terraform provider, refer to the [provider documentation](https://registry.terraform.io/providers/grafana/grafana/latest/docs/resources/data_source).
