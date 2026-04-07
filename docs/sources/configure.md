@@ -81,6 +81,16 @@ These optional settings provide more control over your data source connection.
 | **Skip TLS Verify**          | Skip TLS certificate verification. Use this option for self-hosted Sentry instances with self-signed certificates.       |
 | **Enable Secure Socks Proxy** | Enable proxying the data source connection through the secure socks proxy to a different network. Available in Grafana 10.0.0 and later when the proxy is enabled in Grafana configuration. |
 
+## Private data source connect
+
+{{< admonition type="note" >}}
+Only for Grafana Cloud users.
+{{< /admonition >}}
+
+Private data source connect, or PDC, allows you to establish a private, secured connection between a Grafana Cloud instance, or stack, and data sources secured within a private network. Click the drop-down to locate the URL for PDC. For more information regarding Grafana PDC, refer to [Private data source connect (PDC)](https://grafana.com/docs/grafana-cloud/connect-externally-hosted/private-data-source-connect/) and [Configure Grafana private data source connect (PDC)](https://grafana.com/docs/grafana-cloud/connect-externally-hosted/private-data-source-connect/configure-pdc/) for instructions on setting up a PDC connection.
+
+Click **Manage private data source connect** to open your PDC connection page and view your configuration details.
+
 ## Verify the connection
 
 Click **Save & test** to verify the connection. A successful test displays the message: **plugin health check successful. N projects found.**, where _N_ is the number of projects accessible with the configured credentials. If the test fails, refer to [Troubleshoot Sentry data source issues](https://grafana.com/docs/plugins/grafana-sentry-datasource/latest/troubleshooting/) for common solutions.
