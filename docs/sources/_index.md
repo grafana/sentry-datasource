@@ -38,6 +38,8 @@ The following documents help you set up and use the Sentry data source:
 - [Configure the Sentry data source](https://grafana.com/docs/plugins/grafana-sentry-datasource/latest/configure/)
 - [Sentry query editor](https://grafana.com/docs/plugins/grafana-sentry-datasource/latest/query-editor/)
 - [Template variables](https://grafana.com/docs/plugins/grafana-sentry-datasource/latest/template-variables/)
+- [Alerting](https://grafana.com/docs/plugins/grafana-sentry-datasource/latest/alerting/)
+- [Annotations](https://grafana.com/docs/plugins/grafana-sentry-datasource/latest/annotations/)
 - [Troubleshooting](https://grafana.com/docs/plugins/grafana-sentry-datasource/latest/troubleshooting/)
 
 ## Additional features
@@ -46,7 +48,8 @@ After configuring the data source, you can:
 
 - Use [Explore](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/explore/) to query Sentry data without building a dashboard.
 - Add [Transformations](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/panels-visualizations/query-transform-data/transform-data/) to manipulate query results.
-- Set up [Alerting](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/alerting/) rules based on Sentry data.
+- Set up [Alerting](https://grafana.com/docs/plugins/grafana-sentry-datasource/latest/alerting/) rules based on Sentry data.
+- Add [Annotations](https://grafana.com/docs/plugins/grafana-sentry-datasource/latest/annotations/) to overlay Sentry issues on graphs.
 
 ## Plugin updates
 

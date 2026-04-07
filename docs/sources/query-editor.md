@@ -136,19 +136,6 @@ Use the Stats query type to retrieve organization-level usage statistics from Se
 
 For more information about organization statistics, refer to the [Sentry Org Stats documentation](https://docs.sentry.io/product/accounts/quotas/org-stats/).
 
-## Annotations
-
-You can overlay Sentry issues on graphs using annotations. To create annotations from Sentry issues:
-
-1. Navigate to **Dashboard settings** > **Annotations**.
-1. Click **Add annotation query**.
-1. Select the **Sentry** data source.
-1. Select **Issues** as the query type.
-1. (Optional) Configure project, environment, and query filters to narrow the results.
-
-For more information, refer to [Annotations](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/dashboards/build-dashboards/annotate-visualizations/).
-
 ## Next steps
 
 - [Use template variables](https://grafana.com/docs/plugins/grafana-sentry-datasource/latest/template-variables/)
-- [Set up alerting](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/alerting/)
