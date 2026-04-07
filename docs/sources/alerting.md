@@ -15,7 +15,7 @@ labels:
     - oss
 menuTitle: Alerting
 title: Sentry alerting
-weight: 350
+weight: 400
 review_date: "2026-04-07"
 ---
 
@@ -32,15 +32,15 @@ You can configure Grafana alerting rules that query the Sentry data source to re
 
 Alert rules work with Sentry query types that return numeric or time-series data. The following query types are compatible with alerting:
 
-| Query type   | Compatible | Notes                                                               |
-| ------------ | ---------- | ------------------------------------------------------------------- |
-| Issues       | Yes        | Alert on issue count by using the **Limit** field as a threshold.   |
-| Events       | Yes        | Alert on event counts or aggregate fields like `count()` or `epm()`. |
-| Events Stats | Yes        | Alert on time-series event trends.                                  |
-| Spans        | Yes        | Alert on span counts or aggregate fields.                           |
-| Spans Stats  | Yes        | Alert on time-series span trends.                                   |
-| Metrics      | Yes        | Alert on session metrics like crash rates or error rates.           |
-| Stats        | Yes        | Alert on organization-level usage statistics.                       |
+| Query type   | Compatible | Notes                                                                                                         |
+| ------------ | ---------- | ------------------------------------------------------------------------------------------------------------- |
+| Issues       | Yes        | Returns tabular data. Use a **Count** rows expression to alert on the number of matching issues.              |
+| Events       | Yes        | Use aggregate fields like `count()` or `epm()` in **Fields**, or use a **Count** rows expression.             |
+| Events Stats | Yes        | Returns time-series data. Best suited for alerting on event trends over time.                                  |
+| Spans        | Yes        | Returns tabular data. Use aggregate fields or a **Count** rows expression.                                    |
+| Spans Stats  | Yes        | Returns time-series data. Best suited for alerting on span performance trends.                                 |
+| Metrics      | Yes        | Returns time-series data. Alert on session metrics like crash rates or error rates.                            |
+| Stats        | Yes        | Returns time-series data. Alert on organization-level usage statistics.                                       |
 
 ## Create an alert rule
 
@@ -70,6 +70,26 @@ Monitor for spikes in error events across your projects:
 1. Add a **Reduce** expression with function **Last**.
 1. Add a **Threshold** expression to alert when the value is above your desired limit.
 
+### Alert on unresolved issue count
+
+Get notified when the number of unresolved issues exceeds a threshold:
+
+1. Select **Issues** as the query type.
+1. Set **Query** to `is:unresolved`.
+1. Set **Limit** high enough to capture all matching issues (for example, `100`).
+1. Add a **Reduce** expression with function **Count** to count the number of returned rows.
+1. Add a **Threshold** expression to alert when the count exceeds your limit.
+
+### Alert on slow transactions
+
+Monitor for p95 latency regressions in a specific transaction:
+
+1. Select **Events Stats** as the query type.
+1. Set **Y-axis** to `p95()`.
+1. Set **Query** to `event.type:transaction transaction:<TRANSACTION_NAME>`.
+1. Add a **Reduce** expression with function **Last**.
+1. Add a **Threshold** expression to alert when the p95 value exceeds an acceptable duration in milliseconds.
+
 ### Alert on crash rate changes
 
 Monitor session crash rates using the Metrics query type:
@@ -78,7 +98,16 @@ Monitor session crash rates using the Metrics query type:
 1. Set **Field** to `session.crash_rate`.
 1. Optionally set **Group By** to `project` to monitor per-project crash rates.
 1. Add a **Reduce** expression with function **Last**.
-1. Add a **Threshold** expression to alert when the crash rate exceeds an acceptable level.
+1. Add a **Threshold** expression to alert when the crash rate exceeds an acceptable level (for example, `0.01` for 1%).
+
+### Alert on declining crash-free session rate
+
+Monitor when crash-free rates drop below a target:
+
+1. Select **Metrics** as the query type.
+1. Set **Field** to `session.crash_free_rate`.
+1. Add a **Reduce** expression with function **Last**.
+1. Add a **Threshold** expression to alert when the value drops below your target (for example, `0.995` for 99.5%).
 
 ### Alert on organization quota usage
 
@@ -94,5 +123,6 @@ Monitor organization-level event consumption to avoid quota overages:
 
 - Alert evaluation depends on the Sentry API response time. If the Sentry API is slow or rate-limited, alert evaluation may be delayed.
 - Sentry API rate limits apply to alert rule evaluations. Set evaluation intervals that avoid exceeding rate limits, especially when multiple alert rules query the same Sentry data source.
+- Issues, Events, and Spans queries return tabular data. To create numeric alert conditions from these, use **Reduce** expressions with functions like **Count**, **Min**, **Max**, or **Mean**.
 
 For more information, refer to [Grafana Alerting](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/alerting/).

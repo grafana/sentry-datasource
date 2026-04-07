@@ -15,7 +15,7 @@ labels:
     - oss
 menuTitle: Annotations
 title: Sentry annotations
-weight: 400
+weight: 350
 review_date: "2026-04-07"
 ---
 
