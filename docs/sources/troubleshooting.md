@@ -9,6 +9,8 @@ keywords:
   - errors
   - authentication
   - query
+  - annotations
+  - alerting
 labels:
   products:
     - cloud
@@ -112,6 +114,29 @@ These errors occur when executing queries against Sentry.
 1. Reduce the **Limit** value in the query editor.
 1. For Events Stats or Spans Stats queries, reduce the number of **Group** fields.
 
+### "unknown query type" error
+
+**Symptoms:**
+
+- Query fails with the message "unknown query type"
+
+**Solutions:**
+
+1. Select a valid query type in the **Query Type** drop-down. This error occurs when no query type is selected or the query configuration is corrupted.
+1. If you're using a query type added in a newer plugin version (for example, Spans requires v2.2.0+, Metrics requires v1.8.0+), update the plugin to the required version.
+
+### "invalid or empty organization slug" error
+
+**Symptoms:**
+
+- Queries fail with "invalid or empty organization slug"
+- Save & test may still succeed
+
+**Solutions:**
+
+1. Verify the **Sentry Org** field is set in the data source configuration. Refer to [Configure the Sentry data source](https://grafana.com/docs/plugins/grafana-sentry-datasource/latest/configure/).
+1. Check that the slug doesn't contain extra spaces or the full URL — only enter the slug portion.
+
 ### "404" errors on span queries
 
 **Symptoms:**
@@ -123,6 +148,84 @@ These errors occur when executing queries against Sentry.
 
 1. Ensure you're running plugin version 2.2.4 or later, which includes a fix for 404 responses when querying spans with attribute aggregation.
 1. Verify your Sentry plan includes access to the spans/tracing API.
+
+### "400" errors with detail message
+
+**Symptoms:**
+
+- Query fails with a message like "400 Bad Request" followed by a detail message from Sentry (for example, "400 Bad Request Invalid query")
+
+**Solutions:**
+
+1. Review the detail message for specific guidance. Common causes include invalid search syntax in the **Query** field or unsupported field names in **Fields** or **Y-axis**.
+1. Test the same query directly in Sentry's Discover view to verify the syntax is valid.
+1. For Events or Spans queries, verify the **Fields** values are valid Sentry field names.
+
+## Annotation errors
+
+These errors occur when using Sentry annotations on dashboards.
+
+### Annotations don't appear
+
+**Symptoms:**
+
+- Annotation query is configured but no annotations appear on the graph
+- No error messages are displayed
+
+**Possible causes and solutions:**
+
+| Cause                             | Solution                                                                                                         |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Time range doesn't contain data   | Expand the dashboard time range. Annotations only display for data within the visible time range.                |
+| Query filter too restrictive      | Simplify the **Query** filter or remove it temporarily to verify annotations appear.                             |
+| Wrong project or environment      | Verify the correct project and environment are selected in the annotation query.                                 |
+| Annotations disabled on panel     | Verify annotations are enabled on the panel. Click the panel title and check that the annotation toggle is on.   |
+
+### Too many annotations
+
+**Symptoms:**
+
+- Dashboard is slow or cluttered with annotations
+- Browser performance degrades
+
+**Solutions:**
+
+1. Set a lower **Limit** value in the annotation query to reduce the number of returned results.
+1. Add a more specific **Query** filter (for example, `is:unresolved level:error`) to reduce the number of matching issues.
+1. Filter by **Projects** or **Environments** to narrow the scope.
+
+## Alerting errors
+
+These errors occur when using Grafana alerting with the Sentry data source.
+
+### Alert rule fails to evaluate
+
+**Symptoms:**
+
+- Alert rule status shows "Error"
+- Alert notifications are not triggered
+
+**Possible causes and solutions:**
+
+| Cause                              | Solution                                                                                                                                       |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Sentry API rate limits             | Increase the evaluation interval to reduce the frequency of API calls. Avoid evaluating more frequently than every 5 minutes.                  |
+| Authentication token expired       | Generate a new token and update the data source configuration. Refer to [Configure the Sentry data source](https://grafana.com/docs/plugins/grafana-sentry-datasource/latest/configure/).       |
+| Query returns no data              | Verify the query returns data by running it in [Explore](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/explore/) before creating an alert rule.   |
+| Missing Reduce expression          | Issues, Events, and Spans queries return tabular data. Add a **Reduce** expression (for example, **Count**) to produce a numeric value for the alert condition. |
+
+### Alert condition not met despite matching data
+
+**Symptoms:**
+
+- Data appears in Explore but the alert doesn't fire
+- Alert preview shows data but condition is never met
+
+**Solutions:**
+
+1. Verify the **Reduce** function matches your intent. For example, **Last** returns the most recent value, while **Mean** averages all values in the evaluation window.
+1. Check the **Threshold** expression operator and value. Preview the alert rule to see the actual values being compared.
+1. For Issues queries, verify the **Limit** is set high enough to capture all matching issues, since the **Count** expression only counts returned rows.
 
 ## Template variable errors
 
