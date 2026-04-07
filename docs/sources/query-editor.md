@@ -56,6 +56,14 @@ Use the Issues query type to retrieve a list of Sentry issues. Results are filte
 | **Sort By**  | (Optional) The order of results. Options: Last Seen, First Seen, Priority, Events, Users.                                                                     |
 | **Limit**    | (Optional) The maximum number of results to return. Default: `100`.                                                                                            |
 
+#### Issue query examples
+
+- `is:unresolved` -- Show only unresolved issues.
+- `is:unresolved assigned:me` -- Show unresolved issues assigned to you.
+- `is:unresolved level:error` -- Show unresolved error-level issues.
+- `is:unresolved first-seen:-24h` -- Show unresolved issues first seen in the last 24 hours.
+- `is:unresolved times_seen:>100` -- Show unresolved issues seen more than 100 times.
+
 For more information about Sentry issues, refer to the [Sentry Issues documentation](https://docs.sentry.io/product/issues/).
 
 ### Events
@@ -69,6 +77,14 @@ Use the Events query type to retrieve a list of Sentry events. Results are filte
 | **Sort By**        | (Optional) The sort order for results. Options: Last Seen, Count, Events per minute, Failure rate, Level. You can also enter a custom sort field.                    |
 | **Sort Direction** | (Optional) Ascending or Descending. Appears when a sort field is selected.                                                                                           |
 | **Limit**          | (Optional) The maximum number of results to return. Maximum: `100`.                                                                                                  |
+
+#### Event query examples
+
+- `event.type:error` -- Show only error events.
+- `event.type:error level:fatal` -- Show fatal error events.
+- `event.type:transaction transaction.duration:>5000` -- Show transactions slower than 5 seconds.
+- `release:1.2.0` -- Show events from a specific release.
+- `tags[browser]:Chrome` -- Show events from Chrome browsers.
 
 For more information about Sentry events, refer to the [Sentry Discover documentation](https://docs.sentry.io/product/explore/discover-queries/).
 
@@ -84,6 +100,11 @@ Use the Spans query type to retrieve span data from Sentry. This query type uses
 | **Sort Direction** | (Optional) Ascending or Descending. Appears when a sort field is selected.                                                       |
 | **Limit**          | (Optional) The maximum number of results to return. Maximum: `100`.                                                               |
 
+#### Span query examples
+
+- `span.op:db` -- Show database spans.
+- `span.op:http.client span.description:*api*` -- Show HTTP client spans with "api" in the description.
+
 ### Events Stats
 
 Use the Events Stats query type to retrieve time-series data for Sentry events, suitable for graphing trends over time. Results are filtered based on the dashboard time range.
@@ -96,6 +117,12 @@ Use the Events Stats query type to retrieve time-series data for Sentry events, 
 | **Sort By** | (Optional) A field name to sort results by.                                                                      |
 | **Limit**   | (Optional) The maximum number of result groups. Maximum: `10`.                                                   |
 
+#### Events Stats use cases
+
+- **Error trend monitoring:** Set **Y-axis** to `count()` and **Query** to `event.type:error` to graph error volume over time.
+- **Error rate by release:** Set **Y-axis** to `count()`, **Query** to `event.type:error`, and **Group** to `release` to compare error rates across releases.
+- **Transaction performance:** Set **Y-axis** to `p95(transaction.duration)` to track the 95th percentile response time.
+
 ### Spans Stats
 
 Use the Spans Stats query type to retrieve time-series data for Sentry spans. This query type uses the same editor as Events Stats but queries the Sentry spans stats API.
@@ -107,6 +134,11 @@ Use the Spans Stats query type to retrieve time-series data for Sentry spans. Th
 | **Group**   | (Optional) One or more fields or tags to group results by. Enter values and press Enter to add each one.         |
 | **Sort By** | (Optional) A field name to sort results by.                                                                      |
 | **Limit**   | (Optional) The maximum number of result groups. Maximum: `10`.                                                   |
+
+#### Spans Stats use cases
+
+- **Database performance:** Set **Y-axis** to `p95(span.duration)` and **Query** to `span.op:db` to track database query performance.
+- **Slow HTTP calls by endpoint:** Set **Y-axis** to `avg(span.duration)`, **Query** to `span.op:http.client`, and **Group** to `span.description` to identify slow external calls.
 
 ### Metrics
 
@@ -121,6 +153,12 @@ Use the Metrics query type to retrieve session-based metrics from Sentry, such a
 | **Order**    | (Optional) Sort order: High to low or Low to high. Appears alongside Sort By.                                                                             |
 | **Limit**    | (Optional) The maximum number of result groups. Default: `5`, maximum: `10`. Appears alongside Sort By.                                                   |
 
+#### Metrics use cases
+
+- **Crash-free rate monitoring:** Set **Field** to `session.crash_free_rate` and **Group By** to `release` to compare stability across releases.
+- **Session health by environment:** Set **Field** to `session.healthy` and **Group By** to `environment` to compare session health across staging and production.
+- **ANR rate tracking:** Set **Field** to `session.anr_rate` to monitor Application Not Responding rates on mobile apps.
+
 ### Stats
 
 Use the Stats query type to retrieve organization-level usage statistics from Sentry, such as event counts and quotas. Results are filtered based on the dashboard time range. The Environments filter is not available for this query type.
@@ -133,6 +171,12 @@ Use the Stats query type to retrieve organization-level usage statistics from Se
 | **Outcome Filter**  | (Optional) Filter by one or more outcomes: `accepted`, `filtered`, `invalid`, `rate_limited`, `client_discard`, `abuse`.       |
 | **Reason Filter**   | (Optional) A comma-separated list of reasons to filter by.                                                                     |
 | **Interval**        | (Optional) The time interval for grouping results. Format: `[number][unit]`, where unit is `m` (minutes), `h` (hours), `d` (days), or `w` (weeks). |
+
+#### Stats use cases
+
+- **Error quota monitoring:** Set **Field** to `sum(quantity)`, **Category Filter** to `error`, and **Group By** to `outcome` to track how many errors are accepted, filtered, or rate-limited.
+- **Event consumption by project:** Set **Field** to `sum(quantity)`, **Category Filter** to `error`, and filter by specific projects to understand per-project quota usage.
+- **Dropped event tracking:** Set **Field** to `sum(quantity)`, **Category Filter** to `error`, and **Outcome Filter** to `rate_limited` and `client_discard` to monitor events your organization is losing.
 
 For more information about organization statistics, refer to the [Sentry Org Stats documentation](https://docs.sentry.io/product/accounts/quotas/org-stats/).
 
