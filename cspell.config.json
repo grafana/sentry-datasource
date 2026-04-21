@@ -25,6 +25,7 @@
     "httpclient",
     "instancemgmt",
     "jackspeak",
+    "jsonencode",
     "errorsource",
     "mhdw",
     "nolint",
