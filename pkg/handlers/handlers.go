@@ -4,7 +4,6 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/grafana/grafana-plugin-sdk-go/data/framestruct"
-	"github.com/grafana/grafana-plugin-sdk-go/experimental/errorsource"
 	"github.com/grafana/sentry-datasource/pkg/errors"
 	"github.com/grafana/sentry-datasource/pkg/framer"
 	"github.com/grafana/sentry-datasource/pkg/query"
@@ -14,7 +13,7 @@ import (
 // HandleIssues handles the issues query.to the Sentry API.
 func HandleIssues(client sentry.SentryClient, query query.SentryQuery, backendQuery backend.DataQuery, response backend.DataResponse) backend.DataResponse {
 	if client.OrgSlug == "" {
-		return errors.GetErrorResponse(response, "", errorsource.DownstreamError(errors.ErrorInvalidOrganizationSlug, false))
+		return errors.GetErrorResponse(response, "", backend.DownstreamError(errors.ErrorInvalidOrganizationSlug))
 	}
 	issues, executedQueryString, err := client.GetIssues(sentry.GetIssuesInput{
 		OrganizationSlug: client.OrgSlug,
@@ -42,7 +41,7 @@ func HandleIssues(client sentry.SentryClient, query query.SentryQuery, backendQu
 // HandleEvents handles the events query.to the Sentry API.
 func HandleEvents(client sentry.SentryClient, query query.SentryQuery, backendQuery backend.DataQuery, response backend.DataResponse) backend.DataResponse {
 	if client.OrgSlug == "" {
-		return errors.GetErrorResponse(response, "", errorsource.DownstreamError(errors.ErrorInvalidOrganizationSlug, false))
+		return errors.GetErrorResponse(response, "", backend.DownstreamError(errors.ErrorInvalidOrganizationSlug))
 	}
 	sort := query.EventsSort
 	if query.EventsSort != "" && query.EventsSortDirection == "desc" {
@@ -75,7 +74,7 @@ func HandleEvents(client sentry.SentryClient, query query.SentryQuery, backendQu
 // HandleEvents handles the events query.to the Sentry API.
 func HandleSpans(client sentry.SentryClient, query query.SentryQuery, backendQuery backend.DataQuery, response backend.DataResponse) backend.DataResponse {
 	if client.OrgSlug == "" {
-		return errors.GetErrorResponse(response, "", errorsource.DownstreamError(errors.ErrorInvalidOrganizationSlug, false))
+		return errors.GetErrorResponse(response, "", backend.DownstreamError(errors.ErrorInvalidOrganizationSlug))
 	}
 	sort := query.EventsSort
 	if query.EventsSort != "" && query.EventsSortDirection == "desc" {
@@ -108,7 +107,7 @@ func HandleSpans(client sentry.SentryClient, query query.SentryQuery, backendQue
 // HandleEventsStats handles the events stats query.to the Sentry API.
 func HandleEventsStats(client sentry.SentryClient, query query.SentryQuery, backendQuery backend.DataQuery, response backend.DataResponse) backend.DataResponse {
 	if client.OrgSlug == "" {
-		return errors.GetErrorResponse(response, "", errorsource.DownstreamError(errors.ErrorInvalidOrganizationSlug, false))
+		return errors.GetErrorResponse(response, "", backend.DownstreamError(errors.ErrorInvalidOrganizationSlug))
 	}
 	eventsStats, executedQueryString, err := client.GetEventsStats(sentry.GetEventsStatsInput{
 		OrganizationSlug: client.OrgSlug,
@@ -139,7 +138,7 @@ func HandleEventsStats(client sentry.SentryClient, query query.SentryQuery, back
 // HandleSpansStats handles the events stats query.to the Sentry API.
 func HandleSpansStats(client sentry.SentryClient, query query.SentryQuery, backendQuery backend.DataQuery, response backend.DataResponse) backend.DataResponse {
 	if client.OrgSlug == "" {
-		return errors.GetErrorResponse(response, "", errorsource.DownstreamError(errors.ErrorInvalidOrganizationSlug, false))
+		return errors.GetErrorResponse(response, "", backend.DownstreamError(errors.ErrorInvalidOrganizationSlug))
 	}
 	spansStats, executedQueryString, err := client.GetSpansStats(sentry.GetSpansStatsInput{
 		OrganizationSlug: client.OrgSlug,
@@ -171,7 +170,7 @@ func HandleSpansStats(client sentry.SentryClient, query query.SentryQuery, backe
 // HandleMetrics handles the metrics query.to the Sentry API.
 func HandleMetrics(client sentry.SentryClient, query query.SentryQuery, backendQuery backend.DataQuery, response backend.DataResponse) backend.DataResponse {
 	if client.OrgSlug == "" {
-		return errors.GetErrorResponse(response, "", errorsource.DownstreamError(errors.ErrorInvalidOrganizationSlug, false))
+		return errors.GetErrorResponse(response, "", backend.DownstreamError(errors.ErrorInvalidOrganizationSlug))
 	}
 	metrics, executedQueryString, err := client.GetMetrics(sentry.GetMetricsInput{
 		OrganizationSlug: client.OrgSlug,
@@ -203,7 +202,7 @@ func HandleMetrics(client sentry.SentryClient, query query.SentryQuery, backendQ
 // HandleStatsV2 handles the statsV2 query.to the Sentry API.
 func HandleStatsV2(client sentry.SentryClient, query query.SentryQuery, backendQuery backend.DataQuery, response backend.DataResponse) backend.DataResponse {
 	if client.OrgSlug == "" {
-		return errors.GetErrorResponse(response, "", errorsource.DownstreamError(errors.ErrorInvalidOrganizationSlug, false))
+		return errors.GetErrorResponse(response, "", backend.DownstreamError(errors.ErrorInvalidOrganizationSlug))
 	}
 	stats, executedQueryString, err := client.GetStatsV2(sentry.GetStatsV2Input{
 		OrganizationSlug: client.OrgSlug,
@@ -219,7 +218,7 @@ func HandleStatsV2(client sentry.SentryClient, query query.SentryQuery, backendQ
 	})
 	if err != nil {
 		// errorsource set by Sentry client
-		return errors.GetErrorResponse(response, executedQueryString, errorsource.DownstreamError(err, false))
+		return errors.GetErrorResponse(response, executedQueryString, backend.DownstreamError(err))
 	}
 	frame, err := framer.ConvertStatsV2ResponseToFrame(framer.GetFrameName("Stats", backendQuery.RefID), stats)
 	if err != nil {
