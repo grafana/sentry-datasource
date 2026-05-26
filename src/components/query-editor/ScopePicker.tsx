@@ -2,7 +2,7 @@ import type { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { EditorField, EditorFieldGroup, EditorRow } from '@grafana/plugin-ui';
 import { getTemplateSrv } from '@grafana/runtime';
 import { MultiSelect } from '@grafana/ui';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { replaceProjectIDs } from './../../app/replace';
 import { getEnvironmentNamesFromProject } from './../../app/utils';
 import { SentryDataSource } from './../../datasource';
@@ -19,17 +19,18 @@ export const ScopePicker = (props: ScopePickerProps) => {
   const { projectIds } = query;
   const environments = query.queryType === 'statsV2' ? [] : query.environments;
   const [projects, setProjects] = useState<SentryProject[]>([]);
-  const [allEnvironments, setAllEnvironments] = useState<string[]>([]);
   const orgSlug = datasource.getOrgSlug();
+  const allEnvironments = useMemo(() => {
+    const updatedProjectIDs = replaceProjectIDs(projectIds);
+
+    return getEnvironmentNamesFromProject(projects, updatedProjectIDs);
+  }, [projects, projectIds]);
+
   useEffect(() => {
     if (orgSlug) {
       datasource.getProjects(orgSlug).then(setProjects).catch(console.error);
     }
   }, [datasource, orgSlug]);
-  useEffect(() => {
-    const updatedProjectIDs = replaceProjectIDs(projectIds);
-    setAllEnvironments(getEnvironmentNamesFromProject(projects, updatedProjectIDs));
-  }, [projects, projectIds]);
   const getProjectsAsOptions = (): Array<SelectableValue<string>> => {
     return [
       ...projects.map((o) => {

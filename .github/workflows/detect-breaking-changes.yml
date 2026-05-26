@@ -16,10 +16,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
+      - name: Use pinned npm
+        run: npm install --global npm@11.15.0 --ignore-scripts
       - name: Install dependencies
-        run: yarn install --frozen-lockfile --ignore-scripts --non-interactive
+        run: npm ci --ignore-scripts
       - name: Build plugin
-        run: yarn build:client
+        run: npm run build:client
       - name: Compatibility check
         uses: grafana/plugin-actions/is-compatible@09d9424ff9e927a13892275f0792e1f010ae4bfe
         with:
