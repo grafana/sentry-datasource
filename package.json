@@ -105,7 +105,8 @@
     "js-yaml": "^4.1.1"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=24",
+    "npm": ">=11.15.0"
   },
   "packageManager": "npm@11.15.0"
 }
