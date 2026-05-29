@@ -1,13 +1,12 @@
 name: Compatibility check
 on: [push, pull_request]
 
-permissions:
-  contents: read
-  issues: write
-  pull-requests: write
-
 jobs:
   compatibilitycheck:
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
