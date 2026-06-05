@@ -6,6 +6,7 @@ keywords:
   - grafana
   - sentry
   - data source
+  - error monitoring
   - error tracking
   - application monitoring
 labels:

@@ -41,6 +41,7 @@ Every query type includes the following shared fields.
 | **Query Type**   | The type of Sentry data to query. Select one of: Issues, Events, Spans, Events Stats, Spans Stats, Metrics, or Stats. |
 | **Projects**     | (Optional) Filter results by one or more Sentry projects.                                                    |
 | **Environments** | (Optional) Filter results by one or more Sentry environments. Not available for Stats queries.               |
+| **Interval**     | (Optional) Format: `[number][unit]` where unit is `m` (minutes), `h` (hours), `d` (days), or `w` (weeks). Example: `1h`. |
 
 ## Query types
 
@@ -54,7 +55,7 @@ Use the Issues query type to retrieve a list of Sentry issues. Results are filte
 | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Query**    | (Optional) A Sentry search query to filter results. Use the format `FIELD_NAME:FIELD_VALUE` to filter by issue fields. Run with Shift+Enter.                  |
 | **Sort By**  | (Optional) The order of results. Options: Last Seen, First Seen, Priority, Events, Users.                                                                     |
-| **Limit**    | (Optional) The maximum number of results to return. Default: `100`.                                                                                            |
+| **Limit**    | (Optional) The maximum number of results to return. Default: `100`. Maximum: `10000`.                                                                          |
 
 #### Issue query examples
 
