@@ -6,6 +6,27 @@
     "platformAutomerge": true,
     "packageRules": [
         {
+            "description": "Require 3-day cooldown for npm packages",
+            "matchDatasources": [
+                "npm"
+            ],
+            "minimumReleaseAge": "3 days"
+        },
+        {
+            "description": "Require 3-day cooldown for Go modules",
+            "matchManagers": [
+                "gomod"
+            ],
+            "minimumReleaseAge": "3 days"
+        },
+        {
+            "description": "Require 3-day cooldown for GitHub Actions",
+            "matchManagers": [
+                "github-actions"
+            ],
+            "minimumReleaseAge": "3 days"
+        },
+        {
             "description": "Disable minimum release age for Grafana owned npm packages (@grafana/*)",
             "matchDatasources": [
                 "npm"

@@ -2,8 +2,11 @@ name: Run commands when issues are labeled
 on:
   issues:
     types: [labeled]
+
 jobs:
   main:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Actions

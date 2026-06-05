@@ -16,6 +16,7 @@
     "package.json"
   ],
   "words": [
+    "buildinfo",
     "DataSource",
     "DataSources",
     "endregion",

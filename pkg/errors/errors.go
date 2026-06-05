@@ -5,7 +5,6 @@ import (
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
-	"github.com/grafana/grafana-plugin-sdk-go/experimental/errorsource"
 )
 
 var (
@@ -23,7 +22,7 @@ var (
 // GetErrorResponse returns a DataResponse with an error frame.
 func GetErrorResponse(response backend.DataResponse, executedQueryString string, err error) backend.DataResponse {
 	if err != nil {
-		errResponse := errorsource.Response(err)
+		errResponse := backend.ErrorResponseWithErrorSource(err)
 		response.Error = errResponse.Error
 		response.ErrorSource = errResponse.ErrorSource
 		frame := data.NewFrame("Error")
