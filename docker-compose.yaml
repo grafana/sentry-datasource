@@ -1,0 +1,13 @@
+services:
+  grafana:
+    build:
+      args:
+        grafana_version: ${GRAFANA_VERSION:-9.1.2}
+    ports:
+      - 3000:3000/tcp
+    environment:
+      ORG_SLUG: ${ORG_SLUG}
+      AUTH_TOKEN: ${AUTH_TOKEN}
+    extends:
+      file: .config/docker-compose-base.yaml
+      service: grafana
