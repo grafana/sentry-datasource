@@ -38,3 +38,4 @@ jobs:
       scopes: ${{ github.event.inputs.environment == 'cloud (recommended)' && 'grafana_cloud' || github.event.inputs.environment == 'on-prem (for emergencies fix to On Prem customers)' && 'universal' }}
       run-playwright: false
       github-draft-release: false
+      trufflehog-exclude-detectors: SentryToken
