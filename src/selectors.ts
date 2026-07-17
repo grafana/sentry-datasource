@@ -74,6 +74,12 @@ export const Components = {
       },
     },
     Events: {
+      Dataset: {
+        label: 'Dataset',
+        tooltip:
+          'Sentry dataset to query. Leave this empty to keep the default behaviour of querying both errors and transactions',
+        placeholder: 'Optional',
+      },
       Fields: {
         label: 'Fields',
         tooltip: 'Sentry field names to fetch',

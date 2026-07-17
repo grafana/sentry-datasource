@@ -53,6 +53,7 @@ func HandleEvents(client sentry.SentryClient, query query.SentryQuery, backendQu
 		Environments:     query.Environments,
 		Query:            query.EventsQuery,
 		Fields:           query.EventsFields,
+		Dataset:          query.EventsDataset,
 		Sort:             sort,
 		Limit:            query.EventsLimit,
 		From:             backendQuery.TimeRange.From,

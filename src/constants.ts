@@ -1,6 +1,7 @@
 import type { SelectableValue } from '@grafana/data';
 import type {
   QueryType,
+  SentryEventsDataset,
   SentryEventSort,
   SentryIssueSort,
   SentryMetricsQueryField,
@@ -41,6 +42,10 @@ export const SentryEventSortOptions: Array<SelectableValue<SentryEventSort>> = [
 export const SentryEventSortDirectionOptions: Array<SelectableValue<SentrySortDirection>> = [
   { value: 'asc', label: 'Ascending' },
   { value: 'desc', label: 'Descending' },
+];
+export const SentryEventsDatasetOptions: Array<SelectableValue<SentryEventsDataset>> = [
+  { value: 'errors', label: 'errors' },
+  { value: 'transactions', label: 'transactions' },
 ];
 export const SentryMetricsQueryFieldOptions: Array<SelectableValue<SentryMetricsQueryField>> = [
   { value: 'sum(session)', label: 'sum(session)' },

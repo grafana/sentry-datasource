@@ -1,4 +1,10 @@
-import type { DataQueryRequest, DataQueryResponse, DataSourceInstanceSettings, MetricFindValue, ScopedVars } from '@grafana/data';
+import type {
+  DataQueryRequest,
+  DataQueryResponse,
+  DataSourceInstanceSettings,
+  MetricFindValue,
+  ScopedVars,
+} from '@grafana/data';
 import { DataSourceWithBackend, getTemplateSrv } from '@grafana/runtime';
 import { Observable } from 'rxjs';
 import { applyTemplateVariables, applyTemplateVariablesToVariableQuery } from './app/replace';
@@ -100,7 +106,7 @@ export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryC
 
   getAttributes(orgSlug: string = this.getOrgSlug()): Promise<SentryAttribute[]> {
     const replacedOrgSlug: string = getTemplateSrv().replace(orgSlug);
-    return this.getResource<SentryTag[]>(`api/0/organizations/${replacedOrgSlug}/trace-items/attributes/`);
+    return this.getResource<SentryAttribute[]>(`api/0/organizations/${replacedOrgSlug}/trace-items/attributes`);
   }
 
   getOrganizations(): Promise<SentryOrganization[]> {
@@ -108,7 +114,10 @@ export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryC
   }
   getProjects(orgSlug: string): Promise<SentryProject[]> {
     const replacedOrgSlug: string = getTemplateSrv().replace(orgSlug);
-    return this.getResource<SentryProject[]>(`api/0/organizations/${replacedOrgSlug}/projects` as GetResourceCallProjectsPath, {});
+    return this.getResource<SentryProject[]>(
+      `api/0/organizations/${replacedOrgSlug}/projects` as GetResourceCallProjectsPath,
+      {}
+    );
   }
   getTeamsProjects(orgSlug: string, teamSlug: string): Promise<SentryProject[]> {
     const replacedOrgSlug: string = getTemplateSrv().replace(orgSlug || '');

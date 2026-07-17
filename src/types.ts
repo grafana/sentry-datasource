@@ -72,10 +72,12 @@ export type SentryIssuesQuery = {
   issuesSort?: SentryIssueSort;
   issuesLimit?: number;
 } & SentryQueryBase<'issues'>;
+export type SentryEventsDataset = 'errors' | 'transactions';
 export type SentryEventsQuery = {
   projectIds: string[];
   environments: string[];
   eventsQuery: string;
+  eventsDataset?: SentryEventsDataset;
   eventsFields?: string[];
   eventsSort?: SentryEventSort;
   eventsSortDirection?: SentrySortDirection;
@@ -182,6 +184,10 @@ export type GetResourceCallOrganizations = GetResourceCallBase<
 >;
 export type GetResourceCallProjectsPath = `api/0/organizations/${string}/projects`;
 export type GetResourceCallProjects = GetResourceCallBase<GetResourceCallProjectsPath, {}, SentryProject[]>;
+export type GetResourceCallTagsPath = `api/0/organizations/${string}/tags`;
+export type GetResourceCallTags = GetResourceCallBase<GetResourceCallTagsPath, {}, SentryTag[]>;
+export type GetResourceCallAttributesPath = `api/0/organizations/${string}/trace-items/attributes`;
+export type GetResourceCallAttributes = GetResourceCallBase<GetResourceCallAttributesPath, {}, SentryAttribute[]>;
 export type GetResourceCallListOrgTeamsPath = `api/0/organizations/${string}/teams`;
 export type GetResourceCallListOrgTeams = GetResourceCallBase<GetResourceCallListOrgTeamsPath, {}, SentryTeam[]>;
 export type GetResourceCallGetTeamsProjectsPath = `api/0/teams/${string}/${string}/projects`;
@@ -193,6 +199,8 @@ export type GetResourceCallGetTeamsProjects = GetResourceCallBase<
 export type GetResourceCall =
   | GetResourceCallOrganizations
   | GetResourceCallProjects
+  | GetResourceCallTags
+  | GetResourceCallAttributes
   | GetResourceCallListOrgTeams
   | GetResourceCallGetTeamsProjects;
 //#endregion

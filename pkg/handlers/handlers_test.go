@@ -267,6 +267,36 @@ func TestSentryDatasource_Events(t *testing.T) {
 		require.NotContains(t, frame.Meta.ExecutedQueryString, "dataset=")
 	})
 
+	t.Run("events query with dataset should include the dataset param", func(t *testing.T) {
+		sc := util.NewFakeClient(util.FakeDoer{Body: `{
+			"data": [
+				{
+					"id": "event_id_1",
+					"title": "event_title_1"
+				}
+			]
+		}`})
+
+		query := `{
+			"queryType" : "events",
+			"projectIds" : ["project_id"],
+			"environments" : ["dev"],
+			"eventsQuery" : "event_query",
+			"eventsFields" : ["id","title"],
+			"eventsDataset" : "errors",
+			"eventsLimit" : 10
+		}`
+
+		ds := plugin.NewDatasourceInstance(sc)
+		ctx := context.TODO()
+
+		res, _ := ds.QueryData(ctx, &backend.QueryDataRequest{Queries: []backend.DataQuery{{RefID: "A", JSON: []byte(query)}}})
+
+		assert.Nil(t, res.Responses["A"].Error)
+		require.Equal(t, 1, len(res.Responses["A"].Frames))
+		require.Contains(t, res.Responses["A"].Frames[0].Meta.ExecutedQueryString, "dataset=errors")
+	})
+
 	t.Run("valid events stats query should produce correct result", func(t *testing.T) {
 		sc := util.NewFakeClient(util.FakeDoer{Body: `{
 			"meta": { "dataset": "discover", "start": 1000.0, "end": 2000.0 },
