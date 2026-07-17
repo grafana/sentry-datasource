@@ -18,8 +18,9 @@ export default defineConfig<PluginOptions>({
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://localhost:3000',
+    /* Base URL to use in actions like `await page.goto('/')`. GRAFANA_URL is provided by the
+     * Bench container in Cloud runs and allows local runs against a non-default port. */
+    baseURL: process.env.GRAFANA_URL ?? 'http://localhost:3000',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
