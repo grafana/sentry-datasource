@@ -28,6 +28,16 @@ func (m *mockDoer) Do(req *http.Request) (*http.Response, error) {
 	return m.response, m.err
 }
 
+type sequencedDoer struct {
+	responses []*http.Response
+	requests  []*http.Request
+}
+
+func (m *sequencedDoer) Do(req *http.Request) (*http.Response, error) {
+	m.requests = append(m.requests, req)
+	return m.responses[len(m.requests)-1], nil
+}
+
 func createMockResponse(statusCode int, body interface{}, headers map[string]string) *http.Response {
 	var bodyReader io.Reader
 
@@ -204,6 +214,44 @@ func TestSentryClient_FetchWithPagination(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, "/api/projects/?cursor=next_cursor", nextURL)
 		assert.Equal(t, expectedData, result)
+	})
+
+	// Regression test for #385 (fixed in #538): when Sentry sits behind PDC or a reverse
+	// proxy, the next link header carries a host that differs from the configured datasource
+	// URL. Feeding the returned next URL back into FetchWithPagination must dispatch the
+	// second request against the configured base URL, not a concatenation of the base URL and
+	// the absolute next link.
+	t.Run("requests the next page against the configured base URL", func(t *testing.T) {
+		pageOne := []map[string]interface{}{
+			{"id": "1", "name": "project1"},
+		}
+		pageTwo := []map[string]interface{}{
+			{"id": "2", "name": "project2"},
+		}
+
+		linkHeader := `<http://internal-proxy.example/api/projects/?cursor=next_cursor>; rel="next"; results="true"`
+		doer := &sequencedDoer{
+			responses: []*http.Response{
+				createMockResponse(http.StatusOK, pageOne, map[string]string{"Link": linkHeader}),
+				createMockResponse(http.StatusOK, pageTwo, nil),
+			},
+		}
+
+		client, err := sentry.NewSentryClient(testBaseURL, testOrgSlug, testAuthToken, doer)
+		require.NoError(t, err)
+
+		var result []map[string]interface{}
+		nextURL, err := client.FetchWithPagination("/api/projects/", &result)
+		require.NoError(t, err)
+		assert.Equal(t, "/api/projects/?cursor=next_cursor", nextURL)
+
+		nextURL, err = client.FetchWithPagination(nextURL, &result)
+		require.NoError(t, err)
+		assert.Empty(t, nextURL)
+
+		require.Len(t, doer.requests, 2)
+		assert.Equal(t, testBaseURL+"/api/projects/", doer.requests[0].URL.String())
+		assert.Equal(t, testBaseURL+"/api/projects/?cursor=next_cursor", doer.requests[1].URL.String())
 	})
 
 	t.Run("does not return malformed URLs", func(t *testing.T) {
