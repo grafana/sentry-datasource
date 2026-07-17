@@ -3,8 +3,10 @@ package handlers_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/grafana/sentry-datasource/pkg/framer"
 	"github.com/grafana/sentry-datasource/pkg/plugin"
 	"github.com/grafana/sentry-datasource/pkg/util"
@@ -26,9 +28,80 @@ func TestSentryDatasource_Issues(t *testing.T) {
 		assert.Nil(t, res.Responses["A"].Error)
 		require.Equal(t, 1, len(res.Responses["A"].Frames))
 		assert.Equal(t, "Issues (A)", res.Responses["A"].Frames[0].Name)
-		require.Equal(t, 33, len(res.Responses["A"].Frames[0].Fields))
+		require.Equal(t, 35, len(res.Responses["A"].Frames[0].Fields))
 		require.Equal(t, 3, res.Responses["A"].Frames[0].Fields[0].Len())
 	})
+
+	t.Run("FirstSeen and LastSeen should use lifetime values when present", func(t *testing.T) {
+		sc := util.NewFakeClient(util.FakeDoer{Body: `[{
+			"firstSeen": "2026-07-09T00:18:03Z",
+			"lastSeen": "2026-07-10T19:35:03Z",
+			"lifetime": {
+				"count": "23620",
+				"userCount": 8,
+				"firstSeen": "2025-12-30T13:46:46.300599Z",
+				"lastSeen": "2026-07-16T03:24:23Z"
+			}
+		}]`})
+		ds := plugin.NewDatasourceInstance(sc)
+		ctx := context.TODO()
+
+		res, _ := ds.QueryData(ctx, &backend.QueryDataRequest{Queries: []backend.DataQuery{{RefID: "A", JSON: []byte(`{
+			"queryType" : "issues"
+		}`)}}})
+
+		assert.Nil(t, res.Responses["A"].Error)
+		require.Equal(t, 1, len(res.Responses["A"].Frames))
+		frame := res.Responses["A"].Frames[0]
+		assert.Equal(t, mustParseTime(t, "2025-12-30T13:46:46.300599Z"), fieldTimeAt(t, frame, "FirstSeen", 0))
+		assert.Equal(t, mustParseTime(t, "2026-07-16T03:24:23Z"), fieldTimeAt(t, frame, "LastSeen", 0))
+		assert.Equal(t, mustParseTime(t, "2026-07-09T00:18:03Z"), fieldTimeAt(t, frame, "FirstSeenInRange", 0))
+		assert.Equal(t, mustParseTime(t, "2026-07-10T19:35:03Z"), fieldTimeAt(t, frame, "LastSeenInRange", 0))
+		for _, field := range frame.Fields {
+			assert.NotContains(t, field.Name, "Lifetime", "lifetime object should not leak into the frame as columns")
+		}
+	})
+
+	t.Run("FirstSeen and LastSeen should be kept as-is when lifetime is absent", func(t *testing.T) {
+		sc := util.NewFakeClient(util.FakeDoer{Body: `[{
+			"firstSeen": "2026-07-09T00:18:03Z",
+			"lastSeen": "2026-07-10T19:35:03Z"
+		}]`})
+		ds := plugin.NewDatasourceInstance(sc)
+		ctx := context.TODO()
+
+		res, _ := ds.QueryData(ctx, &backend.QueryDataRequest{Queries: []backend.DataQuery{{RefID: "A", JSON: []byte(`{
+			"queryType" : "issues"
+		}`)}}})
+
+		assert.Nil(t, res.Responses["A"].Error)
+		require.Equal(t, 1, len(res.Responses["A"].Frames))
+		frame := res.Responses["A"].Frames[0]
+		assert.Equal(t, mustParseTime(t, "2026-07-09T00:18:03Z"), fieldTimeAt(t, frame, "FirstSeen", 0))
+		assert.Equal(t, mustParseTime(t, "2026-07-10T19:35:03Z"), fieldTimeAt(t, frame, "LastSeen", 0))
+	})
+}
+
+func mustParseTime(t *testing.T, value string) time.Time {
+	t.Helper()
+	parsed, err := time.Parse(time.RFC3339Nano, value)
+	require.NoError(t, err)
+	return parsed
+}
+
+func fieldTimeAt(t *testing.T, frame *data.Frame, fieldName string, rowIdx int) time.Time {
+	t.Helper()
+	for _, field := range frame.Fields {
+		if field.Name == fieldName {
+			value, ok := field.ConcreteAt(rowIdx)
+			require.True(t, ok, "field %q has no concrete value at row %d", fieldName, rowIdx)
+			parsed, ok := value.(time.Time)
+			require.True(t, ok, "field %q is not a time field", fieldName)
+			return parsed
+		}
+	}
+	t.Fatalf("field %q not found in frame", fieldName)
+	return time.Time{}
 }
 
 func TestSentryDatasource_StatsV2(t *testing.T) {

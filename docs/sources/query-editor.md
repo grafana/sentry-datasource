@@ -57,6 +57,16 @@ Use the Issues query type to retrieve a list of Sentry issues. Results are filte
 | **Sort By**  | (Optional) The order of results. Options: Last Seen, First Seen, Priority, Events, Users.                                                                     |
 | **Limit**    | (Optional) The maximum number of results to return. Default: `100`. Maximum: `10000`.                                                                          |
 
+#### Issue date and count fields
+
+The dashboard time range selects which issues are returned, but the returned fields differ in how they treat that range:
+
+| Field                                 | Scope                                                                                                                        |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `FirstSeen`, `LastSeen`               | The issue's whole-of-life timestamps, matching what the Sentry UI displays. These can fall outside the dashboard time range. |
+| `FirstSeenInRange`, `LastSeenInRange` | The timestamps of the issue's first and last matching events within the dashboard time range.                                |
+| `Count`, `UserCount`                  | The number of events and affected users within the dashboard time range, not the issue's lifetime totals.                    |
+
 #### Issue query examples
 
 - `is:unresolved` -- Show only unresolved issues.
