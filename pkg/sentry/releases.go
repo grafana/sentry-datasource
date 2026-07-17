@@ -73,19 +73,19 @@ type GetReleaseDeploysInput struct {
 	Limit            int64
 }
 
-func (grdi *GetReleaseDeploysInput) ToQuery() string {
-	urlPath := fmt.Sprintf("/api/0/organizations/%s/releases/%s/deploys/?", grdi.OrganizationSlug, url.PathEscape(grdi.ReleaseVersion))
-	if grdi.Limit < 1 || grdi.Limit > 100 {
-		grdi.Limit = 100
+func (args *GetReleaseDeploysInput) ToQuery() string {
+	urlPath := fmt.Sprintf("/api/0/organizations/%s/releases/%s/deploys/?", args.OrganizationSlug, url.PathEscape(args.ReleaseVersion))
+	if args.Limit < 1 || args.Limit > 100 {
+		args.Limit = 100
 	}
 	params := url.Values{}
-	params.Set("per_page", strconv.FormatInt(grdi.Limit, 10))
+	params.Set("per_page", strconv.FormatInt(args.Limit, 10))
 	return urlPath + params.Encode()
 }
 
-func (sc *SentryClient) GetReleaseDeploys(grdi GetReleaseDeploysInput) ([]SentryDeploy, string, error) {
+func (sc *SentryClient) GetReleaseDeploys(args GetReleaseDeploysInput) ([]SentryDeploy, string, error) {
 	out := []SentryDeploy{}
-	executedQueryString := grdi.ToQuery()
+	executedQueryString := args.ToQuery()
 	err := sc.Fetch(executedQueryString, &out)
 	return out, sc.BaseURL + executedQueryString, err
 }
