@@ -5,7 +5,7 @@ import type { PluginOptions } from '@grafana/plugin-e2e';
 const pluginE2eAuth = `${dirname(require.resolve('@grafana/plugin-e2e'))}/auth`;
 
 export default defineConfig<PluginOptions>({
-  testDir: './e2e',
+  testDir: './tests/e2e',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -37,9 +37,9 @@ export default defineConfig<PluginOptions>({
       name: 'run-tests',
       use: {
         ...devices['Desktop Chrome'],
-        // @grafana/plugin-e2e writes the auth state to this file,
-        // the path should not be modified
-        storageState: 'playwright/.auth/admin.json',
+        // @grafana/plugin-e2e writes the auth state to this file. The
+        // administrator username is not always `admin` in Cloud runs.
+        storageState: `playwright/.auth/${process.env.GRAFANA_ADMIN_USER || 'admin'}.json`,
       },
       dependencies: ['auth'],
     },
