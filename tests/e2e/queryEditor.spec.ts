@@ -87,9 +87,11 @@ test.describe('Query editor', () => {
       // The query type select renders its placeholder as text rather than as an input
       // placeholder, so target the first combobox in the editor row (Query Type).
       await queryEditorRow(page).getByRole('combobox').first().click();
-      for (const queryType of QUERY_TYPE_OPTIONS) {
-        await expect(page.getByRole('option', { name: queryType, exact: true })).toBeVisible();
-      }
+      // TODO(grafana-10): Grafana 10.x sets aria-label "Select option" on every option, which
+      // overrides the accessible name, so assert on option text (full set, in order) instead.
+      // Revert to getByRole('option', { name, exact: true }) per option once Grafana 10 support
+      // is dropped in https://github.com/grafana/sentry-datasource/pull/724.
+      await expect(page.getByRole('listbox').getByRole('option')).toHaveText(QUERY_TYPE_OPTIONS);
     });
 
     test('should render the scope fields in the default state', async ({ page }) => {
