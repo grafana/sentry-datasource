@@ -60,6 +60,12 @@ After creating template variables, you can use them in query editor fields. The 
 
 For example, if you create a variable named `project` that lists Sentry projects, you can select `var: ${project}` in the **Projects** field of any Sentry query to dynamically filter by the selected project.
 
+## Global variables
+
+Grafana's [global variables](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/dashboards/variables/add-template-variables/#global-variables) work in every field the plugin interpolates: the query, projects, and environments fields of Issues, Events, Events Stats, and Metrics queries, and the projects and interval fields of Stats queries. For example, you can use `${__from:date:iso}` in an Issues query to filter by the dashboard time range, such as `firstSeen:>${__from:date:iso}`.
+
+The **Interval** field of a Stats query supports the `$__interval` variable. Sentry statistics queries only accept intervals between one minute and one day that divide a day evenly, and reject queries that would return more than 1000 data points, so the plugin snaps the resolved interval up to the nearest value Sentry accepts.
+
 ## Variable examples
 
 The following examples show common template variable configurations.
