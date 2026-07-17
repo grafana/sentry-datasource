@@ -130,7 +130,7 @@ Use the Events Stats query type to retrieve time-series data for Sentry events, 
 | **Limit**   | (Optional) The maximum number of result groups. Maximum: `10`, a cap imposed by the Sentry API.                                                                                                                                     |
 
 {{< admonition type="note" >}}
-Grouped Events Stats queries temporarily use Sentry's earlier statistics endpoint rather than the documented `events-timeseries` API, because the documented endpoint currently returns an internal error for grouped queries on error and transaction data. This is transparent to dashboards, keeps the pre-3.0 sorting and legend behaviour for grouped queries, and will be removed once the upstream issue is resolved.
+Grouped Events Stats queries temporarily use Sentry's earlier statistics endpoint rather than the documented `events-timeseries` API, because the documented endpoint currently returns an internal error for grouped queries on error and transaction data. This is transparent to dashboards, keeps the pre-3.0 sorting and legend behavior for grouped queries, and will be removed once the upstream issue is resolved.
 {{< /admonition >}}
 
 #### Events Stats use cases

@@ -77,7 +77,7 @@ export const Components = {
       Dataset: {
         label: 'Dataset',
         tooltip:
-          'Sentry dataset to query. Leave this empty to keep the default behaviour of querying both errors and transactions',
+          'Sentry dataset to query. Leave this empty to keep the default behavior of querying both errors and transactions',
         placeholder: 'Optional',
       },
       Fields: {
