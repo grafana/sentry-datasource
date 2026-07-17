@@ -1,12 +1,14 @@
 ---
 aliases:
   - /docs/plugins/grafana-sentry-datasource/annotations/
-description: Use annotations to overlay Sentry issues on Grafana dashboard graphs.
+description: Use annotations to overlay Sentry issues, releases, and deploys on Grafana dashboard graphs.
 keywords:
   - grafana
   - sentry
   - annotations
   - issues
+  - releases
+  - deploys
   - overlay
 labels:
   products:
@@ -30,7 +32,7 @@ Annotations let you overlay Sentry data on dashboard graphs, marking when issues
 
 ## Supported query types for annotations
 
-All Sentry query types are available for annotations. The **Issues** and **Events** query types are best suited because they return discrete records with timestamps that map naturally to annotation markers.
+All Sentry query types are available for annotations. The **Issues**, **Events**, **Releases**, and **Deploys** query types are best suited because they return discrete records with timestamps that map naturally to annotation markers.
 
 | Query type                | Recommended | Notes                                                                              |
 | ------------------------- | ----------- | ---------------------------------------------------------------------------------- |
@@ -38,12 +40,16 @@ All Sentry query types are available for annotations. The **Issues** and **Event
 | Events                    | Yes         | Uses event timestamps. Useful for marking individual error or transaction events.  |
 | Spans                     | Yes         | Uses span timestamps. Useful for marking specific span occurrences.                |
 | Uptime                    | Yes         | Use `timestamp` as the time field to mark uptime check results, such as failures.  |
+| Releases                  | Yes         | Use `DateCreated` or `DateReleased` as the time field to mark releases on graphs.  |
+| Deploys                   | Yes         | Use `DateFinished` as the time field to mark deploys on graphs.                    |
 | Events Stats              | No          | Returns time-series data, which is less natural for annotation markers.            |
 | Spans Stats               | No          | Returns time-series data, which is less natural for annotation markers.            |
 | Release Health (Sessions) | No          | Returns time-series data, which is less natural for annotation markers.            |
 | Stats                     | No          | Returns time-series data, which is less natural for annotation markers.            |
 
 For Issues queries, the `FirstSeen` and `LastSeen` timestamps are the issue's whole-of-life values, matching what the Sentry UI displays. By default, annotations use the first time field in the result, so issue markers appear at `FirstSeen`, and an issue first seen before the visible time range doesn't produce a marker inside it. To mark an issue's first and last matching events within the dashboard time range instead, map the annotation **Time** field to `FirstSeenInRange` in the annotation editor, and optionally **Time end** to `LastSeenInRange` to render a range.
+
+By default, annotations use the first time field in the result: `DateCreated` for Releases queries and `DateFinished` for Deploys queries. To use a different field, such as `DateReleased`, map it explicitly in the annotation's field mappings.
 
 ## Create an annotation query
 
