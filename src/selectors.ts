@@ -161,6 +161,30 @@ export const Components = {
         placeholder: '5',
       },
     },
+    Releases: {
+      Query: {
+        label: 'Filter',
+        tooltip: 'Optionally filter releases by a release version substring',
+        placeholder: 'Optional. Enter a release version substring',
+      },
+      Limit: {
+        label: 'Limit',
+        tooltip: 'Number of releases to fetch (100 max)',
+        placeholder: '100',
+      },
+    },
+    Deploys: {
+      ReleaseVersion: {
+        label: 'Release Version',
+        tooltip: 'Release version to list deploys for. Template variables are supported',
+        placeholder: 'Required. Enter a release version',
+      },
+      Limit: {
+        label: 'Limit',
+        tooltip: 'Number of deploys to fetch (100 max)',
+        placeholder: '100',
+      },
+    },
     StatsV2: {
       Field: {
         label: 'Field',

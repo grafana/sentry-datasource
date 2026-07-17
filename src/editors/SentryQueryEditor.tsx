@@ -1,7 +1,9 @@
 import type { QueryEditorProps } from '@grafana/data';
 import { EditorRows } from '@grafana/plugin-ui';
+import { DeploysEditor } from 'components/query-editor/DeploysEditor';
 import { EventsStatsEditor } from 'components/query-editor/EventsStatsEditor';
 import { MetricsEditor } from 'components/query-editor/MetricsEditor';
+import { ReleasesEditor } from 'components/query-editor/ReleasesEditor';
 import React from 'react';
 import { Error } from '../components/Error';
 import { EventsEditor, SpansEditor } from './../components/query-editor/EventsEditor';
@@ -26,21 +28,33 @@ export const SentryQueryEditor = (props: SentryQueryEditorProps) => {
   return (
     <EditorRows>
       <QueryTypePicker {...props} />
-      <ScopePicker {...props} hideEnvironments={query.queryType === 'statsV2'} />
+      {query.queryType !== 'deploys' ? (
+        <ScopePicker {...props} hideEnvironments={query.queryType === 'statsV2'} />
+      ) : null}
       {query.queryType === 'issues' ? <IssuesEditor query={query} onChange={onChange} onRunQuery={onRunQuery} /> : null}
       {query.queryType === 'statsV2' ? (
         <StatsV2Editor query={query} onChange={onChange} onRunQuery={onRunQuery} />
       ) : null}
-      {query.queryType === 'events' ? <EventsEditor query={query} onChange={onChange} onRunQuery={onRunQuery} datasource={datasource} /> : null}
+      {query.queryType === 'events' ? (
+        <EventsEditor query={query} onChange={onChange} onRunQuery={onRunQuery} datasource={datasource} />
+      ) : null}
       {query.queryType === 'eventsStats' ? (
         <EventsStatsEditor query={query} onChange={onChange} onRunQuery={onRunQuery} />
       ) : null}
-      {query.queryType === 'spans' ? <SpansEditor query={query} onChange={onChange} onRunQuery={onRunQuery} datasource={datasource} /> : null}
+      {query.queryType === 'spans' ? (
+        <SpansEditor query={query} onChange={onChange} onRunQuery={onRunQuery} datasource={datasource} />
+      ) : null}
       {query.queryType === 'spansStats' ? (
         <EventsStatsEditor query={query} onChange={onChange} onRunQuery={onRunQuery} />
       ) : null}
       {query.queryType === 'metrics' ? (
         <MetricsEditor query={query} onChange={onChange} onRunQuery={onRunQuery} />
+      ) : null}
+      {query.queryType === 'releases' ? (
+        <ReleasesEditor query={query} onChange={onChange} onRunQuery={onRunQuery} />
+      ) : null}
+      {query.queryType === 'deploys' ? (
+        <DeploysEditor query={query} onChange={onChange} onRunQuery={onRunQuery} />
       ) : null}
     </EditorRows>
   );

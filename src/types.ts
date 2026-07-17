@@ -45,6 +45,20 @@ export type SentryAttribute = {
   key: string;
   name: string;
 };
+export type SentryRelease = {
+  id?: string;
+  version: string;
+  shortVersion?: string;
+  dateCreated?: string;
+  dateReleased?: string | null;
+  firstEvent?: string | null;
+  lastEvent?: string | null;
+  commitCount?: number;
+  deployCount?: number;
+  newGroups?: number;
+  url?: string | null;
+  projects?: Array<{ id?: number; name?: string; slug?: string }>;
+};
 export type SentryIssueSort = 'inbox' | 'new' | 'date' | 'priority' | 'freq' | 'user';
 export type SentryEventSort = 'last_seen()' | 'count()' | 'epm()' | 'failure_rate()' | 'level';
 export type SentrySortDirection = 'asc' | 'desc';
@@ -63,7 +77,16 @@ export interface SentrySecureConfig {
 //#endregion
 
 //#region Query
-export type QueryType = 'issues' | 'events' | 'statsV2' | 'eventsStats' | 'metrics' | 'spans' | 'spansStats';
+export type QueryType =
+  | 'issues'
+  | 'events'
+  | 'statsV2'
+  | 'eventsStats'
+  | 'metrics'
+  | 'spans'
+  | 'spansStats'
+  | 'releases'
+  | 'deploys';
 export type SentryQueryBase<T extends QueryType> = { queryType: T } & DataQuery;
 export type SentryIssuesQuery = {
   projectIds: string[];
@@ -132,6 +155,18 @@ export type SentryMetricsQuery = {
   metricsSort?: SentryMetricsQuerySort;
   metricsOrder?: SentryMetricsQueryOrder;
 } & SentryQueryBase<'metrics'>;
+export type SentryReleasesQuery = {
+  projectIds: string[];
+  environments: string[];
+  releasesQuery?: string;
+  releasesLimit?: number;
+} & SentryQueryBase<'releases'>;
+export type SentryDeploysQuery = {
+  projectIds: string[];
+  environments: string[];
+  deploysReleaseVersion: string;
+  deploysLimit?: number;
+} & SentryQueryBase<'deploys'>;
 export type SentryStatsV2QueryField = 'sum(quantity)' | 'sum(times_seen)';
 export type SentryStatsV2QueryGroupBy = 'outcome' | 'reason' | 'category';
 export type SentryStatsV2QueryCategory = 'transaction' | 'error' | 'attachment' | 'default' | 'session' | 'security';
@@ -158,16 +193,23 @@ export type SentryQuery =
   | SentryEventsStatsQuery
   | SentrySpansStatsQuery
   | SentryMetricsQuery
-  | SentryStatsV2Query;
+  | SentryStatsV2Query
+  | SentryReleasesQuery
+  | SentryDeploysQuery;
 //#endregion
 
 //#region Variable Query
-export type VariableQueryType = 'projects' | 'environments' | 'teams';
+export type VariableQueryType = 'projects' | 'environments' | 'teams' | 'releases';
 export type VariableQueryBase<T extends VariableQueryType> = { type: T };
 export type VariableQueryProjects = { teamSlug?: string } & VariableQueryBase<'projects'>;
 export type VariableQueryEnvironments = { projectIds: string[] } & VariableQueryBase<'environments'>;
 export type VariableQueryTeams = VariableQueryBase<'teams'>;
-export type SentryVariableQuery = VariableQueryProjects | VariableQueryEnvironments | VariableQueryTeams;
+export type VariableQueryReleases = { projectIds?: string[] } & VariableQueryBase<'releases'>;
+export type SentryVariableQuery =
+  | VariableQueryProjects
+  | VariableQueryEnvironments
+  | VariableQueryTeams
+  | VariableQueryReleases;
 //#endregion
 
 //#region Resource call
@@ -188,6 +230,12 @@ export type GetResourceCallTagsPath = `api/0/organizations/${string}/tags`;
 export type GetResourceCallTags = GetResourceCallBase<GetResourceCallTagsPath, {}, SentryTag[]>;
 export type GetResourceCallAttributesPath = `api/0/organizations/${string}/trace-items/attributes`;
 export type GetResourceCallAttributes = GetResourceCallBase<GetResourceCallAttributesPath, {}, SentryAttribute[]>;
+export type GetResourceCallReleasesPath = `api/0/organizations/${string}/releases`;
+export type GetResourceCallReleases = GetResourceCallBase<
+  GetResourceCallReleasesPath,
+  { project?: string[] },
+  SentryRelease[]
+>;
 export type GetResourceCallListOrgTeamsPath = `api/0/organizations/${string}/teams`;
 export type GetResourceCallListOrgTeams = GetResourceCallBase<GetResourceCallListOrgTeamsPath, {}, SentryTeam[]>;
 export type GetResourceCallGetTeamsProjectsPath = `api/0/teams/${string}/${string}/projects`;
@@ -201,6 +249,7 @@ export type GetResourceCall =
   | GetResourceCallProjects
   | GetResourceCallTags
   | GetResourceCallAttributes
+  | GetResourceCallReleases
   | GetResourceCallListOrgTeams
   | GetResourceCallGetTeamsProjects;
 //#endregion

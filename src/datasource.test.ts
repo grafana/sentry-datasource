@@ -1,7 +1,7 @@
 import * as runtime from '@grafana/runtime';
 import { SentryDataSource } from './datasource';
 import type { DataSourceInstanceSettings } from '@grafana/data';
-import type { SentryConfig, SentryProject, SentryTeam, SentryVariableQuery } from './types';
+import type { SentryConfig, SentryProject, SentryRelease, SentryTeam, SentryVariableQuery } from './types';
 
 describe('SentryDataSource', () => {
   beforeEach(() => {
@@ -26,6 +26,18 @@ describe('SentryDataSource', () => {
       const getResourceSpy = jest.spyOn(ds, 'getResource').mockResolvedValue([]);
       await ds.getAttributes();
       expect(getResourceSpy).toHaveBeenCalledWith('api/0/organizations/my-org/trace-items/attributes');
+    });
+    it('getReleases should request the releases resource', async () => {
+      const ds = new SentryDataSource({ jsonData: { orgSlug: 'my-org' } } as DataSourceInstanceSettings<SentryConfig>);
+      const getResourceSpy = jest.spyOn(ds, 'getResource').mockResolvedValue([]);
+      await ds.getReleases();
+      expect(getResourceSpy).toHaveBeenCalledWith('api/0/organizations/my-org/releases', {});
+    });
+    it('getReleases should pass project ids as query params', async () => {
+      const ds = new SentryDataSource({ jsonData: { orgSlug: 'my-org' } } as DataSourceInstanceSettings<SentryConfig>);
+      const getResourceSpy = jest.spyOn(ds, 'getResource').mockResolvedValue([]);
+      await ds.getReleases('my-org', ['1', '2']);
+      expect(getResourceSpy).toHaveBeenCalledWith('api/0/organizations/my-org/releases', { project: ['1', '2'] });
     });
   });
   describe('metricFindQuery', () => {
@@ -74,6 +86,28 @@ describe('SentryDataSource', () => {
         { text: 'Foo (1)', value: '1' },
         { text: 'Bar (2)', value: '2' },
       ]);
+    });
+    it('should return release versions correctly', async () => {
+      const ds = new SentryDataSource({} as DataSourceInstanceSettings<SentryConfig>);
+      ds.getReleases = jest.fn(() =>
+        Promise.resolve([{ version: 'v1.0.0' }, { version: 'v1.1.0' }] as SentryRelease[])
+      );
+      const query = { type: 'releases' } as SentryVariableQuery;
+      const results = await ds.metricFindQuery(query);
+      expect(ds.getReleases).toHaveBeenCalledWith('', []);
+      expect(results.length).toBe(2);
+      expect(results).toStrictEqual([
+        { text: 'v1.0.0', value: 'v1.0.0' },
+        { text: 'v1.1.0', value: 'v1.1.0' },
+      ]);
+    });
+    it('should pass the project filter to getReleases for releases query', async () => {
+      const ds = new SentryDataSource({} as DataSourceInstanceSettings<SentryConfig>);
+      ds.getReleases = jest.fn(() => Promise.resolve([{ version: 'v1.0.0' }] as SentryRelease[]));
+      const query = { type: 'releases', projectIds: ['1', '2'] } as SentryVariableQuery;
+      const results = await ds.metricFindQuery(query);
+      expect(ds.getReleases).toHaveBeenCalledWith('', ['1', '2']);
+      expect(results).toStrictEqual([{ text: 'v1.0.0', value: 'v1.0.0' }]);
     });
     it('should return all unique environments when environments query selected and no projectId passed', async () => {
       const ds = new SentryDataSource({} as DataSourceInstanceSettings<SentryConfig>);

@@ -24,7 +24,7 @@ export const SentryVariableEditor = ({ query, onChange, datasource }: SentryVari
     onChange(newQuery, JSON.stringify(newQuery));
   };
   const onProjectIdsChange = (projectIds: string[]) => {
-    if (query.type === 'environments') {
+    if (query.type === 'environments' || query.type === 'releases') {
       const newQuery: SentryVariableQuery = { ...query, projectIds };
       onChange(newQuery, JSON.stringify(newQuery));
     }
@@ -47,6 +47,15 @@ export const SentryVariableEditor = ({ query, onChange, datasource }: SentryVari
         />
       )}
       {query.type === 'environments' && (
+        <ProjectSelector
+          mode="id"
+          datasource={datasource}
+          orgSlug={orgSlug || ''}
+          values={query.projectIds || []}
+          onValuesChange={onProjectIdsChange}
+        />
+      )}
+      {query.type === 'releases' && (
         <ProjectSelector
           mode="id"
           datasource={datasource}
