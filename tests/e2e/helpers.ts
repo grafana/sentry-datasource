@@ -25,7 +25,9 @@ export function exploreUrl(query: Record<string, unknown>, uid = PROVISIONED_UID
 }
 
 export function queryEditorRow(page: Page) {
-  return page.getByTestId('query-editor-row');
+  // Grafana 13 renamed the query editor row test id to the prefixed e2e-selector form
+  // ("data-testid Query editor row"); Grafana 12 and earlier use "query-editor-row".
+  return page.getByTestId('query-editor-row').or(page.getByTestId('data-testid Query editor row'));
 }
 
 export interface DataFrameJSON {
