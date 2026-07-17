@@ -109,12 +109,42 @@ func HandleEventsStats(client sentry.SentryClient, query query.SentryQuery, back
 	if client.OrgSlug == "" {
 		return errors.GetErrorResponse(response, "", backend.DownstreamError(errors.ErrorInvalidOrganizationSlug))
 	}
+	// Grouped queries temporarily go through Sentry's legacy events-stats
+	// endpoint because the documented events-timeseries endpoint returns
+	// internal errors for grouped queries on the discover dataset. See
+	// pkg/sentry/events_stats_legacy.go for the details and removal condition.
+	if len(query.EventsStatsGroups) > 0 {
+		eventsStats, executedQueryString, err := client.GetLegacyEventsStats(sentry.GetLegacyEventsStatsInput{
+			OrganizationSlug: client.OrgSlug,
+			ProjectIds:       query.ProjectIds,
+			Environments:     query.Environments,
+			Query:            query.EventsStatsQuery,
+			Fields:           append(query.EventsStatsYAxis, query.EventsStatsGroups...),
+			YAxis:            query.EventsStatsYAxis,
+			Sort:             query.EventsStatsSort,
+			Limit:            query.EventsStatsLimit,
+			Interval:         backendQuery.Interval,
+			From:             backendQuery.TimeRange.From,
+			To:               backendQuery.TimeRange.To,
+		})
+		if err != nil {
+			// errorsource set by Sentry client
+			return errors.GetErrorResponse(response, executedQueryString, err)
+		}
+		frame, err := framer.ConvertLegacyEventsStatsResponseToFrame(framer.GetFrameName("EventsStats", backendQuery.RefID), eventsStats)
+		if err != nil {
+			return errors.GetErrorResponse(response, executedQueryString, err)
+		}
+		frame = framer.UpdateFrameMeta(frame, executedQueryString, query, client.BaseURL, client.OrgSlug)
+		response.Frames = append(response.Frames, frame)
+		return response
+	}
 	eventsStats, executedQueryString, err := client.GetEventsStats(sentry.GetEventsStatsInput{
 		OrganizationSlug: client.OrgSlug,
 		ProjectIds:       query.ProjectIds,
 		Environments:     query.Environments,
 		Query:            query.EventsStatsQuery,
-		Fields:           append(query.EventsStatsYAxis, query.EventsStatsGroups...),
+		Groups:           query.EventsStatsGroups,
 		YAxis:            query.EventsStatsYAxis,
 		Sort:             query.EventsStatsSort,
 		Limit:            query.EventsStatsLimit,
@@ -126,7 +156,7 @@ func HandleEventsStats(client sentry.SentryClient, query query.SentryQuery, back
 		// errorsource set by Sentry client
 		return errors.GetErrorResponse(response, executedQueryString, err)
 	}
-	frame, err := framer.ConvertEventsStatsResponseToFrame(framer.GetFrameName("EventsStats", backendQuery.RefID), eventsStats)
+	frame, err := framer.ConvertTimeSeriesResponseToFrame(framer.GetFrameName("EventsStats", backendQuery.RefID), eventsStats)
 	if err != nil {
 		return errors.GetErrorResponse(response, executedQueryString, err)
 	}
@@ -145,7 +175,7 @@ func HandleSpansStats(client sentry.SentryClient, query query.SentryQuery, backe
 		ProjectIds:       query.ProjectIds,
 		Environments:     query.Environments,
 		Query:            query.EventsStatsQuery,
-		Fields:           append(query.EventsStatsYAxis, query.EventsStatsGroups...),
+		Groups:           query.EventsStatsGroups,
 		YAxis:            query.EventsStatsYAxis,
 		Sort:             query.EventsStatsSort,
 		Limit:            query.EventsStatsLimit,
@@ -158,7 +188,7 @@ func HandleSpansStats(client sentry.SentryClient, query query.SentryQuery, backe
 		// errorsource set by Sentry client
 		return errors.GetErrorResponse(response, executedQueryString, err)
 	}
-	frame, err := framer.ConvertEventsStatsResponseToFrame(framer.GetFrameName("SpansStats", backendQuery.RefID), spansStats)
+	frame, err := framer.ConvertTimeSeriesResponseToFrame(framer.GetFrameName("SpansStats", backendQuery.RefID), spansStats)
 	if err != nil {
 		return errors.GetErrorResponse(response, executedQueryString, err)
 	}
@@ -168,12 +198,12 @@ func HandleSpansStats(client sentry.SentryClient, query query.SentryQuery, backe
 	return response
 }
 
-// HandleMetrics handles the metrics query.to the Sentry API.
-func HandleMetrics(client sentry.SentryClient, query query.SentryQuery, backendQuery backend.DataQuery, response backend.DataResponse) backend.DataResponse {
+// HandleSessions handles the sessions query.to the Sentry API.
+func HandleSessions(client sentry.SentryClient, query query.SentryQuery, backendQuery backend.DataQuery, response backend.DataResponse) backend.DataResponse {
 	if client.OrgSlug == "" {
 		return errors.GetErrorResponse(response, "", backend.DownstreamError(errors.ErrorInvalidOrganizationSlug))
 	}
-	metrics, executedQueryString, err := client.GetMetrics(sentry.GetMetricsInput{
+	sessions, executedQueryString, err := client.GetSessions(sentry.GetSessionsInput{
 		OrganizationSlug: client.OrgSlug,
 		ProjectIds:       query.ProjectIds,
 		Environments:     query.Environments,
@@ -191,7 +221,7 @@ func HandleMetrics(client sentry.SentryClient, query query.SentryQuery, backendQ
 		// errorsource set by Sentry client
 		return errors.GetErrorResponse(response, executedQueryString, err)
 	}
-	frame, err := framer.ConvertMetricsResponseToFrame(framer.GetFrameName("Metrics", backendQuery.RefID), metrics)
+	frame, err := framer.ConvertSessionsResponseToFrame(framer.GetFrameName("Metrics", backendQuery.RefID), sessions)
 	if err != nil {
 		return errors.GetErrorResponse(response, executedQueryString, err)
 	}
