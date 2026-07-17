@@ -37,6 +37,7 @@ All Sentry query types are available for annotations. The **Issues** and **Event
 | Issues                    | Yes         | Uses `FirstSeen` and `LastSeen` timestamps. Best for marking when issues appeared. |
 | Events                    | Yes         | Uses event timestamps. Useful for marking individual error or transaction events.  |
 | Spans                     | Yes         | Uses span timestamps. Useful for marking specific span occurrences.                |
+| Uptime                    | Yes         | Use `timestamp` as the time field to mark uptime check results, such as failures.  |
 | Events Stats              | No          | Returns time-series data, which is less natural for annotation markers.            |
 | Spans Stats               | No          | Returns time-series data, which is less natural for annotation markers.            |
 | Release Health (Sessions) | No          | Returns time-series data, which is less natural for annotation markers.            |

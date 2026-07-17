@@ -105,6 +105,40 @@ func HandleSpans(client sentry.SentryClient, query query.SentryQuery, backendQue
 	return response
 }
 
+// HandleUptime handles the uptime query.to the Sentry API.
+func HandleUptime(client sentry.SentryClient, query query.SentryQuery, backendQuery backend.DataQuery, response backend.DataResponse) backend.DataResponse {
+	if client.OrgSlug == "" {
+		return errors.GetErrorResponse(response, "", backend.DownstreamError(errors.ErrorInvalidOrganizationSlug))
+	}
+	sort := query.EventsSort
+	if query.EventsSort != "" && query.EventsSortDirection == "desc" {
+		sort = "-" + query.EventsSort
+	}
+	results, executedQueryString, err := client.GetEvents(sentry.GetEventsInput{
+		OrganizationSlug: client.OrgSlug,
+		ProjectIds:       query.ProjectIds,
+		Environments:     query.Environments,
+		Query:            query.EventsQuery,
+		Fields:           query.EventsFields,
+		Dataset:          "uptime_results",
+		Sort:             sort,
+		Limit:            query.EventsLimit,
+		From:             backendQuery.TimeRange.From,
+		To:               backendQuery.TimeRange.To,
+	})
+	if err != nil {
+		// errorsource set by Sentry client
+		return errors.GetErrorResponse(response, executedQueryString, err)
+	}
+	frame, err := framestruct.ToDataFrame(framer.GetFrameName("Uptime", backendQuery.RefID), results)
+	if err != nil {
+		return errors.GetErrorResponse(response, executedQueryString, err)
+	}
+	frame = framer.UpdateFrameMeta(frame, executedQueryString, query, client.BaseURL, client.OrgSlug)
+	response.Frames = append(response.Frames, frame)
+	return response
+}
+
 // HandleEventsStats handles the events stats query.to the Sentry API.
 func HandleEventsStats(client sentry.SentryClient, query query.SentryQuery, backendQuery backend.DataQuery, response backend.DataResponse) backend.DataResponse {
 	if client.OrgSlug == "" {

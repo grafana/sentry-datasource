@@ -6,7 +6,7 @@ import { MetricsEditor } from 'components/query-editor/MetricsEditor';
 import { ReleasesEditor } from 'components/query-editor/ReleasesEditor';
 import React from 'react';
 import { Error } from '../components/Error';
-import { EventsEditor, SpansEditor } from './../components/query-editor/EventsEditor';
+import { EventsEditor, SpansEditor, UptimeEditor } from './../components/query-editor/EventsEditor';
 import { IssuesEditor } from './../components/query-editor/IssuesEditor';
 import { QueryTypePicker } from './../components/query-editor/QueryTypePicker';
 import { ScopePicker } from './../components/query-editor/ScopePicker';
@@ -43,6 +43,9 @@ export const SentryQueryEditor = (props: SentryQueryEditorProps) => {
       ) : null}
       {query.queryType === 'spans' ? (
         <SpansEditor query={query} onChange={onChange} onRunQuery={onRunQuery} datasource={datasource} />
+      ) : null}
+      {query.queryType === 'uptime' ? (
+        <UptimeEditor query={query} onChange={onChange} onRunQuery={onRunQuery} datasource={datasource} />
       ) : null}
       {query.queryType === 'spansStats' ? (
         <EventsStatsEditor query={query} onChange={onChange} onRunQuery={onRunQuery} />

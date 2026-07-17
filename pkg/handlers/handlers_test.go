@@ -632,6 +632,67 @@ func TestSentryDatasource_Spans(t *testing.T) {
 
 }
 
+func TestSentryDatasource_Uptime(t *testing.T) {
+	t.Run("valid uptime query should produce correct result", func(t *testing.T) {
+		sc := util.NewFakeClient(util.FakeDoer{Body: `{
+			"data": [
+				{
+					"uptime_rule": "rule_1",
+					"check_status": "success",
+					"http_status_code": 200,
+					"duration_ms": 123,
+					"region": "eu-west",
+					"timestamp": "2026-07-17T00:00:00Z"
+				},
+				{
+					"uptime_rule": "rule_1",
+					"check_status": "failure",
+					"http_status_code": 503,
+					"duration_ms": 4567,
+					"region": "eu-west",
+					"timestamp": "2026-07-17T01:00:00Z"
+				}
+			],
+			"meta": {
+				"fields": {
+					"uptime_rule": "string",
+					"check_status": "string",
+					"http_status_code": "integer",
+					"duration_ms": "integer",
+					"region": "string",
+					"timestamp": "date"
+				}
+			}
+		  }`})
+
+		query := `{
+			"queryType" : "uptime",
+			"projectIds" : ["project_id"],
+			"environments" : ["dev"],
+			"eventsQuery" : "check_status:failure",
+			"eventsFields" : ["uptime_rule","check_status","http_status_code","duration_ms","region","timestamp"],
+			"eventsSort" : "timestamp",
+			"eventsSortDirection" : "desc",
+			"eventsLimit" : 10
+		}`
+
+		ds := plugin.NewDatasourceInstance(sc)
+		ctx := context.TODO()
+
+		res, _ := ds.QueryData(ctx, &backend.QueryDataRequest{Queries: []backend.DataQuery{{RefID: "A", JSON: []byte(query)}}})
+
+		assert.Nil(t, res.Responses["A"].Error)
+		require.Equal(t, 1, len(res.Responses["A"].Frames))
+		assert.Equal(t, "Uptime (A)", res.Responses["A"].Frames[0].Name)
+
+		frame := res.Responses["A"].Frames[0]
+		require.NotNil(t, frame.Fields)
+		assert.Equal(t, 2, frame.Fields[0].Len())
+		require.Contains(t, frame.Meta.ExecutedQueryString, "dataset=uptime_results")
+		require.Contains(t, frame.Meta.ExecutedQueryString, "sort=-timestamp")
+	})
+}
+
 func TestSentryDatasource_SpansStats(t *testing.T) {
 	t.Run("valid grouped spans stats query should produce correct result", func(t *testing.T) {
 		sc := util.NewFakeClient(util.FakeDoer{Body: `{

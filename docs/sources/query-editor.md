@@ -117,6 +117,25 @@ Use the Spans query type to retrieve span data from Sentry. This query type uses
 - `span.op:db` -- Show database spans.
 - `span.op:http.client span.description:*api*` -- Show HTTP client spans with "api" in the description.
 
+### Uptime
+
+Use the Uptime query type to retrieve the results of [Sentry Uptime Monitoring](https://docs.sentry.io/product/uptime-monitoring/) checks. This query type uses the same editor as Events but queries the `uptime_results` dataset. Results are filtered based on the dashboard time range.
+
+| Field              | Description                                                                                                                                                        |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Query**          | (Optional) A Sentry search query to filter results, such as `check_status:failure`. Run with Shift+Enter.                                                          |
+| **Fields**         | The uptime result fields to fetch. Default fields: `uptime_rule`, `check_status`, `http_status_code`, `duration_ms`, `region`, `timestamp`.                        |
+| **Sort By**        | (Optional) The result field to sort by, such as `timestamp` or `duration_ms`.                                                                                       |
+| **Sort Direction** | (Optional) Ascending or Descending. Appears when a sort field is selected.                                                                                          |
+| **Limit**          | (Optional) The maximum number of results to return. Maximum: `100`.                                                                                                 |
+
+The Sentry API does not yet support aggregate functions, such as `count()`, or time-series queries for uptime results, so uptime data is available as a table of individual check results only.
+
+#### Uptime query examples
+
+- `check_status:failure` -- Show failed uptime checks.
+- `check_status:failure_incident http_status_code:>499` -- Show failed checks with server error status codes.
+
 ### Events Stats
 
 Use the Events Stats query type to retrieve time-series data for Sentry events, suitable for graphing trends over time. Results are filtered based on the dashboard time range.

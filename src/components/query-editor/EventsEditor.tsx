@@ -4,7 +4,12 @@ import { Input, QueryField, Select } from '@grafana/ui';
 import { SentryDataSource } from 'datasource';
 import { sortBy } from 'lodash';
 import React, { useEffect } from 'react';
-import { SentryEventsDatasetOptions, SentryEventSortDirectionOptions, SentryEventSortOptions } from '../../constants';
+import {
+  SentryEventsDatasetOptions,
+  SentryEventSortDirectionOptions,
+  SentryEventSortOptions,
+  SentryUptimeSortOptions,
+} from '../../constants';
 import { selectors } from '../../selectors';
 import type {
   SentryEventsDataset,
@@ -12,11 +17,12 @@ import type {
   SentryEventsQuery,
   SentrySortDirection,
   SentrySpansQuery,
+  SentryUptimeQuery,
 } from '../../types';
 
 interface EventsEditorProps {
-  query: SentryEventsQuery | SentrySpansQuery;
-  onChange: (value: SentryEventsQuery | SentrySpansQuery) => void;
+  query: SentryEventsQuery | SentrySpansQuery | SentryUptimeQuery;
+  onChange: (value: SentryEventsQuery | SentrySpansQuery | SentryUptimeQuery) => void;
   onRunQuery: () => void;
   datasource: SentryDataSource;
 }
@@ -37,6 +43,10 @@ const EVENTS_DEFAULT_FIELDS = [
   'platform',
 ];
 const SPANS_DEFAULT_FIELDS = ['id', 'span.op', 'span.description', 'count()'];
+const UPTIME_DEFAULT_FIELDS = ['uptime_rule', 'check_status', 'http_status_code', 'duration_ms', 'region', 'timestamp'];
+// There is no attribute autocomplete endpoint for the uptime_results dataset,
+// so the editor offers a static list of the remaining known result fields.
+const UPTIME_SUGGESTED_FIELDS = ['check_id', 'scheduled_check_time', 'trace', 'environment', 'project'];
 
 type Option = SelectableValue<string>;
 
@@ -77,13 +87,33 @@ export const SpansEditor = ({ query, onChange, onRunQuery, datasource }: EventsE
   );
 };
 
+export const UptimeEditor = ({ query, onChange, onRunQuery, datasource }: EventsEditorProps) => {
+  const suggestFields = async () => toOptions(UPTIME_SUGGESTED_FIELDS);
+  return (
+    <EventsLikeEditor
+      query={query}
+      onChange={onChange}
+      onRunQuery={onRunQuery}
+      datasource={datasource}
+      defaultFields={UPTIME_DEFAULT_FIELDS}
+      suggestFields={suggestFields}
+      sortOptions={SentryUptimeSortOptions}
+    />
+  );
+};
+
 const EventsLikeEditor = ({
   query,
   onChange,
   onRunQuery,
   defaultFields,
   suggestFields,
-}: EventsEditorProps & { defaultFields: string[]; suggestFields: () => Promise<Option[]> }) => {
+  sortOptions = SentryEventSortOptions,
+}: EventsEditorProps & {
+  defaultFields: string[];
+  suggestFields: () => Promise<Option[]>;
+  sortOptions?: Array<SelectableValue<SentryEventSort>>;
+}) => {
   const [customOptions, setCustomOptions] = React.useState<Option[]>([]);
   const [fieldOptions, setFieldOptions] = React.useState<Option[]>([]);
   useEffect(() => {
@@ -190,7 +220,7 @@ const EventsLikeEditor = ({
             label={selectors.components.QueryEditor.Events.Sort.label}
           >
             <Select
-              options={SentryEventSortOptions}
+              options={sortOptions}
               value={query.eventsSort}
               width={28}
               onChange={(e) => onEventsSortChange(e?.value!)}

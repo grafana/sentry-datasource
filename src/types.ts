@@ -60,7 +60,15 @@ export type SentryRelease = {
   projects?: Array<{ id?: number; name?: string; slug?: string }>;
 };
 export type SentryIssueSort = 'inbox' | 'new' | 'date' | 'priority' | 'freq' | 'user';
-export type SentryEventSort = 'last_seen()' | 'count()' | 'epm()' | 'failure_rate()' | 'level';
+export type SentryEventSort =
+  | 'last_seen()'
+  | 'count()'
+  | 'epm()'
+  | 'failure_rate()'
+  | 'level'
+  | 'timestamp'
+  | 'duration_ms'
+  | 'scheduled_check_time';
 export type SentrySortDirection = 'asc' | 'desc';
 //#endregion
 
@@ -85,6 +93,7 @@ export type QueryType =
   | 'metrics'
   | 'spans'
   | 'spansStats'
+  | 'uptime'
   | 'releases'
   | 'deploys';
 export type SentryQueryBase<T extends QueryType> = { queryType: T } & DataQuery;
@@ -115,6 +124,15 @@ export type SentrySpansQuery = {
   eventsSortDirection?: SentrySortDirection;
   eventsLimit?: number;
 } & SentryQueryBase<'spans'>;
+export type SentryUptimeQuery = {
+  projectIds: string[];
+  environments: string[];
+  eventsQuery: string;
+  eventsFields?: string[];
+  eventsSort?: SentryEventSort;
+  eventsSortDirection?: SentrySortDirection;
+  eventsLimit?: number;
+} & SentryQueryBase<'uptime'>;
 export type SentryEventsStatsQuery = {
   projectIds: string[];
   environments: string[];
@@ -190,6 +208,7 @@ export type SentryQuery =
   | SentryIssuesQuery
   | SentryEventsQuery
   | SentrySpansQuery
+  | SentryUptimeQuery
   | SentryEventsStatsQuery
   | SentrySpansStatsQuery
   | SentryMetricsQuery

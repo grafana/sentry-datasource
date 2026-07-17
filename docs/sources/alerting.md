@@ -39,6 +39,7 @@ Alert rules work with Sentry query types that return numeric or time-series data
 | Events Stats              | Yes        | Returns time-series data. Best suited for alerting on event trends over time.                         |
 | Spans                     | Yes        | Returns tabular data. Use aggregate fields or a **Count** rows expression.                            |
 | Spans Stats               | Yes        | Returns time-series data. Best suited for alerting on span performance trends.                        |
+| Uptime                    | Yes        | Returns tabular data. Use a **Count** rows expression to alert on the number of failed checks.        |
 | Release Health (Sessions) | Yes        | Returns time-series data. Alert on release health data like crash rates or crash-free rates.          |
 | Stats                     | Yes        | Returns time-series data. Alert on organization-level usage statistics.                               |
 

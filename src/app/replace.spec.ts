@@ -8,6 +8,7 @@ import {
   SentrySpansQuery,
   SentrySpansStatsQuery,
   SentryStatsV2Query,
+  SentryUptimeQuery,
   SentryVariableQuery,
 } from 'types';
 import { applyTemplateVariables, applyTemplateVariablesToVariableQuery, replaceProjectIDs } from './replace';
@@ -128,6 +129,21 @@ describe('replace', () => {
       expect(output.projectIds).toStrictEqual(['bar', 'baz']);
       expect(output.environments).toStrictEqual(['bar', 'baz']);
       expect(output.eventsStatsQuery).toStrictEqual('hello bar');
+    });
+
+    it('should interpolate template variables for uptime', () => {
+      const query: SentryUptimeQuery = {
+        refId: '',
+        queryType: 'uptime',
+        projectIds: ['${foo}', 'baz'],
+        environments: ['${foo}', 'baz'],
+        eventsQuery: 'check_status:${foo}',
+      };
+
+      const output = applyTemplateVariables(query, { foo: { value: 'failure', text: 'failure' } }) as SentryUptimeQuery;
+      expect(output.projectIds).toStrictEqual(['failure', 'baz']);
+      expect(output.environments).toStrictEqual(['failure', 'baz']);
+      expect(output.eventsQuery).toStrictEqual('check_status:failure');
     });
 
     it('should interpolate template variables for statsV2', () => {

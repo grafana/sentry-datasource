@@ -34,6 +34,7 @@ export const applyTemplateVariables = (query: SentryQuery, scopedVars: ScopedVar
         environments: interpolateVariableArray(query.environments, scopedVars),
       };
     case 'spans':
+    case 'uptime':
       return {
         ...query,
         eventsQuery: interpolateVariable(query.eventsQuery || '', scopedVars),
