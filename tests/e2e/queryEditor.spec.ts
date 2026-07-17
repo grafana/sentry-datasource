@@ -8,7 +8,15 @@ import {
 } from './helpers';
 import { Components } from '../../src/selectors';
 
-const QUERY_TYPE_OPTIONS = ['Issues', 'Events', 'Events Stats', 'Stats', 'Spans', 'Spans Stats', 'Metrics'];
+const QUERY_TYPE_OPTIONS = [
+  'Issues',
+  'Events',
+  'Events Stats',
+  'Stats',
+  'Spans',
+  'Spans Stats',
+  'Release Health (Sessions)',
+];
 
 // One entry per query type: the query model encoded in the Explore panes URL, and the field
 // labels the editor should (and should not) render for that mode. Encoding the query type in
@@ -22,7 +30,7 @@ const MODES = [
   {
     name: 'Events',
     query: { queryType: 'events', eventsQuery: '' },
-    visible: ['Fields', 'Query', 'Sort By', 'Limit'],
+    visible: ['Fields', 'Query', 'Dataset', 'Sort By', 'Limit'],
   },
   {
     name: 'Events Stats',
@@ -40,12 +48,13 @@ const MODES = [
       statsReason: [],
     },
     visible: ['Field', 'Category Filter', 'Outcome Filter', 'Reason Filter', 'Group By', 'Interval'],
-    hidden: ['Environments'],
+    hidden: [Components.QueryEditor.Scope.Environments.label],
   },
   {
     name: 'Spans',
     query: { queryType: 'spans', eventsQuery: '' },
     visible: ['Fields', 'Query', 'Sort By', 'Limit'],
+    hidden: ['Dataset'],
   },
   {
     name: 'Spans Stats',
@@ -53,8 +62,8 @@ const MODES = [
     visible: ['Y-axis', 'Query', 'Group', 'Sort By', 'Limit'],
   },
   {
-    name: 'Metrics',
-    query: { queryType: 'metrics', metricsField: 'session.all', metricsQuery: '' },
+    name: 'Release Health (Sessions)',
+    query: { queryType: 'metrics', metricsField: 'sum(session)', metricsQuery: '' },
     visible: ['Field', 'Query', 'Group By'],
   },
 ];
@@ -161,7 +170,12 @@ test.describe('Query editor with live Sentry data', () => {
   test('Events Stats: count() returns a time series', async ({ page, explorePage }) => {
     const { responsePromise, getBody } = waitForQueryDataResponseWithBody(explorePage);
     await page.goto(
-      exploreUrl({ queryType: 'eventsStats', eventsStatsYAxis: ['count()'], eventsStatsQuery: '', eventsStatsGroups: [] })
+      exploreUrl({
+        queryType: 'eventsStats',
+        eventsStatsYAxis: ['count()'],
+        eventsStatsQuery: '',
+        eventsStatsGroups: [],
+      })
     );
     await responsePromise;
 
@@ -201,14 +215,48 @@ test.describe('Query editor with live Sentry data', () => {
     expect(frames[0].data?.values?.[0]?.length ?? 0).toBeGreaterThan(0);
   });
 
-  test('Metrics: session.all returns a time series', async ({ page, explorePage }) => {
+  test('Release Health (Sessions): sum(session) returns a time series', async ({ page, explorePage }) => {
     const { responsePromise, getBody } = waitForQueryDataResponseWithBody(explorePage);
-    await page.goto(exploreUrl({ queryType: 'metrics', metricsField: 'session.all', metricsQuery: '' }));
+    await page.goto(exploreUrl({ queryType: 'metrics', metricsField: 'sum(session)', metricsQuery: '' }));
     await responsePromise;
 
     const frames = getBody()?.results?.A?.frames ?? [];
     expect(frames.length).toBeGreaterThan(0);
     expect(frames[0].data?.values?.[0]?.length ?? 0).toBeGreaterThan(0);
+  });
+
+  test('Events: dataset=errors returns a table of events', async ({ page, explorePage }) => {
+    const { responsePromise, getBody } = waitForQueryDataResponseWithBody(explorePage);
+    await page.goto(exploreUrl({ queryType: 'events', eventsQuery: '', eventsDataset: 'errors' }));
+    await responsePromise;
+
+    expect(getBody()?.results?.A?.status).toBe(200);
+    const frames = getBody()?.results?.A?.frames ?? [];
+    expect(frames.length).toBeGreaterThan(0);
+    // Assert the dataset was actually sent to Sentry rather than silently dropped.
+    expect(frames[0].schema?.meta?.executedQueryString).toContain('dataset=errors');
+  });
+
+  test('Events Stats: grouped count() by release returns a time series per group', async ({ page, explorePage }) => {
+    const { responsePromise, getBody } = waitForQueryDataResponseWithBody(explorePage);
+    await page.goto(
+      exploreUrl({
+        queryType: 'eventsStats',
+        eventsStatsYAxis: ['count()'],
+        eventsStatsQuery: '',
+        eventsStatsGroups: ['release'],
+        eventsStatsSort: '-count()',
+        eventsStatsLimit: 5,
+      })
+    );
+    await responsePromise;
+
+    const frames = getBody()?.results?.A?.frames ?? [];
+    expect(frames.length).toBeGreaterThan(0);
+    expect(frames[0].data?.values?.[0]?.length ?? 0).toBeGreaterThan(0);
+    // Grouped queries temporarily use the legacy events-stats endpoint; see
+    // pkg/sentry/events_stats_legacy.go for the rationale and removal condition.
+    expect(frames[0].schema?.meta?.executedQueryString).toContain('/events-stats/');
   });
 
   test('Issues: query succeeds', async ({ page, explorePage }) => {
