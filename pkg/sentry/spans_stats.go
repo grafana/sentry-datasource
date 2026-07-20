@@ -20,6 +20,7 @@ type GetSpansStatsInput struct {
 	To               time.Time
 	Sort             string
 	Interval         time.Duration
+	MaxDataPoints    int64
 	Limit            int64
 }
 
@@ -33,6 +34,7 @@ func (gei *GetSpansStatsInput) ToQuery() string {
 	params.Set("query", gei.Query)
 	params.Set("start", gei.From.Format("2006-01-02T15:04:05Z07:00"))
 	params.Set("end", gei.To.Format("2006-01-02T15:04:05Z07:00"))
+	params.Set("interval", snapSpansStatsInterval(gei.Interval, gei.To.Sub(gei.From), gei.MaxDataPoints))
 	params.Set("partial", "1")
 	params.Set("excludeOther", "0")
 	params.Set("sampling", "NORMAL")

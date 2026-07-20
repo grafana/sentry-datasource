@@ -150,6 +150,7 @@ func HandleSpansStats(client sentry.SentryClient, query query.SentryQuery, backe
 		Sort:             query.EventsStatsSort,
 		Limit:            query.EventsStatsLimit,
 		Interval:         backendQuery.Interval,
+		MaxDataPoints:    backendQuery.MaxDataPoints,
 		From:             backendQuery.TimeRange.From,
 		To:               backendQuery.TimeRange.To,
 	})

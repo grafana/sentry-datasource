@@ -2,7 +2,6 @@ package sentry
 
 import (
 	"fmt"
-	"math"
 	"net/url"
 	"strconv"
 	"time"
@@ -22,16 +21,6 @@ type GetEventsStatsInput struct {
 	Sort             string
 	Interval         time.Duration
 	Limit            int64
-}
-
-func FormatSentryInterval(interval time.Duration) string {
-	if interval.Hours() > 2 {
-		return fmt.Sprintf("%dh", int(math.Round(interval.Hours())))
-	}
-	if interval.Minutes() > 2 {
-		return fmt.Sprintf("%dm", int(math.Round(interval.Minutes())))
-	}
-	return fmt.Sprintf("%ds", int(math.Round(interval.Seconds())))
 }
 
 func (gei *GetEventsStatsInput) ToQuery() string {
