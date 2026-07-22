@@ -18,29 +18,33 @@ var statsV2IntervalUnits = map[string]time.Duration{
 	"w": 7 * 24 * time.Hour,
 }
 
-// statsV2IntervalSteps are the intervals the stats_v2 endpoint accepts:
-// between one minute and one day, dividing a day without remainder
+// statsV2IntervalSteps holds every interval the stats_v2 endpoint accepts:
+// whole-minute divisors of one day, from one minute up to one day
 // (verified against the live API, 2026-07-17).
-var statsV2IntervalSteps = []time.Duration{
-	time.Minute,
-	2 * time.Minute,
-	5 * time.Minute,
-	10 * time.Minute,
-	15 * time.Minute,
-	30 * time.Minute,
-	time.Hour,
-	2 * time.Hour,
-	3 * time.Hour,
-	4 * time.Hour,
-	6 * time.Hour,
-	8 * time.Hour,
-	12 * time.Hour,
-	24 * time.Hour,
-}
+var statsV2IntervalSteps = func() []time.Duration {
+	steps := []time.Duration{}
+	for minutes := 1; minutes <= 24*60; minutes++ {
+		if (24*60)%minutes == 0 {
+			steps = append(steps, time.Duration(minutes)*time.Minute)
+		}
+	}
+	return steps
+}()
 
 // statsV2MaxBuckets mirrors MAX_POINTS in Sentry's sessions_v2.py: the
-// endpoint rejects requests whose range divided by interval exceeds it.
+// endpoint rejects requests whose aligned range divided by interval exceeds
+// it. Sentry floors the range start and ceils the range end to interval
+// boundaries first, so an unaligned range can gain one bucket on top of
+// ceil(range/interval).
 const statsV2MaxBuckets = 1000
+
+func statsV2FitsBucketCap(interval time.Duration, timeRange time.Duration) bool {
+	if timeRange <= 0 {
+		return true
+	}
+	worstCaseBuckets := (timeRange+interval-1)/interval + 1
+	return worstCaseBuckets <= statsV2MaxBuckets
+}
 
 func parseStatsV2Interval(interval string) (time.Duration, bool) {
 	if match := statsV2IntervalFormat.FindStringSubmatch(interval); match != nil {
@@ -60,11 +64,11 @@ func parseStatsV2Interval(interval string) (time.Duration, bool) {
 // normaliseStatsV2Interval rewrites interval values the stats_v2 endpoint
 // would reject into the nearest interval it accepts. Sentry requires
 // intervals between one minute and one day that divide a day without
-// remainder, and rejects requests producing more than statsV2MaxBuckets
-// buckets, so values such as the "5s" or "1m" that $__interval resolves to
-// on short ranges or wide panels are snapped up accordingly. Intervals that
-// already satisfy every constraint, empty values and values that cannot be
-// parsed are returned unchanged.
+// remainder, and rejects requests whose boundary-aligned range produces more
+// than statsV2MaxBuckets buckets, so values such as the "5s" or "1m" that
+// $__interval resolves to on short ranges or wide panels are snapped up
+// accordingly. Intervals that already satisfy every constraint, empty values
+// and values that cannot be parsed are returned unchanged.
 func normaliseStatsV2Interval(interval string, from time.Time, to time.Time) string {
 	if interval == "" {
 		return interval
@@ -73,22 +77,17 @@ func normaliseStatsV2Interval(interval string, from time.Time, to time.Time) str
 	if !ok {
 		return interval
 	}
-	target := parsed
-	if timeRange := to.Sub(from); timeRange > 0 {
-		if minInterval := timeRange / statsV2MaxBuckets; minInterval > target {
-			target = minInterval
-		}
-	}
-	if target == parsed && statsV2IntervalFormat.MatchString(interval) &&
-		parsed <= 24*time.Hour && (24*time.Hour)%parsed == 0 {
+	timeRange := to.Sub(from)
+	if statsV2IntervalFormat.MatchString(interval) && parsed <= 24*time.Hour &&
+		(24*time.Hour)%parsed == 0 && statsV2FitsBucketCap(parsed, timeRange) {
 		return interval
 	}
 	for _, step := range statsV2IntervalSteps {
-		if target <= step {
-			if step < time.Hour {
-				return fmt.Sprintf("%dm", int(step.Minutes()))
+		if step >= parsed && statsV2FitsBucketCap(step, timeRange) {
+			if step%time.Hour == 0 {
+				return fmt.Sprintf("%dh", int(step.Hours()))
 			}
-			return fmt.Sprintf("%dh", int(step.Hours()))
+			return fmt.Sprintf("%dm", int(step.Minutes()))
 		}
 	}
 	return "24h"
