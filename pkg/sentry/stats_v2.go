@@ -61,7 +61,7 @@ func parseStatsV2Interval(interval string) (time.Duration, bool) {
 	return parsed, true
 }
 
-// normaliseStatsV2Interval rewrites interval values the stats_v2 endpoint
+// normalizeStatsV2Interval rewrites interval values the stats_v2 endpoint
 // would reject into the nearest interval it accepts. Sentry requires
 // intervals between one minute and one day that divide a day without
 // remainder, and rejects requests whose boundary-aligned range produces more
@@ -69,7 +69,7 @@ func parseStatsV2Interval(interval string) (time.Duration, bool) {
 // $__interval resolves to on short ranges or wide panels are snapped up
 // accordingly. Intervals that already satisfy every constraint, empty values
 // and values that cannot be parsed are returned unchanged.
-func normaliseStatsV2Interval(interval string, from time.Time, to time.Time) string {
+func normalizeStatsV2Interval(interval string, from time.Time, to time.Time) string {
 	if interval == "" {
 		return interval
 	}
@@ -176,7 +176,7 @@ func (sc *SentryClient) GetStatsV2(args GetStatsV2Input) (StatsV2Response, strin
 	if len(args.Category) < 1 {
 		return out, "", errors.New(`at least one "category" is required`)
 	}
-	args.Interval = normaliseStatsV2Interval(args.Interval, args.From, args.To)
+	args.Interval = normalizeStatsV2Interval(args.Interval, args.From, args.To)
 	if args.Interval != "" && !statsV2IntervalFormat.MatchString(args.Interval) {
 		return out, "", errors.New(`"interval" should be in the format [number][unit] where unit is one of m/h/d/w`)
 	}
