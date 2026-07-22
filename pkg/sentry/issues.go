@@ -49,6 +49,18 @@ type SentryIssue struct {
 	SubscriptionDetails struct {
 		Reason string `json:"reason"`
 	} `json:"subscriptionDetails"`
+	// Sentry scopes the top-level firstSeen/lastSeen/count/userCount to the
+	// requested start/end window and reports the whole-of-life values in the
+	// lifetime object, which is what Sentry's own UI displays. Excluded from
+	// the frame because its dates are copied over FirstSeen/LastSeen.
+	Lifetime struct {
+		Count     string    `json:"count"`
+		UserCount int64     `json:"userCount"`
+		FirstSeen time.Time `json:"firstSeen"`
+		LastSeen  time.Time `json:"lastSeen"`
+	} `json:"lifetime" frame:"-"`
+	FirstSeenInRange time.Time `json:"-"`
+	LastSeenInRange  time.Time `json:"-"`
 	// StatusDetails struct {
 	// } `json:"statusDetails"`
 	// Stats struct {
@@ -96,5 +108,23 @@ func (sc *SentryClient) GetIssues(gii GetIssuesInput) ([]SentryIssue, string, er
 	out := []SentryIssue{}
 	executedQueryString := gii.ToQuery()
 	err := sc.Fetch(executedQueryString, &out)
+	for i := range out {
+		out[i].applyLifetimeDates()
+	}
 	return out, sc.BaseURL + executedQueryString, err
+}
+
+// applyLifetimeDates promotes the lifetime firstSeen/lastSeen to the top-level
+// fields so they match what Sentry's own UI shows, keeping the window-scoped
+// values available under explicit names. The zero checks retain the top-level
+// values on Sentry instances that do not return a lifetime object.
+func (si *SentryIssue) applyLifetimeDates() {
+	si.FirstSeenInRange = si.FirstSeen
+	si.LastSeenInRange = si.LastSeen
+	if !si.Lifetime.FirstSeen.IsZero() {
+		si.FirstSeen = si.Lifetime.FirstSeen
+	}
+	if !si.Lifetime.LastSeen.IsZero() {
+		si.LastSeen = si.Lifetime.LastSeen
+	}
 }
