@@ -33,7 +33,21 @@ export const applyTemplateVariables = (query: SentryQuery, scopedVars: ScopedVar
         projectIds: interpolateVariableArray(query.projectIds, scopedVars),
         environments: interpolateVariableArray(query.environments, scopedVars),
       };
+    case 'spans':
+      return {
+        ...query,
+        eventsQuery: interpolateVariable(query.eventsQuery || '', scopedVars),
+        projectIds: interpolateVariableArray(query.projectIds, scopedVars),
+        environments: interpolateVariableArray(query.environments, scopedVars),
+      };
     case 'eventsStats':
+      return {
+        ...query,
+        eventsStatsQuery: interpolateVariable(query.eventsStatsQuery || '', scopedVars),
+        projectIds: interpolateVariableArray(query.projectIds, scopedVars),
+        environments: interpolateVariableArray(query.environments, scopedVars),
+      };
+    case 'spansStats':
       return {
         ...query,
         eventsStatsQuery: interpolateVariable(query.eventsStatsQuery || '', scopedVars),
