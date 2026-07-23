@@ -36,11 +36,15 @@ var statsV2IntervalSteps = func() []time.Duration {
 // it.
 const statsV2MaxBuckets = 1000
 
-// statsV2FitsBucketCap mirrors Sentry's get_constrained_date_range: the range
-// start is aligned down and the end aligned up to interval boundaries before
-// counting buckets. Truncate aligns on the same boundaries as Sentry's
-// epoch-based arithmetic because every supported interval divides a whole day.
+// statsV2FitsBucketCap mirrors Sentry's get_constrained_date_range: a range
+// start in the future is clamped to the current time, then the start is
+// aligned down and the end aligned up to interval boundaries before counting
+// buckets. Truncate aligns on the same boundaries as Sentry's epoch-based
+// arithmetic because every supported interval divides a whole day.
 func statsV2FitsBucketCap(interval time.Duration, from time.Time, to time.Time) bool {
+	if now := time.Now().UTC(); from.After(now) {
+		from = now
+	}
 	if !to.After(from) {
 		return true
 	}

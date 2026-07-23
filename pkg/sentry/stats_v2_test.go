@@ -82,4 +82,28 @@ func TestSentryClient_GetStatsV2(t *testing.T) {
 			})
 		}
 	})
+
+	t.Run("future range start is clamped to now like sentry", func(t *testing.T) {
+		// Sentry clamps a future range start to the current time before
+		// counting buckets, so a ten-minute range starting tomorrow spans a
+		// day's worth of buckets on the server. The margins here are wide
+		// enough that the wall clock cannot make the outcome ambiguous.
+		doer := &mockDoer{response: createMockResponse(http.StatusOK, sentry.StatsV2Response{}, nil)}
+		client, err := sentry.NewSentryClient(testBaseURL, testOrgSlug, testAuthToken, doer)
+		require.NoError(t, err)
+
+		futureFrom := time.Now().UTC().Add(24 * time.Hour)
+		_, executedQueryString, err := client.GetStatsV2(sentry.GetStatsV2Input{
+			OrganizationSlug: testOrgSlug,
+			Category:         []string{"error"},
+			Fields:           []string{"sum(quantity)"},
+			Interval:         "1m",
+			From:             futureFrom,
+			To:               futureFrom.Add(10 * time.Minute),
+		})
+		require.NoError(t, err)
+		parsed, err := url.Parse(strings.TrimPrefix(executedQueryString, testBaseURL))
+		require.NoError(t, err)
+		assert.Equal(t, "2m", parsed.Query().Get("interval"))
+	})
 }
