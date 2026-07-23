@@ -33,17 +33,23 @@ var statsV2IntervalSteps = func() []time.Duration {
 
 // statsV2MaxBuckets mirrors MAX_POINTS in Sentry's sessions_v2.py: the
 // endpoint rejects requests whose aligned range divided by interval exceeds
-// it. Sentry floors the range start and ceils the range end to interval
-// boundaries first, so an unaligned range can gain one bucket on top of
-// ceil(range/interval).
+// it.
 const statsV2MaxBuckets = 1000
 
-func statsV2FitsBucketCap(interval time.Duration, timeRange time.Duration) bool {
-	if timeRange <= 0 {
+// statsV2FitsBucketCap mirrors Sentry's get_constrained_date_range: the range
+// start is aligned down and the end aligned up to interval boundaries before
+// counting buckets. Truncate aligns on the same boundaries as Sentry's
+// epoch-based arithmetic because every supported interval divides a whole day.
+func statsV2FitsBucketCap(interval time.Duration, from time.Time, to time.Time) bool {
+	if !to.After(from) {
 		return true
 	}
-	worstCaseBuckets := (timeRange+interval-1)/interval + 1
-	return worstCaseBuckets <= statsV2MaxBuckets
+	alignedFrom := from.Truncate(interval)
+	alignedTo := to.Truncate(interval)
+	if alignedTo.Before(to) {
+		alignedTo = alignedTo.Add(interval)
+	}
+	return int64(alignedTo.Sub(alignedFrom)/interval) <= statsV2MaxBuckets
 }
 
 func parseStatsV2Interval(interval string) (time.Duration, bool) {
@@ -77,13 +83,12 @@ func normalizeStatsV2Interval(interval string, from time.Time, to time.Time) str
 	if !ok {
 		return interval
 	}
-	timeRange := to.Sub(from)
 	if statsV2IntervalFormat.MatchString(interval) && parsed <= 24*time.Hour &&
-		(24*time.Hour)%parsed == 0 && statsV2FitsBucketCap(parsed, timeRange) {
+		(24*time.Hour)%parsed == 0 && statsV2FitsBucketCap(parsed, from, to) {
 		return interval
 	}
 	for _, step := range statsV2IntervalSteps {
-		if step >= parsed && statsV2FitsBucketCap(step, timeRange) {
+		if step >= parsed && statsV2FitsBucketCap(step, from, to) {
 			if step%time.Hour == 0 {
 				return fmt.Sprintf("%dh", int(step.Hours()))
 			}

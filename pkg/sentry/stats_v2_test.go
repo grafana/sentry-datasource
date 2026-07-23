@@ -19,6 +19,7 @@ func TestSentryClient_GetStatsV2(t *testing.T) {
 			name         string
 			interval     string
 			timeRange    time.Duration
+			offset       time.Duration
 			wantInterval string
 			wantErr      string
 		}{
@@ -36,7 +37,10 @@ func TestSentryClient_GetStatsV2(t *testing.T) {
 			{name: "three and a half minutes snaps up to four minutes", interval: "3m30s", timeRange: 6 * time.Hour, wantInterval: "4m"},
 			{name: "interval that does not divide a day snaps up", interval: "7m", timeRange: 6 * time.Hour, wantInterval: "8m"},
 			{name: "interval below the bucket cap snaps up", interval: "1m", timeRange: 24 * time.Hour, wantInterval: "2m"},
-			{name: "interval at the unaligned bucket cap boundary snaps up", interval: "1m", timeRange: 1000 * time.Minute, wantInterval: "2m"},
+			{name: "aligned range at exactly the bucket cap is kept", interval: "1m", timeRange: 1000 * time.Minute, wantInterval: "1m"},
+			{name: "aligned range one bucket over the cap snaps up", interval: "1m", timeRange: 1001 * time.Minute, wantInterval: "2m"},
+			{name: "unaligned range at the bucket cap snaps up", interval: "1m", timeRange: 1000 * time.Minute, offset: 30 * time.Second, wantInterval: "2m"},
+			{name: "unaligned range just under the cap is kept", interval: "1m", timeRange: 999 * time.Minute, offset: 30 * time.Second, wantInterval: "1m"},
 			{name: "interval just under the aligned bucket cap is kept", interval: "1m", timeRange: 999 * time.Minute, wantInterval: "1m"},
 			{name: "hour interval over sixty days snaps up for the bucket cap", interval: "1h", timeRange: 60 * 24 * time.Hour, wantInterval: "90m"},
 			{name: "multi-day interval clamps to one day", interval: "2d", timeRange: 30 * 24 * time.Hour, wantInterval: "24h"},
@@ -58,8 +62,8 @@ func TestSentryClient_GetStatsV2(t *testing.T) {
 					Category:         []string{"error"},
 					Fields:           []string{"sum(quantity)"},
 					Interval:         tc.interval,
-					From:             from,
-					To:               from.Add(tc.timeRange),
+					From:             from.Add(tc.offset),
+					To:               from.Add(tc.offset + tc.timeRange),
 				})
 
 				if tc.wantErr != "" {
