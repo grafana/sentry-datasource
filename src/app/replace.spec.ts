@@ -137,5 +137,22 @@ describe('replace', () => {
       const output = applyTemplateVariables(query, { foo: { value: 'bar', text: 'bar' } }) as SentryStatsV2Query;
       expect(output.projectIds).toStrictEqual(['bar', 'baz']);
     });
+
+    it('should interpolate the interval for statsV2', () => {
+      const query: SentryStatsV2Query = {
+        refId: '',
+        queryType: 'statsV2',
+        projectIds: [],
+        statsCategory: [],
+        statsFields: [],
+        statsGroupBy: [],
+        statsInterval: '${__interval}',
+        statsOutcome: [],
+        statsReason: [],
+      };
+
+      const output = applyTemplateVariables(query, { __interval: { value: '30s', text: '30s' } }) as SentryStatsV2Query;
+      expect(output.statsInterval).toStrictEqual('30s');
+    });
   });
 });

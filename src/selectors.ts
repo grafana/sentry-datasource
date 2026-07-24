@@ -168,7 +168,7 @@ export const Components = {
         label: 'Interval',
         tooltip: 'interval',
         placeholder:
-          'Optional. Enter the interval to group the results (expected format `[number][unit]` where unit is `m` for minutes, `h` for hours, `d` for days, or `w` for weeks)',
+          'Optional. Enter the interval to group the results (format `[number][unit]`, for example `30m` or `2h`; Sentry accepts intervals between `1m` and `1d` that divide a day evenly). Also supports the $__interval variable. Values Sentry cannot accept are snapped to the nearest supported interval',
       },
       Category: {
         label: 'Category Filter',
