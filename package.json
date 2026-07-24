@@ -107,7 +107,7 @@
   },
   "engines": {
     "node": ">=24",
-    "npm": ">=12.0.1"
+    "npm": ">=11.16.0"
   },
   "packageManager": "npm@12.0.1"
 }
