@@ -1,6 +1,6 @@
 import { ScopedVars } from '@grafana/data';
 import * as runtime from '@grafana/runtime';
-import { SentryIssuesQuery, SentryEventsQuery, SentryStatsV2Query } from 'types';
+import { SentryIssuesQuery, SentryEventsQuery, SentrySpansQuery, SentrySpansStatsQuery, SentryStatsV2Query } from 'types';
 import { applyTemplateVariables, replaceProjectIDs } from './replace';
 
 describe('replace', () => {
@@ -89,6 +89,38 @@ describe('replace', () => {
       expect(output.eventsQuery).toStrictEqual('hello bar');
     });
 
+    it('should interpolate template variables for spans', () => {
+      const query: SentrySpansQuery = {
+        refId: '',
+        queryType: 'spans',
+        projectIds: ['${foo}', 'baz'],
+        environments: ['${foo}', 'baz'],
+        eventsQuery: 'hello ${foo}',
+      };
+
+      const output = applyTemplateVariables(query, { foo: { value: 'bar', text: 'bar' } }) as SentrySpansQuery;
+      expect(output.projectIds).toStrictEqual(['bar', 'baz']);
+      expect(output.environments).toStrictEqual(['bar', 'baz']);
+      expect(output.eventsQuery).toStrictEqual('hello bar');
+    });
+
+    it('should interpolate template variables for spansStats', () => {
+      const query: SentrySpansStatsQuery = {
+        refId: '',
+        queryType: 'spansStats',
+        projectIds: ['${foo}', 'baz'],
+        environments: ['${foo}', 'baz'],
+        eventsStatsQuery: 'hello ${foo}',
+        eventsStatsYAxis: [],
+        eventsStatsGroups: [],
+      };
+
+      const output = applyTemplateVariables(query, { foo: { value: 'bar', text: 'bar' } }) as SentrySpansStatsQuery;
+      expect(output.projectIds).toStrictEqual(['bar', 'baz']);
+      expect(output.environments).toStrictEqual(['bar', 'baz']);
+      expect(output.eventsStatsQuery).toStrictEqual('hello bar');
+    });
+
     it('should interpolate template variables for statsV2', () => {
       const query: SentryStatsV2Query = {
         refId: '',
@@ -104,6 +136,23 @@ describe('replace', () => {
 
       const output = applyTemplateVariables(query, { foo: { value: 'bar', text: 'bar' } }) as SentryStatsV2Query;
       expect(output.projectIds).toStrictEqual(['bar', 'baz']);
+    });
+
+    it('should interpolate the interval for statsV2', () => {
+      const query: SentryStatsV2Query = {
+        refId: '',
+        queryType: 'statsV2',
+        projectIds: [],
+        statsCategory: [],
+        statsFields: [],
+        statsGroupBy: [],
+        statsInterval: '${__interval}',
+        statsOutcome: [],
+        statsReason: [],
+      };
+
+      const output = applyTemplateVariables(query, { __interval: { value: '30s', text: '30s' } }) as SentryStatsV2Query;
+      expect(output.statsInterval).toStrictEqual('30s');
     });
   });
 });
