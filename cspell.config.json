@@ -13,7 +13,8 @@
     "CHANGELOG.md",
     "e2e",
     "playwright-report",
-    "package.json"
+    "package.json",
+    "jest.config.js"
   ],
   "words": [
     "buildinfo",
