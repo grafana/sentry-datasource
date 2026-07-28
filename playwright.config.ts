@@ -5,7 +5,7 @@ import type { PluginOptions } from '@grafana/plugin-e2e';
 const pluginE2eAuth = `${dirname(require.resolve('@grafana/plugin-e2e'))}/auth`;
 
 export default defineConfig<PluginOptions>({
-  testDir: './e2e',
+  testDir: './tests/e2e',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -18,8 +18,9 @@ export default defineConfig<PluginOptions>({
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://localhost:3000',
+    /* Base URL to use in actions like `await page.goto('/')`. GRAFANA_URL is provided by the
+     * Bench container in Cloud runs and allows local runs against a non-default port. */
+    baseURL: process.env.GRAFANA_URL ?? 'http://localhost:3000',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -37,9 +38,9 @@ export default defineConfig<PluginOptions>({
       name: 'run-tests',
       use: {
         ...devices['Desktop Chrome'],
-        // @grafana/plugin-e2e writes the auth state to this file,
-        // the path should not be modified
-        storageState: 'playwright/.auth/admin.json',
+        // @grafana/plugin-e2e writes the auth state to this file. The
+        // administrator username is not always `admin` in Cloud runs.
+        storageState: `playwright/.auth/${process.env.GRAFANA_ADMIN_USER || 'admin'}.json`,
       },
       dependencies: ['auth'],
     },

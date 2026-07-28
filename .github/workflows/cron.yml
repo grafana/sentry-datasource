@@ -1,0 +1,19 @@
+name: Scheduled Cloud end-to-end tests
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  playwright-cloud:
+    uses: grafana/data-sources-ci-workflows/.github/workflows/playwright-cloud.yml@main
+    secrets: inherit
+    with:
+      bench-execute-cmd: DS_INSTANCE_UID=sentry-ds-m npm run e2e
+      repo-secrets: |
+        DS_INSTANCE_URL=sentry-datasource/sentry:json_url
+        DS_INSTANCE_ORG_SLUG=sentry-datasource/sentry:json_orgSlug
+        DS_INSTANCE_AUTH_TOKEN=sentry-datasource/sentry:secure_authToken

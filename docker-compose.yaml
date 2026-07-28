@@ -2,7 +2,7 @@ services:
   grafana:
     build:
       args:
-        grafana_version: ${GRAFANA_VERSION:-9.1.2}
+        grafana_version: ${GRAFANA_VERSION:-12.2.0}
     ports:
       - 3000:3000/tcp
     environment:
