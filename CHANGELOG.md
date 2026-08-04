@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.2.6
+
+- Dependency updates
+- Interpolate the interval field and snap values to Sentry-accepted intervals in stats queries (#727)
+- Interpolate template variables for spans and spans stats queries (#728)
+- Use lifetime firstSeen/lastSeen instead of range-scoped values for issues (#726)
+- Respect Grafana query interval in Spans Stats requests (#722)
+
 ## 2.2.5
 
 - Dependency updates
