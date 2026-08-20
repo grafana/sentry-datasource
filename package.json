@@ -40,7 +40,7 @@
     "rxjs": "7.8.2"
   },
   "devDependencies": {
-    "@babel/core": "7.29.0",
+    "@babel/core": "7.29.6",
     "@grafana/e2e-selectors": "13.1.1",
     "@grafana/eslint-config": "9.0.0",
     "@grafana/plugin-e2e": "3.10.0",
@@ -103,7 +103,8 @@
     "@istanbuljs/load-nyc-config": {
       "js-yaml": "^3.14.2"
     },
-    "js-yaml": "^4.1.1"
+    "js-yaml": "^4.1.1",
+    "serialize-javascript": "^7.0.5"
   },
   "engines": {
     "node": ">=24",
