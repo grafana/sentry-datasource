@@ -12,6 +12,7 @@ export const TypeSelector = (props: {
     { value: 'projects', label: 'Projects' },
     { value: 'environments', label: 'Environments' },
     { value: 'teams', label: 'Teams' },
+    { value: 'releases', label: 'Releases' },
   ];
   const { label, tooltip, id } = selectors.components.VariablesEditor.QueryType;
   return (
@@ -21,7 +22,7 @@ export const TypeSelector = (props: {
         options={options}
         onChange={(e) => props.onChange(e.value as VariableQueryType)}
         width={25}
-        data-testid='data-testid query-type-dropdown'
+        data-testid="data-testid query-type-dropdown"
       />
     </Field>
   );

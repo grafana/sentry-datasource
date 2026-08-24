@@ -16,6 +16,7 @@ var (
 	ErrorInvalidSentryConfig             = errors.New("invalid sentry configuration")
 	ErrorInvalidAuthToken                = errors.New("empty or invalid auth token found")
 	ErrorInvalidOrganizationSlug         = errors.New("invalid or empty organization slug")
+	ErrorInvalidReleaseVersion           = errors.New("release version is required")
 	ErrorUnknownQueryType                = errors.New("unknown query type")
 )
 

@@ -39,7 +39,10 @@ Alert rules work with Sentry query types that return numeric or time-series data
 | Events Stats              | Yes        | Returns time-series data. Best suited for alerting on event trends over time.                         |
 | Spans                     | Yes        | Returns tabular data. Use aggregate fields or a **Count** rows expression.                            |
 | Spans Stats               | Yes        | Returns time-series data. Best suited for alerting on span performance trends.                        |
+| Uptime                    | Yes        | Returns tabular data. Use a **Count** rows expression to alert on the number of failed checks.        |
 | Release Health (Sessions) | Yes        | Returns time-series data. Alert on release health data like crash rates or crash-free rates.          |
+| Releases                  | Yes        | Returns tabular data. Use a **Count** rows expression to alert on the number of matching releases.    |
+| Deploys                   | Yes        | Returns tabular data. Use a **Count** rows expression to alert on the number of deploys of a release. |
 | Stats                     | Yes        | Returns time-series data. Alert on organization-level usage statistics.                               |
 
 ## Create an alert rule
@@ -123,6 +126,6 @@ Monitor organization-level event consumption to avoid quota overages:
 
 - Alert evaluation depends on the Sentry API response time. If the Sentry API is slow or rate-limited, alert evaluation may be delayed.
 - Sentry API rate limits apply to alert rule evaluations. Set evaluation intervals that avoid exceeding rate limits, especially when multiple alert rules query the same Sentry data source.
-- Issues, Events, and Spans queries return tabular data. To create numeric alert conditions from these, use **Reduce** expressions with functions like **Count**, **Min**, **Max**, or **Mean**.
+- Issues, Events, Spans, Uptime, Releases, and Deploys queries return tabular data. To create numeric alert conditions from these, use **Reduce** expressions with functions like **Count**, **Min**, **Max**, or **Mean**.
 
 For more information, refer to [Grafana Alerting](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/alerting/).

@@ -95,6 +95,81 @@ func ConvertStatsV2ResponseToFrame(frameName string, stats sentry.StatsV2Respons
 	return frame, nil
 }
 
+func ConvertReleasesResponseToFrame(frameName string, releases []sentry.SentryRelease) (*data.Frame, error) {
+	count := len(releases)
+	versions := make([]string, count)
+	shortVersions := make([]string, count)
+	dateCreated := make([]time.Time, count)
+	dateReleased := make([]*time.Time, count)
+	firstEvents := make([]*time.Time, count)
+	lastEvents := make([]*time.Time, count)
+	commitCounts := make([]int64, count)
+	deployCounts := make([]int64, count)
+	newGroups := make([]int64, count)
+	projects := make([]string, count)
+	urls := make([]*string, count)
+	for index, release := range releases {
+		versions[index] = release.Version
+		shortVersions[index] = release.ShortVersion
+		dateCreated[index] = release.DateCreated
+		dateReleased[index] = release.DateReleased
+		firstEvents[index] = release.FirstEvent
+		lastEvents[index] = release.LastEvent
+		commitCounts[index] = release.CommitCount
+		deployCounts[index] = release.DeployCount
+		newGroups[index] = release.NewGroups
+		slugs := make([]string, len(release.Projects))
+		for projectIndex, project := range release.Projects {
+			slugs[projectIndex] = project.Slug
+		}
+		projects[index] = strings.Join(slugs, ",")
+		urls[index] = release.URL
+	}
+	frame := data.NewFrame(frameName,
+		data.NewField("Version", nil, versions),
+		data.NewField("ShortVersion", nil, shortVersions),
+		data.NewField("DateCreated", nil, dateCreated),
+		data.NewField("DateReleased", nil, dateReleased),
+		data.NewField("FirstEvent", nil, firstEvents),
+		data.NewField("LastEvent", nil, lastEvents),
+		data.NewField("CommitCount", nil, commitCounts),
+		data.NewField("DeployCount", nil, deployCounts),
+		data.NewField("NewGroups", nil, newGroups),
+		data.NewField("Projects", nil, projects),
+		data.NewField("URL", nil, urls),
+	)
+	return frame, nil
+}
+
+func ConvertDeploysResponseToFrame(frameName string, deploys []sentry.SentryDeploy) (*data.Frame, error) {
+	count := len(deploys)
+	ids := make([]string, count)
+	names := make([]*string, count)
+	environments := make([]string, count)
+	dateStarted := make([]*time.Time, count)
+	dateFinished := make([]time.Time, count)
+	urls := make([]*string, count)
+	for index, deploy := range deploys {
+		ids[index] = deploy.ID
+		names[index] = deploy.Name
+		environments[index] = deploy.Environment
+		dateStarted[index] = deploy.DateStarted
+		dateFinished[index] = deploy.DateFinished
+		urls[index] = deploy.URL
+	}
+	// DateFinished is always set and precedes the nullable DateStarted so that
+	// annotations default to it as the time field.
+	frame := data.NewFrame(frameName,
+		data.NewField("ID", nil, ids),
+		data.NewField("Name", nil, names),
+		data.NewField("Environment", nil, environments),
+		data.NewField("DateFinished", nil, dateFinished),
+		data.NewField("DateStarted", nil, dateStarted),
+		data.NewField("URL", nil, urls),
+	)
+	return frame, nil
+}
+
 func ConvertTimeSeriesResponseToFrame(frameName string, response sentry.TimeSeriesResponse) (*data.Frame, error) {
 	frame := data.NewFrameOfFieldTypes(frameName, 0)
 	if len(response.TimeSeries) == 0 {

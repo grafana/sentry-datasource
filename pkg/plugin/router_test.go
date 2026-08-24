@@ -59,6 +59,20 @@ func TestGetProjectsHandler(t *testing.T) {
 		assert.Equal(t, fakeProjects, rr.Body.String())
 	})
 }
+func TestGetReleasesHandler(t *testing.T) {
+	t.Run("valid org slug should return results", func(t *testing.T) {
+		fakeReleases := `[{"version":"1.0.0","shortVersion":"1.0.0","dateCreated":"2025-12-30T13:46:46.300599Z","dateReleased":null,"firstEvent":"2026-07-09T00:16:03Z","lastEvent":"2026-07-16T03:27:23Z","commitCount":0,"deployCount":0,"newGroups":10983,"url":null,"projects":[{"slug":"project-a"}]}]`
+		req, _ := http.NewRequest("GET", "/api/0/organizations/foo/releases?project=123", nil)
+		client := util.NewFakeClient(util.FakeDoer{Body: fakeReleases})
+		handler := plugin.GetReleasesHandler(client)
+		rr := httptest.NewRecorder()
+		router := getFakeRouter(map[string]func(http.ResponseWriter, *http.Request){"/api/0/organizations/{organization_slug}/releases": handler})
+		router.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, fakeReleases, rr.Body.String())
+	})
+}
+
 func TestGetAttributesHandler(t *testing.T) {
 	t.Run("valid org slug should return merged attributes", func(t *testing.T) {
 		fakeAttributes := `[{"key":"span.description","name":"span.description"}]`
