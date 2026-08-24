@@ -63,6 +63,34 @@ docker compose up
 npm run test
 ```
 
+## Release
+
+Releases are automated with [release-please](https://github.com/googleapis/release-please). The version number and the changelog both come from commit messages. There is nothing to edit by hand.
+
+### What you do
+
+Give your pull request a [Conventional Commits](https://www.conventionalcommits.org/) title. The `PR Title` check makes sure of this. The repository squash-merges, so the pull request title becomes the commit subject that release-please reads.
+
+| Prefix                                                             | Effect on the next release               |
+| ------------------------------------------------------------------ | ---------------------------------------- |
+| `fix:`                                                             | patch version                            |
+| `feat:`                                                            | minor version                            |
+| `feat!:`, or a `BREAKING CHANGE:` footer                           | major version                            |
+| `chore:`                                                           | no release, hidden from the changelog    |
+| `docs:`, `test:`, `build:`, `ci:`, `refactor:`, `perf:`, `revert:` | no version bump, listed in the changelog |
+
+### What happens next
+
+1. release-please opens a `chore(main): release X.Y.Z` pull request. It keeps that pull request current as more commits land.
+2. When you merge that pull request, the tag and the GitHub release are created, and the plugin is published to the prod catalog.
+3. Each other push to `main` is published to the dev catalog instead.
+
+### Do not
+
+Do not change the version in `package.json`, and do not write `CHANGELOG.md` entries by hand. release-please owns both files. A manual edit puts `package.json` out of step with `.release-please-manifest.json`, and the next release then gets a wrong version.
+
+To release a specific version, add a `Release-As: X.Y.Z` footer to a commit instead of changing the version.
+
 ## Learn more
 
 - [Sentry data source documentation](https://grafana.com/docs/plugins/grafana-sentry-datasource/latest/)
