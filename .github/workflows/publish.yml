@@ -1,7 +1,19 @@
-name: Deploy to Grafana Cloud
-run-name: Deploy ${{ inputs.branch }} to Grafana Cloud ${{ inputs.environment }} by @${{ github.actor }}
+# Description:
+# Thin caller for the shared datasource publish workflow. On a published release it
+# publishes docs for the released tag. On manual dispatch it publishes the plugin.
+# All logic lives in grafana/data-sources-ci-workflows.
+#
+# The release trigger is new with release-please: merging the release PR creates the
+# tag and the GitHub release, and the docs publish hangs off that release event. The
+# dispatch inputs stay as they were, so the manual and emergency on-prem publish
+# paths this repo relies on are preserved.
+
+name: Plugins - Publish plugin
+run-name: Publish ${{ inputs.branch }} to Grafana Cloud by @${{ github.actor }}
 
 on:
+  release:
+    types: [published]
   workflow_dispatch:
     inputs:
       branch:
@@ -23,19 +35,33 @@ on:
 permissions: {}
 
 jobs:
-  cd:
-    name: CD
-    uses: grafana/plugin-ci-workflows/.github/workflows/cd.yml@ci-cd-workflows/v10.1.0
+  publish:
+    name: Publish
+    # Intentionally pinned to @main: data-sources-ci-workflows publishes no
+    # versioned tags for datasource-publish.yml yet. Allowed by the zizmor policy
+    # (`grafana/*: any`); review periodically.
+    uses: grafana/data-sources-ci-workflows/.github/workflows/datasource-publish.yml@main
     permissions:
       contents: write
       id-token: write
       attestations: write
       pull-requests: read
     with:
+      # On a release event every dispatch input is empty. That is harmless: the
+      # shared workflow's docs job reads github.event.release and ignores these,
+      # and only its manual job reads them.
       branch: ${{ github.event.inputs.branch }}
-      environment: 'prod'
-      docs-only: ${{ fromJSON(github.event.inputs.docs-only) }}
-      scopes: ${{ github.event.inputs.environment == 'cloud (recommended)' && 'grafana_cloud' || github.event.inputs.environment == 'on-prem (for emergencies fix to On Prem customers)' && 'universal' }}
-      run-playwright: false
-      github-draft-release: false
-      trufflehog-exclude-detectors: SentryToken
+      # The catalog environment is always prod. The dispatch choice selects the
+      # publishing scope (Cloud vs On Prem/universal), not the environment.
+      environment: prod
+      scopes: ${{ github.event.inputs.environment == 'cloud (recommended)' && 'grafana_cloud' || 'universal' }}
+      # A string comparison rather than fromJSON: on a release event the input is
+      # empty, and fromJSON('') fails the whole expression.
+      docs-only: ${{ github.event.inputs.docs-only == 'true' }}
+      # KNOWN GAP: this repo previously passed `trufflehog-exclude-detectors:
+      # SentryToken` to cd.yml (#717), because the SentryToken detector
+      # false-positives on the SHA256 hashes in the signed MANIFEST.txt. Neither
+      # shared workflow forwards that input yet, so the exclusion is dropped here.
+      # See the PR description: this needs a pass-through in
+      # data-sources-ci-workflows before merge.
+    secrets: inherit
