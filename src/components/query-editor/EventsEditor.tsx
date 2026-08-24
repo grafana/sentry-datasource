@@ -4,9 +4,15 @@ import { Input, QueryField, Select } from '@grafana/ui';
 import { SentryDataSource } from 'datasource';
 import { sortBy } from 'lodash';
 import React, { useEffect } from 'react';
-import { SentryEventSortDirectionOptions, SentryEventSortOptions } from '../../constants';
+import { SentryEventsDatasetOptions, SentryEventSortDirectionOptions, SentryEventSortOptions } from '../../constants';
 import { selectors } from '../../selectors';
-import type { SentryEventSort, SentryEventsQuery, SentrySortDirection, SentrySpansQuery } from '../../types';
+import type {
+  SentryEventsDataset,
+  SentryEventSort,
+  SentryEventsQuery,
+  SentrySortDirection,
+  SentrySpansQuery,
+} from '../../types';
 
 interface EventsEditorProps {
   query: SentryEventsQuery | SentrySpansQuery;
@@ -30,37 +36,59 @@ const EVENTS_DEFAULT_FIELDS = [
   'event.type',
   'platform',
 ];
-const SPANS_DEFAULT_FIELDS = [
-  'id',
-  "span.op",
-  "span.description",
-  'count()',
-];
+const SPANS_DEFAULT_FIELDS = ['id', 'span.op', 'span.description', 'count()'];
 
 type Option = SelectableValue<string>;
 
-
-const toOptions = (fields: string[]): Option[] => fields.map((field) => ({ icon: 'text-fields', label: field, value: field }));
+const toOptions = (fields: string[]): Option[] =>
+  fields.map((field) => ({ icon: 'text-fields', label: field, value: field }));
 
 export const EventsEditor = ({ query, onChange, onRunQuery, datasource }: EventsEditorProps) => {
-  const suggestFields = async () => datasource.getTags().then((tags) => tags.map((tag) => ({ icon: 'tag-alt', label: `tags[${tag.key}]`, value: `tags[${tag.key}]` })));
-  return <EventsLikeEditor query={query} onChange={onChange} onRunQuery={onRunQuery} datasource={datasource} defaultFields={EVENTS_DEFAULT_FIELDS} suggestFields={suggestFields} />;
+  const suggestFields = async () =>
+    datasource
+      .getTags()
+      .then((tags) => tags.map((tag) => ({ icon: 'tag-alt', label: `tags[${tag.key}]`, value: `tags[${tag.key}]` })));
+  return (
+    <EventsLikeEditor
+      query={query}
+      onChange={onChange}
+      onRunQuery={onRunQuery}
+      datasource={datasource}
+      defaultFields={EVENTS_DEFAULT_FIELDS}
+      suggestFields={suggestFields}
+    />
+  );
 };
 
 export const SpansEditor = ({ query, onChange, onRunQuery, datasource }: EventsEditorProps) => {
-  const suggestFields = async () => datasource.getAttributes().then((attr) => attr.map((attr) => ({ icon: 'tag-alt', label: attr.key, value: attr.key })));
-  return <EventsLikeEditor query={query} onChange={onChange} onRunQuery={onRunQuery} datasource={datasource} defaultFields={SPANS_DEFAULT_FIELDS} suggestFields={suggestFields}/>;
+  const suggestFields = async () =>
+    datasource
+      .getAttributes()
+      .then((attr) => attr.map((attr) => ({ icon: 'tag-alt', label: attr.key, value: attr.key })));
+  return (
+    <EventsLikeEditor
+      query={query}
+      onChange={onChange}
+      onRunQuery={onRunQuery}
+      datasource={datasource}
+      defaultFields={SPANS_DEFAULT_FIELDS}
+      suggestFields={suggestFields}
+    />
+  );
 };
 
-const EventsLikeEditor = ({ query, onChange, onRunQuery, defaultFields, suggestFields }: EventsEditorProps & {defaultFields: string[], suggestFields: () => Promise<Option[]> }) => {
+const EventsLikeEditor = ({
+  query,
+  onChange,
+  onRunQuery,
+  defaultFields,
+  suggestFields,
+}: EventsEditorProps & { defaultFields: string[]; suggestFields: () => Promise<Option[]> }) => {
   const [customOptions, setCustomOptions] = React.useState<Option[]>([]);
   const [fieldOptions, setFieldOptions] = React.useState<Option[]>([]);
   useEffect(() => {
-    suggestFields().then((fields)=> {
-      setFieldOptions(sortBy([
-        ...toOptions(defaultFields),
-        ...fields,
-      ], 'label'))
+    suggestFields().then((fields) => {
+      setFieldOptions(sortBy([...toOptions(defaultFields), ...fields], 'label'));
     });
   }, [defaultFields, suggestFields]);
 
@@ -74,6 +102,12 @@ const EventsLikeEditor = ({ query, onChange, onRunQuery, defaultFields, suggestF
 
   const onEventsQueryChange = (eventsQuery: string) => {
     onChange({ ...query, eventsQuery });
+  };
+  const onEventsDatasetChange = (eventsDataset?: SentryEventsDataset) => {
+    if (query.queryType === 'events') {
+      onChange({ ...query, eventsDataset });
+      onRunQuery();
+    }
   };
   const onEventsFieldsChange = (eventsFields: string[]) => {
     onChange({ ...query, eventsFields: eventsFields });
@@ -135,6 +169,22 @@ const EventsLikeEditor = ({ query, onChange, onRunQuery, defaultFields, suggestF
       </EditorRow>
       <EditorRow>
         <EditorFieldGroup>
+          {query.queryType === 'events' && (
+            <EditorField
+              tooltip={selectors.components.QueryEditor.Events.Dataset.tooltip}
+              label={selectors.components.QueryEditor.Events.Dataset.label}
+            >
+              <Select
+                options={SentryEventsDatasetOptions}
+                value={query.eventsDataset}
+                width={28}
+                onChange={(e) => onEventsDatasetChange(e?.value)}
+                className="inline-element"
+                placeholder={selectors.components.QueryEditor.Events.Dataset.placeholder}
+                isClearable={true}
+              />
+            </EditorField>
+          )}
           <EditorField
             tooltip={selectors.components.QueryEditor.Events.Sort.tooltip}
             label={selectors.components.QueryEditor.Events.Sort.label}

@@ -31,7 +31,11 @@ export function queryEditorRow(page: Page) {
 }
 
 export interface DataFrameJSON {
-  schema?: { name?: string; fields?: Array<{ name?: string; type?: string }> };
+  schema?: {
+    name?: string;
+    fields?: Array<{ name?: string; type?: string }>;
+    meta?: { executedQueryString?: string };
+  };
   data?: { values?: unknown[][] };
 }
 

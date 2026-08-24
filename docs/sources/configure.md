@@ -29,7 +29,7 @@ This document explains how to configure the Sentry data source in Grafana.
 
 Before configuring the data source, ensure you have:
 
-- **Grafana version:** Grafana 10.4.0 or later.
+- **Grafana version:** Grafana 12.4.5 or later.
 - **Grafana permissions:** Organization administrator role. Refer to [Permissions](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/administration/roles-and-permissions/) for more information.
 - **Sentry account:** An active Sentry account.
 - **Sentry role:** The Admin, Manager, or Owner role in Sentry, required to create an internal integration token.

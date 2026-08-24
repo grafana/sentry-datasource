@@ -16,7 +16,7 @@ labels:
 menuTitle: Alerting
 title: Sentry alerting
 weight: 400
-review_date: "2026-04-07"
+review_date: '2026-04-07'
 ---
 
 # Sentry alerting
@@ -32,15 +32,15 @@ You can configure Grafana alerting rules that query the Sentry data source to re
 
 Alert rules work with Sentry query types that return numeric or time-series data. The following query types are compatible with alerting:
 
-| Query type   | Compatible | Notes                                                                                                         |
-| ------------ | ---------- | ------------------------------------------------------------------------------------------------------------- |
-| Issues       | Yes        | Returns tabular data. Use a **Count** rows expression to alert on the number of matching issues.              |
-| Events       | Yes        | Use aggregate fields like `count()` or `epm()` in **Fields**, or use a **Count** rows expression.             |
-| Events Stats | Yes        | Returns time-series data. Best suited for alerting on event trends over time.                                  |
-| Spans        | Yes        | Returns tabular data. Use aggregate fields or a **Count** rows expression.                                    |
-| Spans Stats  | Yes        | Returns time-series data. Best suited for alerting on span performance trends.                                 |
-| Metrics      | Yes        | Returns time-series data. Alert on session metrics like crash rates or error rates.                            |
-| Stats        | Yes        | Returns time-series data. Alert on organization-level usage statistics.                                       |
+| Query type                | Compatible | Notes                                                                                                 |
+| ------------------------- | ---------- | ----------------------------------------------------------------------------------------------------- |
+| Issues                    | Yes        | Returns tabular data. Use a **Count** rows expression to alert on the number of matching issues.      |
+| Events                    | Yes        | Use aggregate fields like `count()` or `epm()` in **Fields**, or use a **Count** rows expression.     |
+| Events Stats              | Yes        | Returns time-series data. Best suited for alerting on event trends over time.                         |
+| Spans                     | Yes        | Returns tabular data. Use aggregate fields or a **Count** rows expression.                            |
+| Spans Stats               | Yes        | Returns time-series data. Best suited for alerting on span performance trends.                        |
+| Release Health (Sessions) | Yes        | Returns time-series data. Alert on release health data like crash rates or crash-free rates.          |
+| Stats                     | Yes        | Returns time-series data. Alert on organization-level usage statistics.                               |
 
 ## Create an alert rule
 
@@ -92,10 +92,10 @@ Monitor for p95 latency regressions in a specific transaction:
 
 ### Alert on crash rate changes
 
-Monitor session crash rates using the Metrics query type:
+Monitor session crash rates using the Release Health (Sessions) query type:
 
-1. Select **Metrics** as the query type.
-1. Set **Field** to `session.crash_rate`.
+1. Select **Release Health (Sessions)** as the query type.
+1. Set **Field** to `crash_rate(session)`.
 1. Optionally set **Group By** to `project` to monitor per-project crash rates.
 1. Add a **Reduce** expression with function **Last**.
 1. Add a **Threshold** expression to alert when the crash rate exceeds an acceptable level (for example, `0.01` for 1%).
@@ -104,8 +104,8 @@ Monitor session crash rates using the Metrics query type:
 
 Monitor when crash-free rates drop below a target:
 
-1. Select **Metrics** as the query type.
-1. Set **Field** to `session.crash_free_rate`.
+1. Select **Release Health (Sessions)** as the query type.
+1. Set **Field** to `crash_free_rate(session)`.
 1. Add a **Reduce** expression with function **Last**.
 1. Add a **Threshold** expression to alert when the value drops below your target (for example, `0.995` for 99.5%).
 

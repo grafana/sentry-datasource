@@ -59,6 +59,21 @@ func TestGetProjectsHandler(t *testing.T) {
 		assert.Equal(t, fakeProjects, rr.Body.String())
 	})
 }
+func TestGetAttributesHandler(t *testing.T) {
+	t.Run("valid org slug should return merged attributes", func(t *testing.T) {
+		fakeAttributes := `[{"key":"span.description","name":"span.description"}]`
+		req, _ := http.NewRequest("GET", "/api/0/organizations/foo/trace-items/attributes", nil)
+		client := util.NewFakeClient(util.FakeDoer{Body: fakeAttributes})
+		handler := plugin.GetAttributesHandler(client)
+		rr := httptest.NewRecorder()
+		router := getFakeRouter(map[string]func(http.ResponseWriter, *http.Request){"/api/0/organizations/{organization_slug}/trace-items/attributes": handler})
+		router.ServeHTTP(rr, req)
+		assert.Equal(t, http.StatusOK, rr.Code)
+		// the fake client returns the same body for both the string and number attributeType fetches, so the merged result repeats it
+		assert.Equal(t, `[{"key":"span.description","name":"span.description"},{"key":"span.description","name":"span.description"}]`, rr.Body.String())
+	})
+}
+
 func TestDefaultResourceHandler(t *testing.T) {
 	t.Run("unknown or invalid route should throw error", func(t *testing.T) {
 		req, _ := http.NewRequest("GET", "/", nil)

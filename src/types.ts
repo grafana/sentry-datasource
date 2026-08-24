@@ -40,11 +40,11 @@ export type SentryTag = {
   key: string;
   name: string;
   totalValues: number;
-}
+};
 export type SentryAttribute = {
   key: string;
   name: string;
-}
+};
 export type SentryIssueSort = 'inbox' | 'new' | 'date' | 'priority' | 'freq' | 'user';
 export type SentryEventSort = 'last_seen()' | 'count()' | 'epm()' | 'failure_rate()' | 'level';
 export type SentrySortDirection = 'asc' | 'desc';
@@ -72,10 +72,12 @@ export type SentryIssuesQuery = {
   issuesSort?: SentryIssueSort;
   issuesLimit?: number;
 } & SentryQueryBase<'issues'>;
+export type SentryEventsDataset = 'errors' | 'transactions';
 export type SentryEventsQuery = {
   projectIds: string[];
   environments: string[];
   eventsQuery: string;
+  eventsDataset?: SentryEventsDataset;
   eventsFields?: string[];
   eventsSort?: SentryEventSort;
   eventsSortDirection?: SentrySortDirection;
@@ -109,24 +111,16 @@ export type SentrySpansStatsQuery = {
   eventsStatsGroups: string[];
 } & SentryQueryBase<'spansStats'>;
 export type SentryMetricsQueryField =
-  | 'session.anr_rate'
-  | 'session.abnormal'
-  | 'session.abnormal_user'
-  | 'session.crashed'
-  | 'session.crashed_user'
-  | 'session.errored'
-  | 'session.errored_user'
-  | 'session.healthy'
-  | 'session.healthy_user'
-  | 'count_unique(sentry.sessions.user)'
-  | 'session.crash_free_rate'
-  | 'session.crash_free_user_rate'
-  | 'session.crash_rate'
-  | 'session.crash_user_rate'
-  | 'session.foreground_anr_rate'
-  | 'session.all';
+  | 'sum(session)'
+  | 'count_unique(user)'
+  | 'crash_free_rate(session)'
+  | 'crash_free_rate(user)'
+  | 'crash_rate(session)'
+  | 'crash_rate(user)'
+  | 'anr_rate()'
+  | 'foreground_anr_rate()';
 export type SentryMetricsQueryGroupBy = 'environment' | 'project' | 'session.status' | 'release';
-export type SentryMetricsQuerySort = SentryMetricsQueryField | 'release';
+export type SentryMetricsQuerySort = SentryMetricsQueryField;
 export type SentryMetricsQueryOrder = 'asc' | 'desc';
 export type SentryMetricsQuery = {
   projectIds: string[];
@@ -141,7 +135,13 @@ export type SentryMetricsQuery = {
 export type SentryStatsV2QueryField = 'sum(quantity)' | 'sum(times_seen)';
 export type SentryStatsV2QueryGroupBy = 'outcome' | 'reason' | 'category';
 export type SentryStatsV2QueryCategory = 'transaction' | 'error' | 'attachment' | 'default' | 'session' | 'security';
-export type SentryStatsV2QueryOutcome = 'accepted' | 'filtered' | 'invalid' | 'rate_limited' | 'client_discard' | 'abuse'; // 'dropped'
+export type SentryStatsV2QueryOutcome =
+  | 'accepted'
+  | 'filtered'
+  | 'invalid'
+  | 'rate_limited'
+  | 'client_discard'
+  | 'abuse'; // 'dropped'
 export type SentryStatsV2Query = {
   projectIds: string[];
   statsFields: SentryStatsV2QueryField[];
@@ -177,16 +177,30 @@ export type GetResourceCallBase<P extends string, Q extends Record<string, any>,
   response: R;
 };
 export type GetResourceCallOrganizationsPath = `api/0/organizations`;
-export type GetResourceCallOrganizations = GetResourceCallBase<GetResourceCallOrganizationsPath, {}, SentryOrganization[]>;
+export type GetResourceCallOrganizations = GetResourceCallBase<
+  GetResourceCallOrganizationsPath,
+  {},
+  SentryOrganization[]
+>;
 export type GetResourceCallProjectsPath = `api/0/organizations/${string}/projects`;
 export type GetResourceCallProjects = GetResourceCallBase<GetResourceCallProjectsPath, {}, SentryProject[]>;
+export type GetResourceCallTagsPath = `api/0/organizations/${string}/tags`;
+export type GetResourceCallTags = GetResourceCallBase<GetResourceCallTagsPath, {}, SentryTag[]>;
+export type GetResourceCallAttributesPath = `api/0/organizations/${string}/trace-items/attributes`;
+export type GetResourceCallAttributes = GetResourceCallBase<GetResourceCallAttributesPath, {}, SentryAttribute[]>;
 export type GetResourceCallListOrgTeamsPath = `api/0/organizations/${string}/teams`;
 export type GetResourceCallListOrgTeams = GetResourceCallBase<GetResourceCallListOrgTeamsPath, {}, SentryTeam[]>;
 export type GetResourceCallGetTeamsProjectsPath = `api/0/teams/${string}/${string}/projects`;
-export type GetResourceCallGetTeamsProjects = GetResourceCallBase<GetResourceCallGetTeamsProjectsPath, {}, SentryProject[]>;
+export type GetResourceCallGetTeamsProjects = GetResourceCallBase<
+  GetResourceCallGetTeamsProjectsPath,
+  {},
+  SentryProject[]
+>;
 export type GetResourceCall =
   | GetResourceCallOrganizations
   | GetResourceCallProjects
+  | GetResourceCallTags
+  | GetResourceCallAttributes
   | GetResourceCallListOrgTeams
   | GetResourceCallGetTeamsProjects;
 //#endregion

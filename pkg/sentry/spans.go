@@ -26,7 +26,6 @@ func (gei *GetSpansInput) ToQuery() string {
 	}
 	params := url.Values{}
 	params.Set("dataset", "spans")
-	params.Set("useRpc", "1")
 	params.Set("query", gei.Query)
 	params.Set("start", gei.From.Format("2006-01-02T15:04:05"))
 	params.Set("end", gei.To.Format("2006-01-02T15:04:05"))

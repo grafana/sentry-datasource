@@ -14,6 +14,20 @@ describe('SentryDataSource', () => {
       },
     }));
   });
+  describe('resource paths', () => {
+    it('getTags should request the tags resource', async () => {
+      const ds = new SentryDataSource({ jsonData: { orgSlug: 'my-org' } } as DataSourceInstanceSettings<SentryConfig>);
+      const getResourceSpy = jest.spyOn(ds, 'getResource').mockResolvedValue([]);
+      await ds.getTags();
+      expect(getResourceSpy).toHaveBeenCalledWith('api/0/organizations/my-org/tags');
+    });
+    it('getAttributes should request the trace-items attributes resource without a trailing slash', async () => {
+      const ds = new SentryDataSource({ jsonData: { orgSlug: 'my-org' } } as DataSourceInstanceSettings<SentryConfig>);
+      const getResourceSpy = jest.spyOn(ds, 'getResource').mockResolvedValue([]);
+      await ds.getAttributes();
+      expect(getResourceSpy).toHaveBeenCalledWith('api/0/organizations/my-org/trace-items/attributes');
+    });
+  });
   describe('metricFindQuery', () => {
     it('expect no results when invalid query passed', async () => {
       const ds = new SentryDataSource({} as DataSourceInstanceSettings<SentryConfig>);

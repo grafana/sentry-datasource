@@ -264,19 +264,52 @@ func TestSentryDatasource_Events(t *testing.T) {
 		require.Equal(t, "id", frame.Fields[0].Name)
 		require.Equal(t, "message", frame.Fields[1].Name)
 		require.Contains(t, frame.Meta.ExecutedQueryString, "release")
+		require.NotContains(t, frame.Meta.ExecutedQueryString, "dataset=")
+	})
+
+	t.Run("events query with dataset should include the dataset param", func(t *testing.T) {
+		sc := util.NewFakeClient(util.FakeDoer{Body: `{
+			"data": [
+				{
+					"id": "event_id_1",
+					"title": "event_title_1"
+				}
+			]
+		}`})
+
+		query := `{
+			"queryType" : "events",
+			"projectIds" : ["project_id"],
+			"environments" : ["dev"],
+			"eventsQuery" : "event_query",
+			"eventsFields" : ["id","title"],
+			"eventsDataset" : "errors",
+			"eventsLimit" : 10
+		}`
+
+		ds := plugin.NewDatasourceInstance(sc)
+		ctx := context.TODO()
+
+		res, _ := ds.QueryData(ctx, &backend.QueryDataRequest{Queries: []backend.DataQuery{{RefID: "A", JSON: []byte(query)}}})
+
+		assert.Nil(t, res.Responses["A"].Error)
+		require.Equal(t, 1, len(res.Responses["A"].Frames))
+		require.Contains(t, res.Responses["A"].Frames[0].Meta.ExecutedQueryString, "dataset=errors")
 	})
 
 	t.Run("valid events stats query should produce correct result", func(t *testing.T) {
 		sc := util.NewFakeClient(util.FakeDoer{Body: `{
-			"": {
-				"data": [
-					[1, [{ "count": 123.0 }]],
-					[2, [{ "count": 234.0 }]]
-				],
-				"order": 0,
-				"isMetricsData": false,
-				"meta": {}
-			}
+			"meta": { "dataset": "discover", "start": 1000.0, "end": 2000.0 },
+			"timeSeries": [
+				{
+					"yAxis": "event_yaxis",
+					"values": [
+						{ "timestamp": 1000, "value": 123.0, "incomplete": false },
+						{ "timestamp": 2000, "value": 234.0, "incomplete": false }
+					],
+					"meta": { "valueType": "integer", "valueUnit": null, "interval": 1000 }
+				}
+			]
 		}`})
 
 		query := `{
@@ -307,29 +340,30 @@ func TestSentryDatasource_Events(t *testing.T) {
 		assert.Equal(t, 2, frame.Fields[0].Len())
 		require.Equal(t, "Timestamp", frame.Fields[0].Name)
 		require.Equal(t, "", frame.Fields[1].Name)
+		require.Contains(t, frame.Meta.ExecutedQueryString, "events-timeseries")
+		require.Contains(t, frame.Meta.ExecutedQueryString, "dataset=discover")
 	})
 }
 
 func TestSentryDatasource_EventsStats(t *testing.T) {
-	t.Run("valid grouped events stats query should produce correct result", func(t *testing.T) {
+	// Grouped queries go through the legacy events-stats endpoint while the
+	// documented events-timeseries endpoint 500s for grouped discover queries.
+	// See pkg/sentry/events_stats_legacy.go.
+	t.Run("valid grouped events stats query should use the legacy endpoint", func(t *testing.T) {
 		sc := util.NewFakeClient(util.FakeDoer{Body: `{
 			"Group A": {
-				"data": [
-					[1, [{ "count": 123.0 }]],
-					[2, [{ "count": 234.0 }]]
-				],
 				"order": 0,
-				"isMetricsData": false,
-				"meta": {}
+				"data": [
+					[1000, [{ "count": 123 }]],
+					[2000, [{ "count": 234 }]]
+				]
 			},
 			"Group B": {
-				"data": [
-					[1, [{ "count": 345.0 }]],
-					[2, [{ "count": 696.0 }]]
-				],
 				"order": 1,
-				"isMetricsData": false,
-				"meta": {}
+				"data": [
+					[1000, [{ "count": 345 }]],
+					[2000, [{ "count": 696 }]]
+				]
 			}
 		}`})
 
@@ -340,7 +374,7 @@ func TestSentryDatasource_EventsStats(t *testing.T) {
 			"eventsStatsQuery" : "event_query",
 			"eventsStatsYAxis": ["event_yaxis"],
 			"eventsStatsGroups": ["event_group"],
-			"eventsStatsSort" : "event_sort",
+			"eventsStatsSort" : "-count()",
 			"eventsStatsLimit" : 10
 		}`
 
@@ -363,51 +397,43 @@ func TestSentryDatasource_EventsStats(t *testing.T) {
 		assert.Contains(t, labels, "Timestamp")
 		assert.Contains(t, labels, "Group A")
 		assert.Contains(t, labels, "Group B")
+		require.Contains(t, frame.Meta.ExecutedQueryString, "/events-stats/")
+		require.Contains(t, frame.Meta.ExecutedQueryString, "topEvents=10")
+		require.Contains(t, frame.Meta.ExecutedQueryString, "sort=-count%28%29")
+		require.NotContains(t, frame.Meta.ExecutedQueryString, "events-timeseries")
 	})
 
-	t.Run("valid multiple yAxis events stats query should produce correct result", func(t *testing.T) {
+	t.Run("valid grouped multiple yAxis events stats query should produce correct result", func(t *testing.T) {
 		sc := util.NewFakeClient(util.FakeDoer{Body: `{
 			"Group A": {
+				"order": 0,
 				"event_yaxis_a": {
 					"data": [
-						[1, [{ "count": 885.0 }]],
-						[2, [{ "count": 951.0 }]]
-					],
-					"order": 0,
-					"isMetricsData": false,
-					"meta": {}
+						[1000, [{ "count": 885 }]],
+						[2000, [{ "count": 951 }]]
+					]
 				},
 				"event_yaxis_b": {
 					"data": [
-						[1, [{ "count": 146 }]],
-						[2, [{ "count": 53 }]]
-					],
-					"order": 1,
-					"isMetricsData": false,
-					"meta": {}
-				},
-				"order": 0
+						[1000, [{ "count": 146 }]],
+						[2000, [{ "count": 53 }]]
+					]
+				}
 			},
 			"Group B": {
+				"order": 1,
 				"event_yaxis_a": {
 					"data": [
-						[1, [{ "count": 697.0 }]],
-						[2, [{ "count": 696.0 }]]
-					],
-					"order": 0,
-					"isMetricsData": false,
-					"meta": {}
+						[1000, [{ "count": 697 }]],
+						[2000, [{ "count": 696 }]]
+					]
 				},
 				"event_yaxis_b": {
 					"data": [
-						[1, [{ "count": 395 }]],
-						[2, [{ "count": 150 }]]
-					],
-					"order": 1,
-					"isMetricsData": false,
-					"meta": {}
-				},
-				"order": 1
+						[1000, [{ "count": 395 }]],
+						[2000, [{ "count": 150 }]]
+					]
+				}
 			}
 		}`})
 
@@ -447,23 +473,17 @@ func TestSentryDatasource_EventsStats(t *testing.T) {
 
 	t.Run("events stats with null values should be handled gracefully", func(t *testing.T) {
 		sc := util.NewFakeClient(util.FakeDoer{Body: `{
-			"data": [
-				[1, [{ "count": null }]],
-				[2, [{ "count": 234.0 }]]
-			],
-			"order": 0,
-			"isMetricsData": false,
-			"start": 1,
-			"end": 2,
-			"meta": {
-				"fields": {},
-				"units": {},
-				"isMetricsData": false,
-				"isMetricsExtractedData": false,
-				"tips": {},
-				"datasetReason": "unchanged",
-				"dataset": "discover"
-			}
+			"meta": { "dataset": "discover", "start": 1000.0, "end": 2000.0 },
+			"timeSeries": [
+				{
+					"yAxis": "event_yaxis",
+					"values": [
+						{ "timestamp": 1000, "value": null, "incomplete": true },
+						{ "timestamp": 2000, "value": 234.0, "incomplete": false }
+					],
+					"meta": { "valueType": "integer", "valueUnit": null, "interval": 1000 }
+				}
+			]
 		}`})
 
 		query := `{
@@ -613,26 +633,37 @@ func TestSentryDatasource_Spans(t *testing.T) {
 }
 
 func TestSentryDatasource_SpansStats(t *testing.T) {
-	t.Run("valid grouped events stats query should produce correct result", func(t *testing.T) {
+	t.Run("valid grouped spans stats query should produce correct result", func(t *testing.T) {
 		sc := util.NewFakeClient(util.FakeDoer{Body: `{
-			"Group A": {
-				"data": [
-					[1, [{ "count": 123.0 }]],
-					[2, [{ "count": 234.0 }]]
-				],
-				"order": 0,
-				"isMetricsData": false,
-				"meta": {}
-			},
-			"Group B": {
-				"data": [
-					[1, [{ "count": 345.0 }]],
-					[2, [{ "count": 696.0 }]]
-				],
-				"order": 1,
-				"isMetricsData": false,
-				"meta": {}
-			}
+			"meta": { "dataset": "spans", "start": 1000.0, "end": 2000.0 },
+			"timeSeries": [
+				{
+					"yAxis": "event_yaxis",
+					"groupBy": [{ "key": "event_group", "value": "Group A" }],
+					"values": [
+						{ "timestamp": 1000, "value": 123.0, "incomplete": false },
+						{ "timestamp": 2000, "value": 234.0, "incomplete": false }
+					],
+					"meta": { "valueType": "integer", "valueUnit": null, "interval": 1000, "order": 0 }
+				},
+				{
+					"yAxis": "event_yaxis",
+					"groupBy": [{ "key": "event_group", "value": "Group B" }],
+					"values": [
+						{ "timestamp": 1000, "value": 345.0, "incomplete": false },
+						{ "timestamp": 2000, "value": 696.0, "incomplete": false }
+					],
+					"meta": { "valueType": "integer", "valueUnit": null, "interval": 1000, "order": 1 }
+				},
+				{
+					"yAxis": "event_yaxis",
+					"values": [
+						{ "timestamp": 1000, "value": 11.0, "incomplete": false },
+						{ "timestamp": 2000, "value": 22.0, "incomplete": false }
+					],
+					"meta": { "valueType": "integer", "valueUnit": null, "interval": 1000, "order": 2, "isOther": true }
+				}
+			]
 		}`})
 
 		query := `{
@@ -659,62 +690,63 @@ func TestSentryDatasource_SpansStats(t *testing.T) {
 		// Assert the content of the data frame
 		frame := res.Responses["A"].Frames[0]
 		require.NotNil(t, frame.Fields)
-		require.Equal(t, 3, len(frame.Fields))
+		require.Equal(t, 4, len(frame.Fields))
 		assert.Equal(t, 2, frame.Fields[0].Len())
 		labels := framer.GetFrameLabels(frame)
 		assert.Contains(t, labels, "Timestamp")
 		assert.Contains(t, labels, "Group A")
 		assert.Contains(t, labels, "Group B")
+		assert.Contains(t, labels, "Other")
+		require.Equal(t, data.FrameTypeTimeSeriesWide, frame.Meta.Type)
+		require.Contains(t, frame.Meta.ExecutedQueryString, "events-timeseries")
+		require.Contains(t, frame.Meta.ExecutedQueryString, "dataset=spans")
 	})
 
 	t.Run("valid multiple yAxis spans stats query should produce correct result", func(t *testing.T) {
 		sc := util.NewFakeClient(util.FakeDoer{Body: `{
-			"Group A": {
-				"event_yaxis_a": {
-					"data": [
-						[1, [{ "count": 885.0 }]],
-						[2, [{ "count": 951.0 }]]
+			"meta": { "dataset": "spans", "start": 1000.0, "end": 2000.0 },
+			"timeSeries": [
+				{
+					"yAxis": "event_yaxis_a",
+					"groupBy": [{ "key": "event_group", "value": "Group A" }],
+					"values": [
+						{ "timestamp": 1000, "value": 885.0, "incomplete": false },
+						{ "timestamp": 2000, "value": 951.0, "incomplete": false }
 					],
-					"order": 0,
-					"isMetricsData": false,
-					"meta": {}
+					"meta": { "valueType": "integer", "valueUnit": null, "interval": 1000, "order": 0 }
 				},
-				"event_yaxis_b": {
-					"data": [
-						[1, [{ "count": 146 }]],
-						[2, [{ "count": 53 }]]
+				{
+					"yAxis": "event_yaxis_b",
+					"groupBy": [{ "key": "event_group", "value": "Group A" }],
+					"values": [
+						{ "timestamp": 1000, "value": 146, "incomplete": false },
+						{ "timestamp": 2000, "value": 53, "incomplete": false }
 					],
-					"order": 1,
-					"isMetricsData": false,
-					"meta": {}
+					"meta": { "valueType": "integer", "valueUnit": null, "interval": 1000, "order": 0 }
 				},
-				"order": 0
-			},
-			"Group B": {
-				"event_yaxis_a": {
-					"data": [
-						[1, [{ "count": 697.0 }]],
-						[2, [{ "count": 696.0 }]]
+				{
+					"yAxis": "event_yaxis_a",
+					"groupBy": [{ "key": "event_group", "value": "Group B" }],
+					"values": [
+						{ "timestamp": 1000, "value": 697.0, "incomplete": false },
+						{ "timestamp": 2000, "value": 696.0, "incomplete": false }
 					],
-					"order": 0,
-					"isMetricsData": false,
-					"meta": {}
+					"meta": { "valueType": "integer", "valueUnit": null, "interval": 1000, "order": 1 }
 				},
-				"event_yaxis_b": {
-					"data": [
-						[1, [{ "count": 395 }]],
-						[2, [{ "count": 150 }]]
+				{
+					"yAxis": "event_yaxis_b",
+					"groupBy": [{ "key": "event_group", "value": "Group B" }],
+					"values": [
+						{ "timestamp": 1000, "value": 395, "incomplete": false },
+						{ "timestamp": 2000, "value": 150, "incomplete": false }
 					],
-					"order": 1,
-					"isMetricsData": false,
-					"meta": {}
-				},
-				"order": 1
-			}
+					"meta": { "valueType": "integer", "valueUnit": null, "interval": 1000, "order": 1 }
+				}
+			]
 		}`})
 
 		query := `{
-			"queryType" : "eventsStats",
+			"queryType" : "spansStats",
 			"projectIds" : ["project_id"],
 			"environments" : ["dev"],
 			"eventsStatsQuery" : "event_query",
@@ -732,7 +764,7 @@ func TestSentryDatasource_SpansStats(t *testing.T) {
 		// Assert that there are no errors and the data frame is correctly formed
 		assert.Nil(t, res.Responses["A"].Error)
 		require.Equal(t, 1, len(res.Responses["A"].Frames))
-		assert.Equal(t, "EventsStats (A)", res.Responses["A"].Frames[0].Name)
+		assert.Equal(t, "SpansStats (A)", res.Responses["A"].Frames[0].Name)
 
 		// Assert the content of the data frame
 		frame := res.Responses["A"].Frames[0]
@@ -745,31 +777,27 @@ func TestSentryDatasource_SpansStats(t *testing.T) {
 		assert.Contains(t, labels, "Group A: event_yaxis_b")
 		assert.Contains(t, labels, "Group B: event_yaxis_a")
 		assert.Contains(t, labels, "Group B: event_yaxis_b")
+		require.Contains(t, frame.Meta.ExecutedQueryString, "events-timeseries")
+		require.Contains(t, frame.Meta.ExecutedQueryString, "dataset=spans")
 	})
 
-	t.Run("events stats with null values should be handled gracefully", func(t *testing.T) {
+	t.Run("spans stats with null values should be handled gracefully", func(t *testing.T) {
 		sc := util.NewFakeClient(util.FakeDoer{Body: `{
-			"data": [
-				[1, [{ "count": null }]],
-				[2, [{ "count": 234.0 }]]
-			],
-			"order": 0,
-			"isMetricsData": false,
-			"start": 1,
-			"end": 2,
-			"meta": {
-				"fields": {},
-				"units": {},
-				"isMetricsData": false,
-				"isMetricsExtractedData": false,
-				"tips": {},
-				"datasetReason": "unchanged",
-				"dataset": "discover"
-			}
+			"meta": { "dataset": "spans", "start": 1000.0, "end": 2000.0 },
+			"timeSeries": [
+				{
+					"yAxis": "event_yaxis",
+					"values": [
+						{ "timestamp": 1000, "value": null, "incomplete": true },
+						{ "timestamp": 2000, "value": 234.0, "incomplete": false }
+					],
+					"meta": { "valueType": "integer", "valueUnit": null, "interval": 1000 }
+				}
+			]
 		}`})
 
 		query := `{
-			"queryType" : "eventsStats",
+			"queryType" : "spansStats",
 			"projectIds" : ["project_id"],
 			"environments" : ["dev"],
 			"eventsStatsQuery" : "event_query",
@@ -885,6 +913,7 @@ func TestSentryDatasource_Metrics(t *testing.T) {
 		assert.Equal(t, 2, frame.Fields[0].Len())
 		require.Equal(t, "Timestamp", frame.Fields[0].Name)
 		require.Equal(t, "session.crash_rate", frame.Fields[1].Name)
+		require.Contains(t, frame.Meta.ExecutedQueryString, "/sessions/")
 	})
 
 	t.Run("grouped metrics query should handle null values", func(t *testing.T) {
@@ -937,5 +966,6 @@ func TestSentryDatasource_Metrics(t *testing.T) {
 		assert.Contains(t, labels, "Timestamp")
 		assert.Contains(t, labels, "version-1.0")
 		assert.Contains(t, labels, "version-1.1")
+		require.Contains(t, frame.Meta.ExecutedQueryString, "/sessions/")
 	})
 }
