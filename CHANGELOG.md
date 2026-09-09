@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.6
+
+- Chore: Added plugin schema and artifacts
+
 ## 2.2.5
 
 - Dependency updates

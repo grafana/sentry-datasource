@@ -1,0 +1,39 @@
+{
+  "targetApiVersion": "v0alpha1",
+  "settings": {
+    "spec": {
+      "type": "object",
+      "properties": {
+        "jsonData": {
+          "type": "object",
+          "required": [
+            "url",
+            "orgSlug"
+          ],
+          "properties": {
+            "orgSlug": {
+              "description": "Sentry Org slug. Typically this will be the last segment of the URL: https://sentry.io/organizations/{organization_slug}/ - only the slug should be entered here.",
+              "type": "string"
+            },
+            "tlsSkipVerify": {
+              "description": "Skip TLS certificate verification. Use this option for self-hosted Sentry instances with self-signed certificates.",
+              "type": "boolean"
+            },
+            "url": {
+              "description": "Sentry URL to be used. If left blank, https://sentry.io will be used.",
+              "type": "string",
+              "default": "https://sentry.io"
+            }
+          }
+        }
+      }
+    },
+    "secureValues": [
+      {
+        "key": "authToken",
+        "description": "Sentry authentication token. Auth tokens can be created from https://sentry.io/settings/{organization_slug}/developer-settings.",
+        "required": true
+      }
+    ]
+  }
+}

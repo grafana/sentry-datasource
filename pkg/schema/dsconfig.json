@@ -1,0 +1,81 @@
+{
+    "$schema": "https://raw.githubusercontent.com/grafana/dsconfig/refs/heads/main/dsconfig/schema.json",
+    "schemaVersion": "v1",
+    "pluginType": "grafana-sentry-datasource",
+    "pluginName": "Sentry",
+    "docURL": "https://grafana.com/grafana/plugins/grafana-sentry-datasource/",
+    "fields": [
+        {
+            "id": "jsonData.url",
+            "key": "url",
+            "label": "Sentry URL",
+            "description": "Sentry URL to be used. If left blank, https://sentry.io will be used.",
+            "valueType": "string",
+            "semanticType": "url",
+            "target": "jsonData",
+            "required": true,
+            "defaultValue": "https://sentry.io",
+            "ui": {
+                "component": "input",
+                "placeholder": "https://sentry.io"
+            }
+        },
+        {
+            "id": "jsonData.orgSlug",
+            "key": "orgSlug",
+            "label": "Sentry Org",
+            "description": "Sentry Org slug. Typically this will be the last segment of the URL: https://sentry.io/organizations/{organization_slug}/ - only the slug should be entered here.",
+            "valueType": "string",
+            "target": "jsonData",
+            "required": true,
+            "ui": {
+                "component": "input",
+                "placeholder": "Sentry org slug"
+            }
+        },
+        {
+            "id": "secureJsonData.authToken",
+            "key": "authToken",
+            "label": "Sentry Auth Token",
+            "description": "Sentry authentication token. Auth tokens can be created from https://sentry.io/settings/{organization_slug}/developer-settings.",
+            "valueType": "string",
+            "semanticType": "token",
+            "target": "secureJsonData",
+            "required": true,
+            "ui": {
+                "component": "input",
+                "placeholder": "Sentry Authentication Token"
+            }
+        },
+        {
+            "id": "jsonData.tlsSkipVerify",
+            "key": "tlsSkipVerify",
+            "label": "Skip TLS Verify",
+            "description": "Skip TLS certificate verification. Use this option for self-hosted Sentry instances with self-signed certificates.",
+            "valueType": "boolean",
+            "target": "jsonData",
+            "ui": {
+                "component": "switch"
+            }
+        }
+    ],
+    "groups": [
+        {
+            "id": "connection",
+            "title": "Sentry Settings",
+            "fieldRefs": [
+                "jsonData.url",
+                "jsonData.orgSlug",
+                "secureJsonData.authToken"
+            ]
+        },
+        {
+            "id": "additional",
+            "title": "Additional settings",
+            "optional": true,
+            "fieldRefs": [
+                "jsonData.tlsSkipVerify"
+            ]
+        }
+    ]
+}
