@@ -21,6 +21,9 @@ jobs:
   publish-and-deploy:
     if: github.ref == 'refs/heads/main'
     uses: grafana/data-sources-ci-workflows/.github/workflows/cd-dev.yml@main
+    with:
+      go-version: '1.27.0'
+      golangci-lint-version: '2.13.2'
     permissions:
       attestations: write
       contents: write
