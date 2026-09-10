@@ -17,8 +17,6 @@ jobs:
       id-token: write
     with:
       plugin-version-suffix: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || '' }}
-      run-playwright: true
-      run-trufflehog: false
 
   publish-and-deploy:
     if: github.ref == 'refs/heads/main'
