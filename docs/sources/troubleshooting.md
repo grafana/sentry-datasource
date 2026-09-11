@@ -123,7 +123,7 @@ These errors occur when executing queries against Sentry.
 **Solutions:**
 
 1. Select a valid query type in the **Query Type** drop-down. This error occurs when no query type is selected or the query configuration is corrupted.
-1. If you're using a query type added in a newer plugin version (for example, Spans requires v2.2.0+, Metrics requires v1.8.0+), update the plugin to the required version.
+1. If you're using a query type added in a newer plugin version (for example, Spans requires v2.2.0+, Release Health (Sessions) requires v1.8.0+), update the plugin to the required version.
 
 ### "invalid or empty organization slug" error
 

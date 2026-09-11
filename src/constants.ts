@@ -1,6 +1,7 @@
 import type { SelectableValue } from '@grafana/data';
 import type {
   QueryType,
+  SentryEventsDataset,
   SentryEventSort,
   SentryIssueSort,
   SentryMetricsQueryField,
@@ -21,7 +22,7 @@ export const QueryTypeOptions: Array<SelectableValue<QueryType>> = [
   { value: 'statsV2', label: 'Stats' },
   { value: 'spans', label: 'Spans' },
   { value: 'spansStats', label: 'Spans Stats' },
-  { value: 'metrics', label: 'Metrics' },
+  { value: 'metrics', label: 'Release Health (Sessions)' },
 ];
 export const SentryIssueSortOptions: Array<SelectableValue<SentryIssueSort>> = [
   // { value: 'inbox', label: 'Date Added' },
@@ -42,27 +43,22 @@ export const SentryEventSortDirectionOptions: Array<SelectableValue<SentrySortDi
   { value: 'asc', label: 'Ascending' },
   { value: 'desc', label: 'Descending' },
 ];
+export const SentryEventsDatasetOptions: Array<SelectableValue<SentryEventsDataset>> = [
+  { value: 'errors', label: 'errors' },
+  { value: 'transactions', label: 'transactions' },
+];
 export const SentryMetricsQueryFieldOptions: Array<SelectableValue<SentryMetricsQueryField>> = [
-  { value: 'session.anr_rate', label: 'session.anr_rate' },
-  { value: 'session.abnormal', label: 'session.abnormal' },
-  { value: 'session.abnormal_user', label: 'session.abnormal_user' },
-  { value: 'session.crashed', label: 'session.crashed' },
-  { value: 'session.crashed_user', label: 'session.crashed_user' },
-  { value: 'session.errored', label: 'session.errored' },
-  { value: 'session.errored_user', label: 'session.errored_user' },
-  { value: 'session.healthy', label: 'session.healthy' },
-  { value: 'session.healthy_user', label: 'session.healthy_user' },
-  { value: 'count_unique(sentry.sessions.user)', label: 'count_unique(sentry.sessions.user)' },
-  { value: 'session.crash_free_rate', label: 'session.crash_free_rate' },
-  { value: 'session.crash_free_user_rate', label: 'session.crash_free_user_rate' },
-  { value: 'session.crash_rate', label: 'session.crash_rate' },
-  { value: 'session.crash_user_rate', label: 'session.crash_user_rate' },
-  { value: 'session.foreground_anr_rate', label: 'session.foreground_anr_rate' },
-  { value: 'session.all', label: 'session.all' },
+  { value: 'sum(session)', label: 'sum(session)' },
+  { value: 'count_unique(user)', label: 'count_unique(user)' },
+  { value: 'crash_free_rate(session)', label: 'crash_free_rate(session)' },
+  { value: 'crash_free_rate(user)', label: 'crash_free_rate(user)' },
+  { value: 'crash_rate(session)', label: 'crash_rate(session)' },
+  { value: 'crash_rate(user)', label: 'crash_rate(user)' },
+  { value: 'anr_rate()', label: 'anr_rate()' },
+  { value: 'foreground_anr_rate()', label: 'foreground_anr_rate()' },
 ];
 export const SentryMetricsQuerySortOptions: Array<SelectableValue<SentryMetricsQuerySort>> = [
   ...SentryMetricsQueryFieldOptions,
-  { value: 'release', label: 'release' },
 ];
 export const SentryMetricsQueryOrderOptions: Array<SelectableValue<SentryMetricsQueryOrder>> = [
   { value: 'desc', label: 'High to low' },

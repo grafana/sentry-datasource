@@ -6,7 +6,7 @@ For user-facing documentation on configuration, query types, template variables,
 
 ## Requirements
 
-- Grafana 10.4.0 or later
+- Grafana 12.4.5 or later
 - An active Sentry account
 
 ## Install the plugin

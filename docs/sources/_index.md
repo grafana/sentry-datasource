@@ -22,11 +22,11 @@ review_date: "2026-04-07"
 
 # Sentry data source
 
-The Sentry data source plugin lets you query and visualize [Sentry](https://sentry.io/) data within Grafana. You can display issues, events, spans, session metrics, and organization statistics in Grafana dashboards, giving you a unified view of application errors and performance alongside your other observability data.
+The Sentry data source plugin lets you query and visualize [Sentry](https://sentry.io/) data within Grafana. You can display issues, events, spans, release health session data, and organization statistics in Grafana dashboards, giving you a unified view of application errors and performance alongside your other observability data.
 
 ## Requirements
 
-- Grafana version 10.4.0 or later.
+- Grafana version 12.4.5 or later.
 - A Sentry account (hosted at [sentry.io](https://sentry.io/) or self-hosted).
 - A Sentry internal integration authentication token with **Read** access to **Project**, **Issue & Event**, and **Organization**. Refer to [Configure the Sentry data source](https://grafana.com/docs/plugins/grafana-sentry-datasource/latest/configure/) for setup instructions.
 
@@ -42,15 +42,15 @@ The Sentry data source plugin lets you query and visualize [Sentry](https://sent
 
 The Sentry data source supports the following query types. For detailed field descriptions and examples, refer to the [query editor](https://grafana.com/docs/plugins/grafana-sentry-datasource/latest/query-editor/) documentation.
 
-| Query type   | Description                                                                                   |
-| ------------ | --------------------------------------------------------------------------------------------- |
-| Issues       | Query Sentry issues with filtering, sorting, and pagination.                                  |
-| Events       | Query individual error and transaction events with custom fields.                             |
-| Spans        | Query span data for distributed tracing analysis.                                             |
-| Events Stats | Query time-series event data for trend analysis and visualization.                            |
-| Spans Stats  | Query time-series span data for performance trend analysis.                                   |
-| Metrics      | Query session-based metrics such as crash rates and session health.                           |
-| Stats        | Query organization-level usage statistics such as event quotas and consumption.               |
+| Query type                | Description                                                                      |
+| ------------------------- | -------------------------------------------------------------------------------- |
+| Issues                    | Query Sentry issues with filtering, sorting, and pagination.                     |
+| Events                    | Query individual error and transaction events with custom fields.                |
+| Spans                     | Query span data for distributed tracing analysis.                                |
+| Events Stats              | Query time-series event data for trend analysis and visualization.               |
+| Spans Stats               | Query time-series span data for performance trend analysis.                      |
+| Release Health (Sessions) | Query session-based release health data such as crash rates and session counts.  |
+| Stats                     | Query organization-level usage statistics such as event quotas and consumption.  |
 
 ## Get started
 

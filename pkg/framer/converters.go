@@ -3,20 +3,21 @@ package framer
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/grafana/sentry-datasource/pkg/sentry"
 )
 
-func ConvertMetricsResponseToFrame(frameName string, metrics sentry.MetricsResponse) (*data.Frame, error) {
-	if len(metrics.Intervals) == 0 {
+func ConvertSessionsResponseToFrame(frameName string, sessions sentry.SessionsResponse) (*data.Frame, error) {
+	if len(sessions.Intervals) == 0 {
 		return data.NewFrameOfFieldTypes(frameName, 0), nil
 	}
-	frame := data.NewFrameOfFieldTypes(frameName, len(metrics.Intervals))
-	field := data.NewField("Timestamp", nil, metrics.Intervals)
+	frame := data.NewFrameOfFieldTypes(frameName, len(sessions.Intervals))
+	field := data.NewField("Timestamp", nil, sessions.Intervals)
 	frame.Fields = append(frame.Fields, field)
-	for _, group := range metrics.Groups {
+	for _, group := range sessions.Groups {
 		for valueName, series := range group.Series {
 			array, isArray := series.([]interface{})
 			if !isArray {
@@ -94,69 +95,76 @@ func ConvertStatsV2ResponseToFrame(frameName string, stats sentry.StatsV2Respons
 	return frame, nil
 }
 
-func ConvertEventStatsSetToTimestampField(set SentryEventsStatsSet) (*data.Field, error) {
-	field := data.NewFieldFromFieldType(data.FieldTypeTime, len(set.Data))
-	field.Name = "Timestamp"
-	for index, value := range set.Data {
-		row, isArray := value.([]interface{})
-		if !isArray {
-			return nil, fmt.Errorf("expected array, got %T", value)
-		}
-		timestamp, isFloat64 := row[0].(float64)
-		if !isFloat64 {
-			return nil, fmt.Errorf("expected float64, got %T", row[0])
-		}
-		field.Set(index, time.Unix(int64(timestamp), 0))
-	}
-	return field, nil
-}
-
-func ConvertEventStatsSetToField(set SentryEventsStatsSet) (*data.Field, error) {
-	field := data.NewFieldFromFieldType(data.FieldTypeNullableFloat64, len(set.Data))
-	field.Name = set.Name
-	for index, value := range set.Data {
-		row, isArray := value.([]interface{})
-		if !isArray {
-			return nil, fmt.Errorf("expected array, got %T", value)
-		}
-		valueArray, isArray := row[1].([]interface{})
-		if !isArray {
-			return nil, fmt.Errorf("expected array, got %T", row[1])
-		}
-		valueObject, isObject := valueArray[0].(map[string]interface{})
-		if !isObject {
-			return nil, fmt.Errorf("expected JSON object, got %T", valueArray[0])
-		}
-		count, ok := valueObject["count"].(float64)
-		if ok {
-			field.Set(index, &count)
-		} else if valueObject["count"] != nil {
-			return nil, fmt.Errorf("expected float64 or null, got %T", valueObject["count"])
-		}
-	}
-	return field, nil
-}
-
-func ConvertEventsStatsResponseToFrame(frameName string, eventsStats sentry.SentryEventsStats) (*data.Frame, error) {
-	sets, error := ExtractDataSets("", eventsStats)
-	if error != nil {
-		return nil, error
-	}
+func ConvertTimeSeriesResponseToFrame(frameName string, response sentry.TimeSeriesResponse) (*data.Frame, error) {
 	frame := data.NewFrameOfFieldTypes(frameName, 0)
-
-	for index, set := range sets {
-		if index == 0 {
-			timestampField, error := ConvertEventStatsSetToTimestampField(set)
-			if error != nil {
-				return nil, error
-			}
-			frame.Fields = append(frame.Fields, timestampField)
+	if len(response.TimeSeries) == 0 {
+		return frame, nil
+	}
+	firstValues := response.TimeSeries[0].Values
+	timestampField := data.NewFieldFromFieldType(data.FieldTypeTime, len(firstValues))
+	timestampField.Name = "Timestamp"
+	for index, value := range firstValues {
+		timestampField.Set(index, time.UnixMilli(value.Timestamp))
+	}
+	frame.Fields = append(frame.Fields, timestampField)
+	grouped := false
+	axes := map[string]bool{}
+	for _, series := range response.TimeSeries {
+		if len(series.GroupBy) > 0 || series.Meta.IsOther || axes[series.YAxis] {
+			grouped = true
 		}
-		field, error := ConvertEventStatsSetToField(set)
-		if error != nil {
-			return nil, error
+		axes[series.YAxis] = true
+	}
+	multiAxis := len(axes) > 1
+	for _, series := range response.TimeSeries {
+		if len(series.Values) != len(firstValues) {
+			return nil, fmt.Errorf("expected %d values in series %q, got %d", len(firstValues), series.YAxis, len(series.Values))
+		}
+		field := data.NewFieldFromFieldType(data.FieldTypeNullableFloat64, len(series.Values))
+		field.Name = getTimeSeriesFieldName(series, grouped, multiAxis)
+		for index, value := range series.Values {
+			field.Set(index, value.Value)
 		}
 		frame.Fields = append(frame.Fields, field)
 	}
 	return frame, nil
+}
+
+func getTimeSeriesFieldName(series sentry.TimeSeries, grouped bool, multiAxis bool) string {
+	if !grouped {
+		if multiAxis {
+			return series.YAxis
+		}
+		return ""
+	}
+	group := "Other"
+	if !series.Meta.IsOther {
+		values := make([]string, len(series.GroupBy))
+		for index, groupBy := range series.GroupBy {
+			values[index] = formatGroupByValue(groupBy.Value)
+		}
+		group = strings.Join(values, ",")
+		if group == "" {
+			group = fmt.Sprintf("Series %d", series.Meta.Order)
+		}
+	}
+	if multiAxis {
+		return fmt.Sprintf("%s: %s", group, series.YAxis)
+	}
+	return group
+}
+
+func formatGroupByValue(value interface{}) string {
+	switch typedValue := value.(type) {
+	case string:
+		return typedValue
+	case float64:
+		return strconv.FormatFloat(typedValue, 'f', -1, 64)
+	case bool:
+		return strconv.FormatBool(typedValue)
+	case nil:
+		return ""
+	default:
+		return fmt.Sprintf("%v", typedValue)
+	}
 }
