@@ -3,6 +3,7 @@
 ## 2.2.7
 
 - Dependency updates
+- Fix security vulnerabilities (CVE-2026-40181, CVE-2026-85730)
 
 ## 2.2.6
 
