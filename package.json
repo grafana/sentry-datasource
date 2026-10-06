@@ -95,15 +95,7 @@
     "webpack-virtual-modules": "0.6.2"
   },
   "overrides": {
-    "rxjs": "7.8.2",
     "jackspeak": "2.1.1",
-    "form-data": "^4.0.4",
-    "react-router-dom-v5-compat": "6.30.6",
-    "lodash": "4.18.1",
-    "@istanbuljs/load-nyc-config": {
-      "js-yaml": "^3.14.2"
-    },
-    "js-yaml": "^4.1.1",
     "serialize-javascript": "^7.0.5",
     "basic-ftp": "6.2.1"
   },
