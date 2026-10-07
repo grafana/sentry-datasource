@@ -11,13 +11,14 @@ permissions: {}
 jobs:
   ci:
     name: CI
-    uses: grafana/plugin-ci-workflows/.github/workflows/ci.yml@ci-cd-workflows/v10.1.0
+    uses: grafana/plugin-ci-workflows/.github/workflows/ci.yml@ci-cd-workflows/v11.3.0
     permissions:
       contents: read
       id-token: write
     with:
       plugin-version-suffix: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || '' }}
       golangci-lint-version: '2.14.0'
+      trufflehog-exclude-detectors: SentryToken
   publish-and-deploy:
     if: github.ref == 'refs/heads/main'
     uses: grafana/data-sources-ci-workflows/.github/workflows/cd-dev.yml@main

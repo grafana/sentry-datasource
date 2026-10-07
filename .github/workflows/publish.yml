@@ -25,7 +25,7 @@ permissions: {}
 jobs:
   cd:
     name: CD
-    uses: grafana/plugin-ci-workflows/.github/workflows/cd.yml@ci-cd-workflows/v10.1.0
+    uses: grafana/plugin-ci-workflows/.github/workflows/cd.yml@ci-cd-workflows/v11.3.0
     permissions:
       contents: write
       id-token: write
@@ -36,6 +36,7 @@ jobs:
       environment: 'prod'
       docs-only: ${{ fromJSON(github.event.inputs.docs-only) }}
       scopes: ${{ github.event.inputs.environment == 'cloud (recommended)' && 'grafana_cloud' || github.event.inputs.environment == 'on-prem (for emergencies fix to On Prem customers)' && 'universal' }}
+      golangci-lint-version: '2.14.0'
       run-playwright: false
       github-draft-release: false
       trufflehog-exclude-detectors: SentryToken
