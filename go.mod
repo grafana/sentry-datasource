@@ -1,6 +1,6 @@
 module github.com/grafana/sentry-datasource
 
-go 1.27.0
+go 1.27.3
 
 require (
 	github.com/gorilla/mux v1.8.1
