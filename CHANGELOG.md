@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.10
+
+- Dependency updates
+
 ## 2.2.9
 
 - Update Go to 1.27.3
