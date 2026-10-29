@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.11
+
+- Dependency updates
+- Fix security vulnerabilities (CVE-2026-78669, CVE-2026-78660, CVE-2026-78659, CVE-2026-93749, CVE-2023-54404, GHSA-cg2g-xh64-v4q7, GHSA-mrv2-3pqr-j5jr)
+
 ## 2.2.10
 
 - Dependency updates
