@@ -1,7 +1,7 @@
 ---
 aliases:
   - /docs/plugins/grafana-sentry-datasource/query-editor/
-description: Use the Sentry query editor to query issues, events, spans, release health sessions, and organization statistics.
+description: Use the Sentry query editor to query issues, events, spans, uptime checks, release health sessions, releases, deploys, and organization statistics.
 keywords:
   - grafana
   - sentry
@@ -11,6 +11,9 @@ keywords:
   - spans
   - events stats
   - metrics
+  - uptime
+  - releases
+  - deploys
   - organization stats
 labels:
   products:
@@ -38,14 +41,14 @@ Every query type includes the following shared fields.
 
 | Field            | Description                                                                                                                                                |
 | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Query Type**   | The type of Sentry data to query. Select one of: Issues, Events, Spans, Events Stats, Spans Stats, Release Health (Sessions), or Stats. |
+| **Query Type**   | The type of Sentry data to query. Select one of: Issues, Events, Spans, Uptime, Events Stats, Spans Stats, Release Health (Sessions), Releases, Deploys, or Stats. |
 | **Projects**     | (Optional) Filter results by one or more Sentry projects.                                                                                                  |
 | **Environments** | (Optional) Filter results by one or more Sentry environments. Not available for Stats queries.                                                             |
 | **Interval**     | (Optional) Format: `[number][unit]` where unit is `m` (minutes), `h` (hours), `d` (days), or `w` (weeks). Example: `1h`.                                   |
 
 ## Query types
 
-The query editor supports seven query types, each returning a different kind of Sentry data.
+The query editor supports ten query types, each returning a different kind of Sentry data.
 
 ### Issues
 
@@ -116,6 +119,25 @@ Use the Spans query type to retrieve span data from Sentry. This query type uses
 
 - `span.op:db` -- Show database spans.
 - `span.op:http.client span.description:*api*` -- Show HTTP client spans with "api" in the description.
+
+### Uptime
+
+Use the Uptime query type to retrieve the results of [Sentry Uptime Monitoring](https://docs.sentry.io/product/uptime-monitoring/) checks. This query type uses the same editor as Events but queries the `uptime_results` dataset. Results are filtered based on the dashboard time range.
+
+| Field              | Description                                                                                                                                                        |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Query**          | (Optional) A Sentry search query to filter results, such as `check_status:failure`. Run with Shift+Enter.                                                          |
+| **Fields**         | The uptime result fields to fetch. Default fields: `uptime_rule`, `check_status`, `http_status_code`, `duration_ms`, `region`, `timestamp`.                        |
+| **Sort By**        | (Optional) The result field to sort by, such as `timestamp` or `duration_ms`.                                                                                       |
+| **Sort Direction** | (Optional) Ascending or Descending. Appears when a sort field is selected.                                                                                          |
+| **Limit**          | (Optional) The maximum number of results to return. Maximum: `100`.                                                                                                 |
+
+The Sentry API does not yet support aggregate functions, such as `count()`, or time-series queries for uptime results, so uptime data is available as a table of individual check results only.
+
+#### Uptime query examples
+
+- `check_status:failure` -- Show failed uptime checks.
+- `check_status:failure_incident http_status_code:>499` -- Show failed checks with server error status codes.
 
 ### Events Stats
 
@@ -192,6 +214,42 @@ Queries saved with plugin versions before 3.0.0 used the Metrics query type name
 - **Crash-free rate monitoring:** Set **Field** to `crash_free_rate(session)` and **Group By** to `release` to compare stability across releases.
 - **Session health by status:** Set **Field** to `sum(session)` and **Group By** to `session.status` to compare healthy, errored, abnormal, and crashed session counts.
 - **ANR rate tracking:** Set **Field** to `anr_rate()` to monitor Application Not Responding rates on mobile apps.
+
+### Releases
+
+Use the Releases query type to retrieve a list of releases for the selected projects and environments. Results are not filtered by the dashboard time range. Sentry returns the most recently created releases first.
+
+| Field     | Description                                                                       |
+| --------- | --------------------------------------------------------------------------------- |
+| **Query** | (Optional) Filter releases to those whose version contains this text.             |
+| **Limit** | (Optional) The maximum number of releases to return, up to `100`. Default: `100`. |
+
+Each result row contains the `Version`, `ShortVersion`, `DateCreated`, `DateReleased`, `FirstEvent`, `LastEvent`, `CommitCount`, `DeployCount`, `NewGroups`, `Projects`, and `URL` fields.
+
+#### Releases use cases
+
+- **Release overview:** Leave **Query** empty to list the latest releases for the selected projects in a table panel.
+- **Track a release line:** Set **Query** to `2.1` to list only releases whose version contains `2.1`.
+- **Release markers on graphs:** Use a Releases annotation query with `DateCreated` (the default) or `DateReleased` as the time field. Refer to [Sentry annotations](https://grafana.com/docs/plugins/grafana-sentry-datasource/latest/annotations/).
+
+For more information about Sentry releases, refer to the [Sentry Releases documentation](https://docs.sentry.io/product/releases/).
+
+### Deploys
+
+Use the Deploys query type to retrieve the deploys of a single Sentry release.
+
+| Field               | Description                                                                                                                                                                                    |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Release version** | (Required) The version of the release to list deploys for. Template variables are supported, so the field pairs well with a dashboard variable that uses the **Releases** variable query type. |
+| **Limit**           | (Optional) The maximum number of deploys to return, up to `100`. Default: `100`.                                                                                                               |
+
+The **Projects** and **Environments** filters are not available for this query type. The release version alone determines which deploys are returned. Each result row contains the deploy's `ID`, `Name`, `Environment`, `DateFinished`, `DateStarted`, and `URL` fields.
+
+#### Deploys use cases
+
+- **Deploy history:** Enter a release version to list every deploy of that release, with its environment and timings, in a table panel.
+- **Variable-driven deploys:** Create a `release` dashboard variable with the **Releases** variable query type and enter `$release` in **Release version** to switch between releases. Refer to [Sentry template variables](https://grafana.com/docs/plugins/grafana-sentry-datasource/latest/template-variables/).
+- **Deploy markers on graphs:** Use a Deploys annotation query with `DateFinished` as the time field. Refer to [Sentry annotations](https://grafana.com/docs/plugins/grafana-sentry-datasource/latest/annotations/).
 
 ### Stats
 

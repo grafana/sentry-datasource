@@ -1,7 +1,17 @@
 import { ScopedVars } from '@grafana/data';
 import * as runtime from '@grafana/runtime';
-import { SentryIssuesQuery, SentryEventsQuery, SentrySpansQuery, SentrySpansStatsQuery, SentryStatsV2Query } from 'types';
-import { applyTemplateVariables, replaceProjectIDs } from './replace';
+import {
+  SentryDeploysQuery,
+  SentryEventsQuery,
+  SentryIssuesQuery,
+  SentryReleasesQuery,
+  SentrySpansQuery,
+  SentrySpansStatsQuery,
+  SentryStatsV2Query,
+  SentryUptimeQuery,
+  SentryVariableQuery,
+} from 'types';
+import { applyTemplateVariables, applyTemplateVariablesToVariableQuery, replaceProjectIDs } from './replace';
 
 describe('replace', () => {
   afterEach(jest.clearAllMocks);
@@ -121,6 +131,21 @@ describe('replace', () => {
       expect(output.eventsStatsQuery).toStrictEqual('hello bar');
     });
 
+    it('should interpolate template variables for uptime', () => {
+      const query: SentryUptimeQuery = {
+        refId: '',
+        queryType: 'uptime',
+        projectIds: ['${foo}', 'baz'],
+        environments: ['${foo}', 'baz'],
+        eventsQuery: 'check_status:${foo}',
+      };
+
+      const output = applyTemplateVariables(query, { foo: { value: 'failure', text: 'failure' } }) as SentryUptimeQuery;
+      expect(output.projectIds).toStrictEqual(['failure', 'baz']);
+      expect(output.environments).toStrictEqual(['failure', 'baz']);
+      expect(output.eventsQuery).toStrictEqual('check_status:failure');
+    });
+
     it('should interpolate template variables for statsV2', () => {
       const query: SentryStatsV2Query = {
         refId: '',
@@ -153,6 +178,68 @@ describe('replace', () => {
 
       const output = applyTemplateVariables(query, { __interval: { value: '30s', text: '30s' } }) as SentryStatsV2Query;
       expect(output.statsInterval).toStrictEqual('30s');
+    });
+
+    it('should interpolate template variables for releases', () => {
+      const query: SentryReleasesQuery = {
+        refId: '',
+        queryType: 'releases',
+        projectIds: ['${foo}', 'baz'],
+        environments: ['${foo}', 'baz'],
+        releasesQuery: 'hello ${foo}',
+      };
+
+      const output = applyTemplateVariables(query, { foo: { value: 'bar', text: 'bar' } }) as SentryReleasesQuery;
+      expect(output.projectIds).toStrictEqual(['bar', 'baz']);
+      expect(output.environments).toStrictEqual(['bar', 'baz']);
+      expect(output.releasesQuery).toStrictEqual('hello bar');
+    });
+
+    it('should interpolate template variables for deploys', () => {
+      const query: SentryDeploysQuery = {
+        refId: '',
+        queryType: 'deploys',
+        projectIds: ['${foo}', 'baz'],
+        environments: [],
+        deploysReleaseVersion: '${foo}',
+      };
+
+      const output = applyTemplateVariables(query, { foo: { value: 'bar', text: 'bar' } }) as SentryDeploysQuery;
+      expect(output.projectIds).toStrictEqual(['bar', 'baz']);
+      expect(output.deploysReleaseVersion).toStrictEqual('bar');
+    });
+  });
+
+  describe('applyTemplateVariablesToVariableQuery', () => {
+    beforeEach(() => {
+      jest.spyOn(runtime, 'getTemplateSrv').mockImplementation(() => ({
+        containsTemplate: jest.fn(),
+        updateTimeRange: jest.fn(),
+        getVariables: jest.fn(),
+        replace: (s: string) => {
+          return s === '${project}' ? '42' : s;
+        },
+      }));
+    });
+
+    it('should interpolate project ids for the releases variable query', () => {
+      const query: SentryVariableQuery = { type: 'releases', projectIds: ['${project}', '7'] };
+      const output = applyTemplateVariablesToVariableQuery(query);
+      expect(output).toStrictEqual({ type: 'releases', projectIds: ['42', '7'] });
+    });
+
+    it('should expand multi-value project variables for the releases variable query', () => {
+      jest.spyOn(runtime, 'getTemplateSrv').mockImplementation(() => ({
+        containsTemplate: jest.fn(),
+        updateTimeRange: jest.fn(),
+        getVariables: jest.fn(),
+        replace: (s: string) => {
+          return s === '${project}' ? '42,43' : s;
+        },
+      }));
+      const query: SentryVariableQuery = { type: 'releases', projectIds: ['${project}', '7'] };
+      const output = applyTemplateVariablesToVariableQuery(query);
+      expect(output).toStrictEqual({ type: 'releases', projectIds: ['42', '43', '7'] });
     });
   });
 });

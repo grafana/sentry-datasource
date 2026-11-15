@@ -2,6 +2,7 @@ import { expect, test } from '@grafana/plugin-e2e';
 import {
   exploreUrl,
   PLUGIN_ID,
+  PROVISIONED_UID,
   queryEditorRow,
   sentryCredentialsConfigured,
   waitForQueryDataResponseWithBody,
@@ -15,7 +16,10 @@ const QUERY_TYPE_OPTIONS = [
   'Stats',
   'Spans',
   'Spans Stats',
+  'Uptime',
   'Release Health (Sessions)',
+  'Releases',
+  'Deploys',
 ];
 
 // One entry per query type: the query model encoded in the Explore panes URL, and the field
@@ -65,6 +69,23 @@ const MODES = [
     name: 'Release Health (Sessions)',
     query: { queryType: 'metrics', metricsField: 'sum(session)', metricsQuery: '' },
     visible: ['Field', 'Query', 'Group By'],
+  },
+  {
+    name: 'Uptime',
+    query: { queryType: 'uptime', eventsQuery: '' },
+    visible: ['Fields', 'Query', 'Sort By', 'Limit'],
+    hidden: ['Dataset'],
+  },
+  {
+    name: 'Releases',
+    query: { queryType: 'releases' },
+    visible: ['Filter', 'Limit'],
+  },
+  {
+    name: 'Deploys',
+    query: { queryType: 'deploys', deploysReleaseVersion: '' },
+    visible: ['Release Version', 'Limit'],
+    hidden: [Components.QueryEditor.Scope.ProjectIDs.label, Components.QueryEditor.Scope.Environments.label],
   },
 ];
 
@@ -275,6 +296,57 @@ test.describe('Query editor with live Sentry data', () => {
     await page.goto(exploreUrl({ queryType: 'spans', eventsQuery: '' }));
     await responsePromise;
 
+    expect(getBody()?.results?.A?.status).toBe(200);
+    expect(getBody()?.results?.A?.frames?.length ?? 0).toBeGreaterThan(0);
+  });
+
+  test('Uptime: query succeeds', async ({ page, explorePage }) => {
+    const { responsePromise, getBody } = waitForQueryDataResponseWithBody(explorePage);
+    await page.goto(exploreUrl({ queryType: 'uptime', eventsQuery: '' }));
+    await responsePromise;
+
+    // The live org has no uptime monitors, so only assert the query round-trips successfully
+    // through the uptime_results dataset.
+    expect(getBody()?.results?.A?.status).toBe(200);
+    const frames = getBody()?.results?.A?.frames ?? [];
+    expect(frames.length).toBeGreaterThan(0);
+    expect(frames[0].schema?.meta?.executedQueryString).toContain('dataset=uptime_results');
+  });
+
+  test('Releases: returns a table of releases', async ({ page, explorePage }) => {
+    const { responsePromise, getBody } = waitForQueryDataResponseWithBody(explorePage);
+    await page.goto(exploreUrl({ queryType: 'releases' }));
+    await responsePromise;
+
+    expect(getBody()?.results?.A?.status).toBe(200);
+    const frames = getBody()?.results?.A?.frames ?? [];
+    expect(frames.length).toBeGreaterThan(0);
+    const fieldNames = frames[0].schema?.fields?.map((field) => field.name) ?? [];
+    expect(fieldNames).toEqual(expect.arrayContaining(['Version', 'DateCreated']));
+    expect(frames[0].data?.values?.[0]?.length ?? 0).toBeGreaterThan(0);
+  });
+
+  test('Deploys: query succeeds for an existing release', async ({ page, explorePage, request }) => {
+    // Discover a release version from the live org rather than hardcoding one, so the test
+    // skips with a clear message rather than timing out if the org's releases change.
+    const settingsResponse = await request.get(`/api/datasources/uid/${PROVISIONED_UID}`);
+    test.skip(!settingsResponse.ok(), 'Could not read the provisioned datasource settings');
+    const settings = (await settingsResponse.json()) as { jsonData?: { orgSlug?: string } };
+    const orgSlug = settings.jsonData?.orgSlug;
+    test.skip(!orgSlug, 'The provisioned datasource has no organization slug');
+    const releasesResponse = await request.get(
+      `/api/datasources/uid/${PROVISIONED_UID}/resources/api/0/organizations/${orgSlug}/releases`
+    );
+    test.skip(!releasesResponse.ok(), 'Could not list releases from the live org');
+    const releases = (await releasesResponse.json()) as Array<{ version?: string }>;
+    const version = releases[0]?.version;
+    test.skip(!version, 'The live org has no releases to query deploys for');
+
+    const { responsePromise, getBody } = waitForQueryDataResponseWithBody(explorePage);
+    await page.goto(exploreUrl({ queryType: 'deploys', deploysReleaseVersion: version }));
+    await responsePromise;
+
+    // The live org's release has no deploys, so only assert the query round-trips successfully.
     expect(getBody()?.results?.A?.status).toBe(200);
     expect(getBody()?.results?.A?.frames?.length ?? 0).toBeGreaterThan(0);
   });

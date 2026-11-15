@@ -632,6 +632,67 @@ func TestSentryDatasource_Spans(t *testing.T) {
 
 }
 
+func TestSentryDatasource_Uptime(t *testing.T) {
+	t.Run("valid uptime query should produce correct result", func(t *testing.T) {
+		sc := util.NewFakeClient(util.FakeDoer{Body: `{
+			"data": [
+				{
+					"uptime_rule": "rule_1",
+					"check_status": "success",
+					"http_status_code": 200,
+					"duration_ms": 123,
+					"region": "eu-west",
+					"timestamp": "2026-07-17T00:00:00Z"
+				},
+				{
+					"uptime_rule": "rule_1",
+					"check_status": "failure",
+					"http_status_code": 503,
+					"duration_ms": 4567,
+					"region": "eu-west",
+					"timestamp": "2026-07-17T01:00:00Z"
+				}
+			],
+			"meta": {
+				"fields": {
+					"uptime_rule": "string",
+					"check_status": "string",
+					"http_status_code": "integer",
+					"duration_ms": "integer",
+					"region": "string",
+					"timestamp": "date"
+				}
+			}
+		  }`})
+
+		query := `{
+			"queryType" : "uptime",
+			"projectIds" : ["project_id"],
+			"environments" : ["dev"],
+			"eventsQuery" : "check_status:failure",
+			"eventsFields" : ["uptime_rule","check_status","http_status_code","duration_ms","region","timestamp"],
+			"eventsSort" : "timestamp",
+			"eventsSortDirection" : "desc",
+			"eventsLimit" : 10
+		}`
+
+		ds := plugin.NewDatasourceInstance(sc)
+		ctx := context.TODO()
+
+		res, _ := ds.QueryData(ctx, &backend.QueryDataRequest{Queries: []backend.DataQuery{{RefID: "A", JSON: []byte(query)}}})
+
+		assert.Nil(t, res.Responses["A"].Error)
+		require.Equal(t, 1, len(res.Responses["A"].Frames))
+		assert.Equal(t, "Uptime (A)", res.Responses["A"].Frames[0].Name)
+
+		frame := res.Responses["A"].Frames[0]
+		require.NotNil(t, frame.Fields)
+		assert.Equal(t, 2, frame.Fields[0].Len())
+		require.Contains(t, frame.Meta.ExecutedQueryString, "dataset=uptime_results")
+		require.Contains(t, frame.Meta.ExecutedQueryString, "sort=-timestamp")
+	})
+}
+
 func TestSentryDatasource_SpansStats(t *testing.T) {
 	t.Run("valid grouped spans stats query should produce correct result", func(t *testing.T) {
 		sc := util.NewFakeClient(util.FakeDoer{Body: `{
@@ -967,5 +1028,148 @@ func TestSentryDatasource_Metrics(t *testing.T) {
 		assert.Contains(t, labels, "version-1.0")
 		assert.Contains(t, labels, "version-1.1")
 		require.Contains(t, frame.Meta.ExecutedQueryString, "/sessions/")
+	})
+}
+
+func TestSentryDatasource_Releases(t *testing.T) {
+	t.Run("valid releases query should produce correct result", func(t *testing.T) {
+		sc := util.NewFakeClient(util.FakeDoer{Body: `[
+			{
+				"version": "1.0.0",
+				"shortVersion": "1.0.0",
+				"dateCreated": "2025-12-30T13:46:46.300599Z",
+				"dateReleased": null,
+				"firstEvent": null,
+				"lastEvent": null,
+				"commitCount": 0,
+				"deployCount": 0,
+				"newGroups": 10983,
+				"url": null,
+				"projects": [{ "slug": "project-a" }]
+			},
+			{
+				"version": "2.0.0",
+				"shortVersion": "2.0.0",
+				"dateCreated": "2026-01-30T13:46:46Z",
+				"dateReleased": "2026-01-31T09:00:00Z",
+				"firstEvent": "2026-02-01T00:16:03Z",
+				"lastEvent": "2026-02-02T03:27:23Z",
+				"commitCount": 3,
+				"deployCount": 2,
+				"newGroups": 5,
+				"url": "https://example.com/releases/2.0.0",
+				"projects": [{ "slug": "project-a" }, { "slug": "project-b" }]
+			}
+		]`})
+
+		query := `{
+			"queryType" : "releases",
+			"projectIds" : ["project_id"],
+			"environments" : ["dev"],
+			"releasesQuery" : "webapp",
+			"releasesLimit" : 10
+		}`
+
+		ds := plugin.NewDatasourceInstance(sc)
+		ctx := context.TODO()
+
+		res, _ := ds.QueryData(ctx, &backend.QueryDataRequest{Queries: []backend.DataQuery{{RefID: "A", JSON: []byte(query)}}})
+
+		// Assert that there are no errors and the data frame is correctly formed
+		assert.Nil(t, res.Responses["A"].Error)
+		require.Equal(t, 1, len(res.Responses["A"].Frames))
+		assert.Equal(t, "Releases (A)", res.Responses["A"].Frames[0].Name)
+
+		// Assert the content of the data frame
+		frame := res.Responses["A"].Frames[0]
+		require.NotNil(t, frame.Fields)
+		require.Equal(t, 11, len(frame.Fields))
+		assert.Equal(t, 2, frame.Fields[0].Len())
+		labels := framer.GetFrameLabels(frame)
+		assert.Equal(t, []string{"Version", "ShortVersion", "DateCreated", "DateReleased", "FirstEvent", "LastEvent", "CommitCount", "DeployCount", "NewGroups", "Projects", "URL"}, labels)
+		assert.Equal(t, "1.0.0", frame.Fields[0].At(0))
+		assert.Nil(t, frame.Fields[3].At(0))
+		assert.Nil(t, frame.Fields[4].At(0))
+		assert.Nil(t, frame.Fields[10].At(0))
+		assert.NotNil(t, frame.Fields[3].At(1))
+		assert.NotNil(t, frame.Fields[10].At(1))
+		assert.Equal(t, int64(10983), frame.Fields[8].At(0))
+		assert.Equal(t, "project-a", frame.Fields[9].At(0))
+		assert.Equal(t, "project-a,project-b", frame.Fields[9].At(1))
+		require.Contains(t, frame.Meta.ExecutedQueryString, "/releases/")
+		require.Contains(t, frame.Meta.ExecutedQueryString, "per_page=10")
+		require.Contains(t, frame.Meta.ExecutedQueryString, "query=webapp")
+		require.Contains(t, frame.Meta.ExecutedQueryString, "project=project_id")
+		require.Contains(t, frame.Meta.ExecutedQueryString, "environment=dev")
+	})
+}
+
+func TestSentryDatasource_Deploys(t *testing.T) {
+	t.Run("deploys query without a release version should throw error", func(t *testing.T) {
+		sc := util.NewFakeClient(util.FakeDoer{Body: "[]"})
+		ds := plugin.NewDatasourceInstance(sc)
+		ctx := context.TODO()
+
+		res, _ := ds.QueryData(ctx, &backend.QueryDataRequest{Queries: []backend.DataQuery{{RefID: "A", JSON: []byte(`{
+			"queryType" : "deploys"
+		}`)}}})
+
+		assert.NotNil(t, res.Responses["A"].Error)
+		assert.Equal(t, "release version is required", res.Responses["A"].Error.Error())
+	})
+
+	t.Run("valid deploys query should produce correct result", func(t *testing.T) {
+		sc := util.NewFakeClient(util.FakeDoer{Body: `[
+			{
+				"id": "1",
+				"environment": "prod",
+				"dateStarted": null,
+				"dateFinished": "2026-02-01T10:00:00Z",
+				"name": null,
+				"url": null
+			},
+			{
+				"id": "2",
+				"environment": "staging",
+				"dateStarted": "2026-02-02T09:00:00Z",
+				"dateFinished": "2026-02-02T10:00:00Z",
+				"name": "deploy-2",
+				"url": "https://example.com/deploys/2"
+			}
+		]`})
+
+		query := `{
+			"queryType" : "deploys",
+			"deploysReleaseVersion" : "1.0.0",
+			"deploysLimit" : 10
+		}`
+
+		ds := plugin.NewDatasourceInstance(sc)
+		ctx := context.TODO()
+
+		res, _ := ds.QueryData(ctx, &backend.QueryDataRequest{Queries: []backend.DataQuery{{RefID: "A", JSON: []byte(query)}}})
+
+		// Assert that there are no errors and the data frame is correctly formed
+		assert.Nil(t, res.Responses["A"].Error)
+		require.Equal(t, 1, len(res.Responses["A"].Frames))
+		assert.Equal(t, "Deploys (A)", res.Responses["A"].Frames[0].Name)
+
+		// Assert the content of the data frame
+		frame := res.Responses["A"].Frames[0]
+		require.NotNil(t, frame.Fields)
+		require.Equal(t, 6, len(frame.Fields))
+		assert.Equal(t, 2, frame.Fields[0].Len())
+		labels := framer.GetFrameLabels(frame)
+		// DateFinished must come before DateStarted so annotations default to it as the time field
+		assert.Equal(t, []string{"ID", "Name", "Environment", "DateFinished", "DateStarted", "URL"}, labels)
+		assert.Equal(t, "1", frame.Fields[0].At(0))
+		assert.Nil(t, frame.Fields[1].At(0))
+		assert.Nil(t, frame.Fields[4].At(0))
+		assert.Nil(t, frame.Fields[5].At(0))
+		assert.NotNil(t, frame.Fields[1].At(1))
+		assert.NotNil(t, frame.Fields[4].At(1))
+		assert.Equal(t, "prod", frame.Fields[2].At(0))
+		require.Contains(t, frame.Meta.ExecutedQueryString, "/releases/1.0.0/deploys/")
+		require.Contains(t, frame.Meta.ExecutedQueryString, "per_page=10")
 	})
 }

@@ -24,4 +24,31 @@ test.describe('Sentry variables', () => {
       formatExpectError('Expected variable edit page to display certain label names after query execution')
     ).toDisplayPreviews([]);
   });
+
+  test('releases variable returns release versions', async ({
+    variableEditPage,
+    page,
+    readProvisionedDataSource,
+    request,
+  }) => {
+    // The Releases variable query hits the live Sentry API, so it needs working credentials.
+    test.skip(
+      !(await sentryCredentialsConfigured(request)),
+      'Sentry credentials are not configured for the provisioned datasource'
+    );
+    const datasource = await readProvisionedDataSource<SentryConfig, SentrySecureConfig>({
+      fileName: 'sentry.yaml',
+    });
+    await variableEditPage.datasource.set(datasource.name);
+    await page.keyboard.press('Enter');
+    await page.getByTestId(Components.VariablesEditor.QueryType.selectorTestId).getByRole('combobox').fill(`Releases`);
+    await page.keyboard.press('Enter');
+    await variableEditPage.runQuery();
+    // Release versions are semver-shaped in the live org; a version-shaped assertion catches
+    // the variable type accidentally routing to another list, such as project names.
+    await expect(
+      variableEditPage,
+      formatExpectError('Expected the releases variable preview to list the release versions of the live org')
+    ).toDisplayPreviews([/^\d+\.\d+/]);
+  });
 });

@@ -34,6 +34,7 @@ export const applyTemplateVariables = (query: SentryQuery, scopedVars: ScopedVar
         environments: interpolateVariableArray(query.environments, scopedVars),
       };
     case 'spans':
+    case 'uptime':
       return {
         ...query,
         eventsQuery: interpolateVariable(query.eventsQuery || '', scopedVars),
@@ -67,6 +68,20 @@ export const applyTemplateVariables = (query: SentryQuery, scopedVars: ScopedVar
         statsInterval: interpolateVariable(query.statsInterval || '', scopedVars),
         projectIds: interpolateVariableArray(query.projectIds, scopedVars),
       };
+    case 'releases':
+      return {
+        ...query,
+        releasesQuery: interpolateVariable(query.releasesQuery || '', scopedVars),
+        projectIds: interpolateVariableArray(query.projectIds, scopedVars),
+        environments: interpolateVariableArray(query.environments, scopedVars),
+      };
+    case 'deploys':
+      return {
+        ...query,
+        deploysReleaseVersion: interpolateVariable(query.deploysReleaseVersion || '', scopedVars),
+        projectIds: interpolateVariableArray(query.projectIds, scopedVars),
+        environments: interpolateVariableArray(query.environments, scopedVars),
+      };
     default:
       return query;
   }
@@ -82,6 +97,11 @@ export const applyTemplateVariablesToVariableQuery = (query: SentryVariableQuery
       return {
         ...query,
         projectIds: (query.projectIds || []).map((projectId) => getTemplateSrv().replace(projectId)),
+      };
+    case 'releases':
+      return {
+        ...query,
+        projectIds: interpolateVariableArray(query.projectIds || []),
       };
     default:
       return query;

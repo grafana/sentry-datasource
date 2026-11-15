@@ -1,6 +1,7 @@
 package sentry
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -51,11 +52,15 @@ func closeHttpResponseBody(res *http.Response) {
 }
 
 func (sc *SentryClient) FetchWithPagination(path string, out interface{}) (string, error) {
+	return sc.FetchWithPaginationContext(context.Background(), path, out)
+}
+
+func (sc *SentryClient) FetchWithPaginationContext(ctx context.Context, path string, out interface{}) (string, error) {
 	fullURL := path
 	if !strings.HasPrefix(path, sc.BaseURL) {
 		fullURL = sc.BaseURL + path
 	}
-	req, err := http.NewRequest(http.MethodGet, fullURL, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fullURL, nil)
 	if err != nil {
 		return "", err
 	}

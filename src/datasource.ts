@@ -13,11 +13,13 @@ import type {
   GetResourceCallGetTeamsProjectsPath,
   GetResourceCallListOrgTeamsPath,
   GetResourceCallProjectsPath,
+  GetResourceCallReleasesPath,
   SentryAttribute,
   SentryConfig,
   SentryOrganization,
   SentryProject,
   SentryQuery,
+  SentryRelease,
   SentryTag,
   SentryTeam,
   SentryVariableQuery,
@@ -78,6 +80,16 @@ export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryC
             .then((projects) => resolve(this.getProjectsAsMetricFindValue(projects)))
             .catch(reject);
         }
+      } else if (query && query.type === 'releases') {
+        this.getReleases(this.getOrgSlug(), query.projectIds)
+          .then((releases) => {
+            resolve(
+              releases.map((release) => {
+                return { value: release.version, text: release.version };
+              })
+            );
+          })
+          .catch(reject);
       } else if (query && query.type === 'environments') {
         this.getProjects(this.getOrgSlug())
           .then((projects) => {
@@ -107,6 +119,15 @@ export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryC
   getAttributes(orgSlug: string = this.getOrgSlug()): Promise<SentryAttribute[]> {
     const replacedOrgSlug: string = getTemplateSrv().replace(orgSlug);
     return this.getResource<SentryAttribute[]>(`api/0/organizations/${replacedOrgSlug}/trace-items/attributes`);
+  }
+
+  getReleases(orgSlug: string = this.getOrgSlug(), projectIds?: string[]): Promise<SentryRelease[]> {
+    const replacedOrgSlug: string = getTemplateSrv().replace(orgSlug);
+    const query = projectIds && projectIds.length > 0 ? { project: projectIds } : {};
+    return this.getResource<SentryRelease[]>(
+      `api/0/organizations/${replacedOrgSlug}/releases` as GetResourceCallReleasesPath,
+      query
+    );
   }
 
   getOrganizations(): Promise<SentryOrganization[]> {

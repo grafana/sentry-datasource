@@ -119,12 +119,18 @@ func createResponse(backendQuery backend.DataQuery, client sentry.SentryClient) 
 		return handlers.HandleEvents(client, query, backendQuery, response)
 	case "spans":
 		return handlers.HandleSpans(client, query, backendQuery, response)
+	case "uptime":
+		return handlers.HandleUptime(client, query, backendQuery, response)
 	case "eventsStats":
 		return handlers.HandleEventsStats(client, query, backendQuery, response)
 	case "spansStats":
 		return handlers.HandleSpansStats(client, query, backendQuery, response)
 	case "metrics":
 		return handlers.HandleSessions(client, query, backendQuery, response)
+	case "releases":
+		return handlers.HandleReleases(client, query, backendQuery, response)
+	case "deploys":
+		return handlers.HandleDeploys(client, query, backendQuery, response)
 	case "statsV2":
 		return handlers.HandleStatsV2(client, query, backendQuery, response)
 	default:

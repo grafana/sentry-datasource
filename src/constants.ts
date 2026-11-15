@@ -22,7 +22,10 @@ export const QueryTypeOptions: Array<SelectableValue<QueryType>> = [
   { value: 'statsV2', label: 'Stats' },
   { value: 'spans', label: 'Spans' },
   { value: 'spansStats', label: 'Spans Stats' },
+  { value: 'uptime', label: 'Uptime' },
   { value: 'metrics', label: 'Release Health (Sessions)' },
+  { value: 'releases', label: 'Releases' },
+  { value: 'deploys', label: 'Deploys' },
 ];
 export const SentryIssueSortOptions: Array<SelectableValue<SentryIssueSort>> = [
   // { value: 'inbox', label: 'Date Added' },
@@ -38,6 +41,13 @@ export const SentryEventSortOptions: Array<SelectableValue<SentryEventSort>> = [
   { value: 'epm()', label: 'Events per minute' },
   { value: 'failure_rate()', label: 'Failure rate' },
   { value: 'level', label: 'Level' },
+];
+// The uptime_results dataset does not support aggregate sorts such as count(),
+// so uptime queries sort by plain result fields only.
+export const SentryUptimeSortOptions: Array<SelectableValue<SentryEventSort>> = [
+  { value: 'timestamp', label: 'Timestamp' },
+  { value: 'duration_ms', label: 'Duration' },
+  { value: 'scheduled_check_time', label: 'Scheduled check time' },
 ];
 export const SentryEventSortDirectionOptions: Array<SelectableValue<SentrySortDirection>> = [
   { value: 'asc', label: 'Ascending' },
