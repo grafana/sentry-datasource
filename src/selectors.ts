@@ -34,7 +34,8 @@ export const Components = {
     },
     TLSSkipVerify: {
       label: 'Skip TLS Verify',
-      tooltip: 'Skip TLS certificate verification. Use this option for self-hosted Sentry instances with self-signed certificates.',
+      tooltip:
+        'Skip TLS certificate verification. Use this option for self-hosted Sentry instances with self-signed certificates.',
     },
   },
   QueryEditor: {
@@ -73,6 +74,12 @@ export const Components = {
       },
     },
     Events: {
+      Dataset: {
+        label: 'Dataset',
+        tooltip:
+          'Sentry dataset to query. Leave this empty to keep the default behavior of querying both errors and transactions',
+        placeholder: 'Optional',
+      },
       Fields: {
         label: 'Fields',
         tooltip: 'Sentry field names to fetch',
@@ -112,19 +119,20 @@ export const Components = {
       },
       Sort: {
         label: 'Sort By',
-        tooltip: 'Sort results',
+        tooltip: 'Sort grouped results, for example by an aggregate such as -count() or by a Group field',
         placeholder: 'Optional',
       },
       Limit: {
         label: 'Limit',
-        tooltip: 'Number of results (10 max)',
+        tooltip: 'Number of result groups (maximum 10, a cap imposed by the Sentry API)',
         placeholder: '10',
       },
     },
     Metrics: {
       Field: {
         label: 'Field',
-        tooltip: 'metrics field',
+        tooltip:
+          'Sessions (release health) field. For per-status session or user counts, use sum(session) or count_unique(user) with Group By session.status, or filter with session.status in the query',
         placeholder: 'Required. Select one or more fields to see the metric',
       },
       Query: {
@@ -149,7 +157,7 @@ export const Components = {
       },
       Limit: {
         label: 'Limit',
-        tooltip: 'Number of results (10 max)',
+        tooltip: 'Number of results (100 max)',
         placeholder: '5',
       },
     },

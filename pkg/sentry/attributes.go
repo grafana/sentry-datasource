@@ -12,26 +12,30 @@ func (sc *SentryClient) GetAttributes(organizationSlug string, withPagination bo
 	if organizationSlug == "" {
 		organizationSlug = sc.OrgSlug
 	}
-	urlPath := "/api/0/organizations/" + organizationSlug + "/trace-items/attributes/?"
-	params := url.Values{}
-	params.Set("attributeType", "number")
-	params.Set("itemType", "spans")
-	urlPath += params.Encode()
+	for _, attributeType := range []string{"string", "number"} {
+		params := url.Values{}
+		params.Set("attributeType", attributeType)
+		params.Set("itemType", "spans")
+		urlPath := "/api/0/organizations/" + organizationSlug + "/trace-items/attributes/?" + params.Encode()
 
-	if withPagination {
-		for urlPath != "" {
+		if withPagination {
+			for urlPath != "" {
+				batch := []SentryAttribute{}
+				nextURL, err := sc.FetchWithPagination(urlPath, &batch)
+				if err != nil {
+					return nil, err
+				}
+
+				attributes = append(attributes, batch...)
+				urlPath = nextURL
+			}
+		} else {
 			batch := []SentryAttribute{}
-			nextURL, err := sc.FetchWithPagination(urlPath, &batch)
-			if err != nil {
+			if err := sc.Fetch(urlPath, &batch); err != nil {
 				return nil, err
 			}
-
 			attributes = append(attributes, batch...)
-			urlPath = nextURL
 		}
-		return attributes, nil
-	} else {
-		err := sc.Fetch(urlPath, &attributes)
-		return attributes, err
 	}
+	return attributes, nil
 }
