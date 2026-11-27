@@ -12,6 +12,7 @@ type GetEventsInput struct {
 	ProjectIds       []string
 	Environments     []string
 	Fields           []string
+	Dataset          string
 	Query            string
 	From             time.Time
 	To               time.Time
@@ -25,6 +26,9 @@ func (gei *GetEventsInput) ToQuery() string {
 		gei.Limit = 100
 	}
 	params := url.Values{}
+	if gei.Dataset != "" {
+		params.Set("dataset", gei.Dataset)
+	}
 	params.Set("query", gei.Query)
 	params.Set("start", gei.From.Format("2006-01-02T15:04:05"))
 	params.Set("end", gei.To.Format("2006-01-02T15:04:05"))

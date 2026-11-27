@@ -12,6 +12,7 @@ type SentryQuery struct {
 	EventsSort          string   `json:"eventsSort,omitempty"`
 	EventsSortDirection string   `json:"eventsSortDirection,omitempty"`
 	EventsLimit         int64    `json:"eventsLimit,omitempty"`
+	EventsDataset       string   `json:"eventsDataset,omitempty"`
 	EventsStatsQuery    string   `json:"eventsStatsQuery,omitempty"`
 	EventsStatsYAxis    []string `json:"eventsStatsYAxis,omitempty"`
 	EventsStatsGroups   []string `json:"eventsStatsGroups,omitempty"`
