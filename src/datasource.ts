@@ -3,6 +3,7 @@ import { DataSourceWithBackend, getTemplateSrv } from '@grafana/runtime';
 import { Observable } from 'rxjs';
 import { applyTemplateVariables, applyTemplateVariablesToVariableQuery } from './app/replace';
 import { getEnvironmentNamesFromProject } from './app/utils';
+import { trackQueryExecuted } from './tracking';
 import type {
   GetResourceCallGetTeamsProjectsPath,
   GetResourceCallListOrgTeamsPath,
@@ -33,6 +34,7 @@ export class SentryDataSource extends DataSourceWithBackend<SentryQuery, SentryC
     return applyTemplateVariables(query, scopedVars);
   }
   query(request: DataQueryRequest<SentryQuery>): Observable<DataQueryResponse> {
+    trackQueryExecuted(request);
     return super.query({ ...request, targets: request.targets });
   }
   getOrgSlug(): string {

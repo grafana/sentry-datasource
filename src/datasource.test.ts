@@ -1,7 +1,12 @@
 import * as runtime from '@grafana/runtime';
+import { DataSourceWithBackend } from '@grafana/runtime';
+import { of } from 'rxjs';
 import { SentryDataSource } from './datasource';
-import type { DataSourceInstanceSettings } from '@grafana/data';
-import type { SentryConfig, SentryProject, SentryTeam, SentryVariableQuery } from './types';
+import { trackQueryExecuted } from './tracking';
+import type { DataQueryRequest, DataSourceInstanceSettings } from '@grafana/data';
+import type { SentryConfig, SentryProject, SentryQuery, SentryTeam, SentryVariableQuery } from './types';
+
+jest.mock('./tracking', () => ({ trackQueryExecuted: jest.fn() }));
 
 describe('SentryDataSource', () => {
   beforeEach(() => {
@@ -98,6 +103,22 @@ describe('SentryDataSource', () => {
         { text: 'pink', value: 'pink' },
         { text: 'purple', value: 'purple' },
       ]);
+    });
+  });
+  describe('query', () => {
+    it('reports the query types being run and still runs the query', async () => {
+      const backendQuery = jest.spyOn(DataSourceWithBackend.prototype, 'query').mockReturnValue(of({ data: [] }));
+      const ds = new SentryDataSource({} as DataSourceInstanceSettings<SentryConfig>);
+      const request = {
+        app: 'dashboard',
+        targets: [{ refId: 'A', queryType: 'issues' }],
+      } as DataQueryRequest<SentryQuery>;
+
+      await new Promise((resolve) => ds.query(request).subscribe({ complete: () => resolve(undefined) }));
+
+      expect(trackQueryExecuted).toHaveBeenCalledWith(request);
+      expect(backendQuery).toHaveBeenCalledTimes(1);
+      backendQuery.mockRestore();
     });
   });
 });
